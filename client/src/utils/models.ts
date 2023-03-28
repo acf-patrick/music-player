@@ -1,9 +1,10 @@
 export interface Audio {
-  name: String,
+  name?: String,
+  track?: Number,
   title?: String,
   album?: String,
   artist?: String,
   cover?: String,
   genre?: String,
-  year?: String,
+  year?: Number,
 }
