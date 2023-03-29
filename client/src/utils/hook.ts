@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { mockSongs } from ".";
+import { useState, useEffect } from "react";
+import mockSongs from "./mockDatas";
 import { Audio } from "./models";
 import jsmediatags from "jsmediatags";
 
@@ -7,8 +7,10 @@ function getAudioLinks() {
   return mockSongs;
 }
 
-function getImage(format: String, data: []) {
-  return "";
+function getImage(format: String, data: number[]) {
+  let str = "";
+  for (let byte of data) str += String.fromCharCode(byte);
+  return `data:${format};base64,${btoa(str)}`;
 }
 
 function getMetadata(blob: Blob, audios: Audio[], setAudios: any) {
@@ -23,7 +25,12 @@ function getMetadata(blob: Blob, audios: Audio[], setAudios: any) {
       audio.title = tags.title;
       audio.track = parseInt(tags.track);
       audio.year = parseInt(tags.year);
-      setAudios([...audios, audio]);
+      if (
+        !audios.find((a) => a.title === audio.title)
+      ) {
+        audios.push(audio);
+        setAudios([...audios]);
+      }
     },
     onError: (error: any) => {
       console.error(error);
@@ -31,20 +38,29 @@ function getMetadata(blob: Blob, audios: Audio[], setAudios: any) {
   });
 }
 
-export default function getAudios() {
+export default function useAudios() {
   const [audios, setAudios] = useState<Audio[]>([]);
+  const [loading, setLoading] = useState(true);
   const links = getAudioLinks();
 
-  for (let link of links) {
-    fetch(`${link}`)
-      .then((res) => res.blob())
-      .then((blob) => {
-        getMetadata(blob, audios, setAudios);
-      })
-      .catch((error) => {
-        console.error(error);
-      });
-  }
+  useEffect(() => {
+    for (let link of links) {
+      fetch(`${link}`)
+        .then((res) => res.blob())
+        .then((blob) => {
+          getMetadata(blob, audios, setAudios);
+        })
+        .catch((error) => {
+          console.error(error);
+        });
+    }
+  }, []);
 
-  return audios;
+  useEffect(() => {
+    if (links.length === audios.length) {
+      setLoading(false);
+    }
+  }, [audios]);
+
+  return { loading, audios };
 }
