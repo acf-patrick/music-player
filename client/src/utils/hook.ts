@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import mockSongs from "./mockDatas";
-import { Audio } from "./models";
+import { Audio as Song } from "./models";
 import jsmediatags from "jsmediatags";
 
 function getAudioLinks() {
@@ -13,23 +13,52 @@ function getImage(format: String, data: number[]) {
   return `data:${format};base64,${btoa(str)}`;
 }
 
-function getMetadata(blob: Blob, audios: Audio[], setAudios: any) {
+function getDuration(source: String, callback: (duration: String) => any) {
+  const audio = new Audio();
+  audio.onloadedmetadata = () => {
+    if (isNaN(audio.duration)) callback("");
+    else {
+      let seconds = Math.ceil(audio.duration);
+      let minutes = Math.floor(seconds / 60);
+      seconds %= 60;
+      let hours = Math.floor(minutes / 60);
+      minutes %= 60;
+
+      const toStr = (n: number) => `${n < 10 ? "0" : ""}${n}`;
+      callback(
+        `${hours ? toStr(hours) + ":" : ""}${toStr(minutes) + ":"}${toStr(
+          seconds
+        )}`
+      );
+    }
+  };
+  audio.src = source.toString();
+}
+
+function getMetadata(
+  blob: Blob,
+  source: String,
+  audios: Song[],
+  setAudios: any
+) {
   jsmediatags.read(blob, {
     onSuccess: (datas: any) => {
       const tags = datas.tags;
-      const audio: Audio = {};
+      const audio: Song = { source: source };
       audio.album = tags.album;
       audio.artist = tags.artist;
-      audio.cover = getImage(tags.picture.format, tags.picture.data);
       audio.genre = tags.genre;
       audio.title = tags.title;
       audio.track = parseInt(tags.track);
       audio.year = parseInt(tags.year);
-      if (
-        !audios.find((a) => a.title === audio.title)
-      ) {
-        audios.push(audio);
-        setAudios([...audios]);
+
+      if (!audios.find((a) => a.title === audio.title)) {
+        getDuration(source, (duration) => {
+          audio.duration = duration;
+          audio.cover = getImage(tags.picture.format, tags.picture.data);
+          audios.push(audio);
+          setAudios([...audios]);
+        });
       }
     },
     onError: (error: any) => {
@@ -39,7 +68,7 @@ function getMetadata(blob: Blob, audios: Audio[], setAudios: any) {
 }
 
 export default function useAudios() {
-  const [audios, setAudios] = useState<Audio[]>([]);
+  const [audios, setAudios] = useState<Song[]>([]);
   const [loading, setLoading] = useState(true);
   const links = getAudioLinks();
 
@@ -48,7 +77,7 @@ export default function useAudios() {
       fetch(`${link}`)
         .then((res) => res.blob())
         .then((blob) => {
-          getMetadata(blob, audios, setAudios);
+          getMetadata(blob, link, audios, setAudios);
         })
         .catch((error) => {
           console.error(error);

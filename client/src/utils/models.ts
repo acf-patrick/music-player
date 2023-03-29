@@ -1,5 +1,6 @@
 export interface Audio {
-  name?: String,
+  source: String,
+  duration?: String,
   track?: Number,
   title?: String,
   album?: String,
