@@ -1,3 +1,20 @@
+export enum AlbumAppearance {
+  WithThumbnail,
+  WithoutThumbnail,
+  GridCell,
+}
+
+export interface IAlbum {
+  name: String;
+  cover?: String;
+}
+
+export interface IAlbumProps {
+  appearance: AlbumAppearance;
+  name?: String;
+  cover?: String;
+}
+
 export interface Audio {
   source: String,
   duration?: String,

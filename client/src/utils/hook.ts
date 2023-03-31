@@ -86,7 +86,7 @@ export default function useAudios() {
   }, []);
 
   useEffect(() => {
-    if (links.length === audios.length) {
+    if (links.length <= audios.length) {
       setLoading(false);
     }
   }, [audios]);

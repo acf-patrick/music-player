@@ -27,6 +27,7 @@ const StyledForm = styled.form`
     align-items: center;
     gap: 0.25rem;
     cursor: default;
+    user-select: none;
   }
 
   .options {

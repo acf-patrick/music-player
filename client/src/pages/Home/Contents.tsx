@@ -1,9 +1,11 @@
 import styled from "styled-components";
 
-const StyledContainer = styled.div``;
+const StyledContainer = styled.div`
+  background: darkblue;
+`;
 
 function Contents() {
-  return <StyledContainer>CONTENTS</StyledContainer>
+  return <StyledContainer></StyledContainer>
 }
 
 export default Contents;

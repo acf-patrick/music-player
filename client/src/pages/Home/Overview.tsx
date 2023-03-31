@@ -1,56 +1,135 @@
-import { useState, useContext, useEffect } from "react";
-import styled from "styled-components";
+import { useState, useRef, useContext, useEffect, useMemo } from "react";
 import { HiMagnifyingGlass } from "react-icons/hi2";
 import { TiArrowSortedDown } from "react-icons/ti";
+import { BsFillGearFill } from "react-icons/bs";
 import { AudioListContext } from "../../utils";
-import { StyledForm } from "../../styles";
+import { StyledForm, StyledOverview } from "../../styles";
 import { Song } from "../../components";
-import { Audio } from "../../utils/models";
+import { AlbumAppearance, Audio, IAlbum } from "../../utils/models";
+import Album from "../../components/Album";
 
-const StyledContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  padding: ${({ theme }) => theme.spacings.padding};
-  overflow-y: auto;
+// Convenience component for conditional rendering
+function Result({
+  result,
+  field,
+  albumAppearance,
+}: {
+  result: String | Audio | IAlbum;
+  field: string;
+  albumAppearance: AlbumAppearance;
+}) {
+  if (field === "Song") return <Song datas={result as Audio} />;
 
-  * {
-    font-size: 1.125rem;
+  if (field === "Album") {
+    const album = result as IAlbum;
+    return (
+      <Album
+        appearance={albumAppearance}
+        cover={album.cover}
+        name={album.name}
+      />
+    );
   }
 
-  ul {
-    list-style: none;
-    padding: 0;
+  if (typeof result !== "object") {
+    if (field === "Genre")
+      return (
+        <div>
+          ♪<span>{result as String}</span>
+        </div>
+      );
+    if (field === "Artist")
+      return (
+        <div>
+          🎙️<span>{result as String}</span>
+        </div>
+      );
   }
 
-  li {
-    margin: 0.5rem 0;
-  }
-`;
+  return <></>;
+}
 
 function Overview() {
   const audios = useContext(AudioListContext);
-  const [results, setResults] = useState<Audio[]>([...audios]);
+  const { artists, genres, albums } = useMemo(() => {
+    const artists = new Set<String>();
+    const genres = new Set<String>();
+    const albums: IAlbum[] = [];
+
+    for (let audio of audios) {
+      if (audio.artist) artists.add(audio.artist);
+      if (audio.genre) genres.add(audio.genre);
+      if (audio.album) {
+        if (!albums.find((album) => album.name === audio.album))
+          albums.push({ name: audio.album, cover: audio.cover });
+      }
+    }
+
+    return { artists, genres, albums };
+  }, [audios]);
+
+  const [results, setResults] = useState<Audio[] | String[] | IAlbum[]>([
+    ...audios,
+  ]);
   const [optionsFolded, setOptionsFolded] = useState(true);
-  const fields = ["Artist", "Genre", "Playlist", "Album"] as const;
-  const [currentField, setCurrentField] = useState(0);
+
+  const fields = ["Song", "Artist", "Genre", "Playlist", "Album"] as const;
+  const [currentField, setCurrentField] =
+    useState<typeof fields[number]>("Album");
+
+  const [albumAppearance, setAlbumAppearance] = useState(
+    AlbumAppearance.WithThumbnail
+  );
+
+  const viewSetterButton = useRef<HTMLDivElement>(null);
+  const [viewOptionsFolded, setViewOptionsFolded] = useState(true);
+
+  useEffect(() => {
+    switch (currentField) {
+      case "Song":
+        setResults([...audios]);
+        break;
+      case "Artist":
+        setResults([...artists]);
+        break;
+      case "Genre":
+        setResults([...genres]);
+        break;
+      case "Album":
+        setResults([...albums]);
+        break;
+      case "Playlist":
+        setResults([]);
+        break;
+      default:
+    }
+  }, [currentField]);
 
   const selectOnClick = () => {
     setOptionsFolded(!optionsFolded);
   };
 
   const optionOnClick = (index: number) => {
-    setCurrentField(index);
+    setCurrentField(fields[index]);
     setOptionsFolded(true);
   };
 
-  const formOnSubmit = () => {};
+  const viewSetterOnClick = () => {
+    const button = viewSetterButton.current!;
+    button.style.transform = `rotate(${viewOptionsFolded ? 180 : 0}deg)`;
+    setViewOptionsFolded(!viewOptionsFolded);
+  };
+
+  const formOnSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+  };
 
   return (
-    <StyledContainer>
+    <StyledOverview>
       <StyledForm onSubmit={formOnSubmit}>
         <div className="select" onClick={selectOnClick}>
           <TiArrowSortedDown />
-          <div>{fields[currentField]}</div>
+          <div>{currentField}</div>
         </div>
         {!optionsFolded && (
           <div className="options">
@@ -73,14 +152,41 @@ function Overview() {
           </button>
         </div>
       </StyledForm>
-      <ul className="results">
-        {results.map((song, i) => (
-          <li key={i}>
-            <Song datas={song} />
-          </li>
-        ))}
-      </ul>
-    </StyledContainer>
+      {results.length ? (
+        <ul className="results">
+          {results.map((result, i) => (
+            <li key={i}>
+              <Result
+                result={result}
+                field={currentField}
+                albumAppearance={albumAppearance}
+              />
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <h1 className="no-result">
+          <span>No result found 😞</span>
+        </h1>
+      )}
+      {currentField === "Album" && (
+        <>
+          <div className="view-setter" ref={viewSetterButton} onClick={viewSetterOnClick}>
+            <BsFillGearFill />
+          </div>
+          {!viewOptionsFolded && (
+            <>
+              <div className="arrow"></div>
+              <div className="view-options">
+                <div>List with thumbnail</div>
+                <div>List without thumbnail</div>
+                <div>Grid view</div>
+              </div>
+            </>
+          )}
+        </>
+      )}
+    </StyledOverview>
   );
 }
 
