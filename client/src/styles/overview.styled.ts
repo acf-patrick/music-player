@@ -2,9 +2,9 @@ import styled, { keyframes } from "styled-components";
 
 const dropUp = keyframes`
   from {
-    scaleY: 0;
+    transform: scaleY(0);
   } to {
-    scaleY: 1;
+    transform: scaleY(1);
   }
 `;
 
@@ -54,6 +54,8 @@ const StyledOverview = styled.div`
     bottom: 32px;
     width: 46px;
     aspect-ratio: 1;
+    border: none;
+    outline: none;
     border-radius: 100%;
     display: grid;
     place-items: center;
@@ -61,6 +63,7 @@ const StyledOverview = styled.div`
     background: transparent;
     transform: rotate(0);
     transition: background 300ms, transform 500ms ease-out;
+    backdrop-filter: blur(15px);
 
     &:hover {
       background: ${({ theme }) => theme.colors.hovered.background};
@@ -73,7 +76,7 @@ const StyledOverview = styled.div`
 
   .view-options {
     position: absolute;
-    z-index: 2;
+    z-index: 10;
     right: 32px;
     bottom: 98px;
     border-radius: 5px;
@@ -81,7 +84,8 @@ const StyledOverview = styled.div`
     box-shadow: 0 3px 10px rgba(0, 0, 0, 0.4);
     background: black;
     transform-origin: bottom center;
-    animation: ${dropUp} 500ms forwards;
+    transform: scaleY(0);
+    transition: transform 200ms ease-out;
 
     div {
       font-size: 0.85rem;
@@ -92,6 +96,7 @@ const StyledOverview = styled.div`
       transition: background 300ms;
 
       &:hover {
+        color: black;
         background: ${({ theme }) => theme.colors.hovered.background};
       }
     }

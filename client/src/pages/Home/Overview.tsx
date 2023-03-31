@@ -2,6 +2,7 @@ import { useState, useRef, useContext, useEffect, useMemo } from "react";
 import { HiMagnifyingGlass } from "react-icons/hi2";
 import { TiArrowSortedDown } from "react-icons/ti";
 import { BsFillGearFill } from "react-icons/bs";
+import { GrClose } from "react-icons/gr";
 import { AudioListContext } from "../../utils";
 import { StyledForm, StyledOverview } from "../../styles";
 import { Song } from "../../components";
@@ -81,7 +82,9 @@ function Overview() {
     AlbumAppearance.WithThumbnail
   );
 
-  const viewSetterButton = useRef<HTMLDivElement>(null);
+  const viewSetterButton = useRef<HTMLButtonElement>(null);
+  const viewOptions = useRef<HTMLDivElement>(null);
+  const [viewButton, setViewButton] = useState(<BsFillGearFill />);
   const [viewOptionsFolded, setViewOptionsFolded] = useState(true);
 
   useEffect(() => {
@@ -105,19 +108,34 @@ function Overview() {
     }
   }, [currentField]);
 
+  useEffect(() => {
+    const button = viewSetterButton.current;
+    if (button)
+      button.style.transform = `rotate(${viewOptionsFolded ? 180 : 0}deg)`;
+    const div = viewOptions.current;
+    if (div) div.style.transform = `scaleY(${viewOptionsFolded ? 0 : 1})`;
+    setTimeout(() => {
+      setViewButton(viewOptionsFolded ? <BsFillGearFill /> : <GrClose />);
+    }, 300);
+  }, [viewOptionsFolded]);
+
   const selectOnClick = () => {
     setOptionsFolded(!optionsFolded);
   };
 
   const optionOnClick = (index: number) => {
     setCurrentField(fields[index]);
+    setViewOptionsFolded(true);
     setOptionsFolded(true);
   };
 
   const viewSetterOnClick = () => {
-    const button = viewSetterButton.current!;
-    button.style.transform = `rotate(${viewOptionsFolded ? 180 : 0}deg)`;
     setViewOptionsFolded(!viewOptionsFolded);
+  };
+
+  const viewOptionOnClick = (appearance: AlbumAppearance) => {
+    setAlbumAppearance(appearance);
+    setViewOptionsFolded(true);
   };
 
   const formOnSubmit = (e: React.FormEvent<HTMLFormElement>) => {
@@ -171,19 +189,37 @@ function Overview() {
       )}
       {currentField === "Album" && (
         <>
-          <div className="view-setter" ref={viewSetterButton} onClick={viewSetterOnClick}>
-            <BsFillGearFill />
+          <button
+            className="view-setter"
+            ref={viewSetterButton}
+            onClick={viewSetterOnClick}
+          >
+            {viewButton}
+          </button>
+          <div className="view-options" ref={viewOptions}>
+            <div
+              onClick={() => {
+                viewOptionOnClick(AlbumAppearance.WithThumbnail);
+              }}
+            >
+              List with thumbnail
+            </div>
+            <div
+              onClick={() => {
+                viewOptionOnClick(AlbumAppearance.WithoutThumbnail);
+              }}
+            >
+              List without thumbnail
+            </div>
+            <div
+              onClick={() => {
+                viewOptionOnClick(AlbumAppearance.GridCell);
+              }}
+            >
+              Grid view
+            </div>
           </div>
-          {!viewOptionsFolded && (
-            <>
-              <div className="arrow"></div>
-              <div className="view-options">
-                <div>List with thumbnail</div>
-                <div>List without thumbnail</div>
-                <div>Grid view</div>
-              </div>
-            </>
-          )}
+          {!viewOptionsFolded && <div className="arrow"></div>}
         </>
       )}
     </StyledOverview>
