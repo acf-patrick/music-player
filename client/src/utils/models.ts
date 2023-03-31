@@ -5,18 +5,15 @@ export enum AlbumAppearance {
 }
 
 export interface IAlbum {
-  name: String;
-  cover?: String;
-}
-
-export interface IAlbumProps {
-  appearance: AlbumAppearance;
+  appearance?: AlbumAppearance;
   name?: String;
+  artist?: String;
   cover?: String;
 }
 
 export interface Audio {
   source: String,
+  hash: String,       // SHA256sum
   duration?: String,
   track?: Number,
   title?: String,

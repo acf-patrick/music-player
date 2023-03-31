@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
-import mockSongs from "./mockDatas";
 import { Audio as Song } from "./models";
+import mockSongs from "./mockDatas";
 import jsmediatags from "jsmediatags";
+import { getSHA256 } from ".";
 
 function getAudioLinks() {
   return mockSongs;
@@ -43,8 +44,9 @@ function getMetadata(
 ) {
   jsmediatags.read(blob, {
     onSuccess: (datas: any) => {
+      const hash = getSHA256(source);
       const tags = datas.tags;
-      const audio: Song = { source: source };
+      const audio: Song = { source: source, hash: hash };
       audio.album = tags.album;
       audio.artist = tags.artist;
       audio.genre = tags.genre;
@@ -52,14 +54,15 @@ function getMetadata(
       audio.track = parseInt(tags.track);
       audio.year = parseInt(tags.year);
 
-      if (!audios.find((a) => a.title === audio.title)) {
-        getDuration(source, (duration) => {
-          audio.duration = duration;
-          audio.cover = getImage(tags.picture.format, tags.picture.data);
+      getDuration(source, (duration) => {
+        audio.duration = duration;
+        audio.cover = getImage(tags.picture.format, tags.picture.data);
+        
+        if (!audios.find(audio => audio.hash === hash)) {
           audios.push(audio);
           setAudios([...audios]);
-        });
-      }
+        }
+      });
     },
     onError: (error: any) => {
       console.error(error);

@@ -10,7 +10,7 @@ const optionsGrow = keyframes`
     }
 `;
 
-const StyledForm = styled.form`
+const StyledForm = styled.form<{arrowDown: boolean}>`
   position: relative;
   display: flex;
   justify-content: space-between;
@@ -28,6 +28,11 @@ const StyledForm = styled.form`
     gap: 0.25rem;
     cursor: default;
     user-select: none;
+
+    svg {
+      transform: ${({arrowDown}) => `rotate(${arrowDown ? 0 : 180}deg)`};
+      transition: transform 200ms linear;
+    }
   }
 
   .options {

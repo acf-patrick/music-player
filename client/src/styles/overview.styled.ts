@@ -1,4 +1,5 @@
 import styled, { keyframes } from "styled-components";
+import { AlbumAppearance } from "../utils/models";
 
 const dropUp = keyframes`
   from {
@@ -8,31 +9,42 @@ const dropUp = keyframes`
   }
 `;
 
-const StyledOverview = styled.div`
+const StyledOverview = styled.div<{ albumAppearance: AlbumAppearance }>`
   display: flex;
   flex-direction: column;
   overflow-y: auto;
   padding: ${({ theme }) => theme.spacings.padding};
-  position: relative;
 
   ::-webkit-scrollbar {
     display: none;
   }
 
-  ul {
+  ul.results {
+    display: ${({ albumAppearance }) =>
+      albumAppearance === AlbumAppearance.GridCell ? "grid" : "block"};
+
+    font-size: ${({ albumAppearance }) =>
+      albumAppearance === AlbumAppearance.GridCell ? "0.75rem" : "1rem"};
+
     list-style: none;
-    font-size: 1rem;
     padding: 0;
+
+    grid-template-columns: repeat(auto-fit, minmax(128px, 144px));
+    align-items: start;
+    justify-items: center;
   }
 
   li {
     padding: 0.5rem;
     cursor: pointer;
     border-radius: ${({ theme }) => theme.borderRadius};
+    overflow: hidden;
     background: transparent;
-    transition: background 300ms;
+    transition: background 300ms, transform 300ms;
 
     &:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
       background: ${({ theme }) => theme.colors.hovered.background};
       outline: solid 1px ${({ theme }) => theme.colors.hovered.border};
     }
@@ -50,7 +62,7 @@ const StyledOverview = styled.div`
 
   .view-setter {
     position: absolute;
-    right: 32px;
+    right: calc(50% + 32px);
     bottom: 32px;
     width: 46px;
     aspect-ratio: 1;
@@ -77,7 +89,7 @@ const StyledOverview = styled.div`
   .view-options {
     position: absolute;
     z-index: 10;
-    right: 32px;
+    right: calc(50% + 32px);
     bottom: 98px;
     border-radius: 5px;
     overflow: hidden;
@@ -107,7 +119,7 @@ const StyledOverview = styled.div`
     width: 0;
     position: absolute;
     bottom: 82px;
-    right: 42px;
+    right: calc(50% + 40px);
     border-top: solid 16px black;
     border-left: solid 16px transparent;
     border-right: solid 16px transparent;

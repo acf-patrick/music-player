@@ -12,7 +12,8 @@ const themes = {
     image: {
       sm: "48px",
       md: "64px",
-    }
+      lg: "144px",
+    },
   },
 };
 

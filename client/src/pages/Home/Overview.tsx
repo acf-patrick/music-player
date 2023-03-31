@@ -27,6 +27,7 @@ function Result({
       <Album
         appearance={albumAppearance}
         cover={album.cover}
+        artist={album.artist}
         name={album.name}
       />
     );
@@ -53,6 +54,8 @@ function Result({
 function Overview() {
   const audios = useContext(AudioListContext);
   const { artists, genres, albums } = useMemo(() => {
+    // Creating array of unique elements from songs list
+
     const artists = new Set<String>();
     const genres = new Set<String>();
     const albums: IAlbum[] = [];
@@ -62,7 +65,7 @@ function Overview() {
       if (audio.genre) genres.add(audio.genre);
       if (audio.album) {
         if (!albums.find((album) => album.name === audio.album))
-          albums.push({ name: audio.album, cover: audio.cover });
+          albums.push({ name: audio.album, cover: audio.cover, artist: audio.artist });
       }
     }
 
@@ -72,22 +75,31 @@ function Overview() {
   const [results, setResults] = useState<Audio[] | String[] | IAlbum[]>([
     ...audios,
   ]);
+
+  // Whether the select options are shown or not
   const [optionsFolded, setOptionsFolded] = useState(true);
 
   const fields = ["Song", "Artist", "Genre", "Playlist", "Album"] as const;
   const [currentField, setCurrentField] =
     useState<typeof fields[number]>("Album");
 
+  // How album items will be displayed
   const [albumAppearance, setAlbumAppearance] = useState(
-    AlbumAppearance.WithThumbnail
+    AlbumAppearance.GridCell
   );
 
   const viewSetterButton = useRef<HTMLButtonElement>(null);
   const viewOptions = useRef<HTMLDivElement>(null);
+
+  // button displayed in album view setter
   const [viewButton, setViewButton] = useState(<BsFillGearFill />);
+
+  // Whether the options used to set album viewing are set or not
   const [viewOptionsFolded, setViewOptionsFolded] = useState(true);
 
   useEffect(() => {
+    // Setting result view according to field chosen by the user
+
     switch (currentField) {
       case "Song":
         setResults([...audios]);
@@ -125,6 +137,7 @@ function Overview() {
 
   const optionOnClick = (index: number) => {
     setCurrentField(fields[index]);
+    setAlbumAppearance(AlbumAppearance.WithThumbnail);
     setViewOptionsFolded(true);
     setOptionsFolded(true);
   };
@@ -143,8 +156,8 @@ function Overview() {
   };
 
   return (
-    <StyledOverview>
-      <StyledForm onSubmit={formOnSubmit}>
+    <StyledOverview albumAppearance={albumAppearance}>
+      <StyledForm arrowDown={optionsFolded} onSubmit={formOnSubmit}>
         <div className="select" onClick={selectOnClick}>
           <TiArrowSortedDown />
           <div>{currentField}</div>
