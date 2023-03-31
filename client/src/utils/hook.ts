@@ -72,7 +72,7 @@ function getMetadata(
 
 export default function useAudios() {
   const [audios, setAudios] = useState<Song[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const links = getAudioLinks();
 
   useEffect(() => {

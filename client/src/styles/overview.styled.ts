@@ -73,7 +73,7 @@ const StyledOverview = styled.div<{ albumAppearance: AlbumAppearance }>`
     place-items: center;
     cursor: pointer;
     background: transparent;
-    transform: rotate(0);
+    transform: rotate(180deg);
     transition: background 300ms, transform 500ms ease-out;
     backdrop-filter: blur(15px);
 

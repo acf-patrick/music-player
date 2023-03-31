@@ -12,6 +12,7 @@ const GlobalStyles = createGlobalStyle`
     margin: 0;
     padding: 0;
     background: black;
+    user-select: ${() => (import.meta.env.PROD ? "none" : "auto")};
   }
 `;
 

@@ -1,11 +1,9 @@
 import { useState, useRef, useContext, useEffect, useMemo } from "react";
-import { HiMagnifyingGlass } from "react-icons/hi2";
-import { TiArrowSortedDown } from "react-icons/ti";
 import { BsFillGearFill } from "react-icons/bs";
 import { GrClose } from "react-icons/gr";
 import { AudioListContext } from "../../utils";
 import { StyledForm, StyledOverview } from "../../styles";
-import { Song } from "../../components";
+import { Song, Searchbar } from "../../components";
 import { AlbumAppearance, Audio, IAlbum } from "../../utils/models";
 import Album from "../../components/Album";
 
@@ -65,27 +63,29 @@ function Overview() {
       if (audio.genre) genres.add(audio.genre);
       if (audio.album) {
         if (!albums.find((album) => album.name === audio.album))
-          albums.push({ name: audio.album, cover: audio.cover, artist: audio.artist });
+          albums.push({
+            name: audio.album,
+            cover: audio.cover,
+            artist: audio.artist,
+          });
       }
     }
 
     return { artists, genres, albums };
   }, [audios]);
 
-  const [results, setResults] = useState<Audio[] | String[] | IAlbum[]>([
-    ...audios,
-  ]);
+  const [results, setResults] = useState<Audio[] | String[] | IAlbum[]>([]);
 
   // Whether the select options are shown or not
   const [optionsFolded, setOptionsFolded] = useState(true);
 
   const fields = ["Song", "Artist", "Genre", "Playlist", "Album"] as const;
   const [currentField, setCurrentField] =
-    useState<typeof fields[number]>("Album");
+    useState<typeof fields[number]>("Song");
 
   // How album items will be displayed
   const [albumAppearance, setAlbumAppearance] = useState(
-    AlbumAppearance.GridCell
+    AlbumAppearance.WithThumbnail
   );
 
   const viewSetterButton = useRef<HTMLButtonElement>(null);
@@ -118,7 +118,7 @@ function Overview() {
         break;
       default:
     }
-  }, [currentField]);
+  }, [audios, currentField]);
 
   useEffect(() => {
     const button = viewSetterButton.current;
@@ -130,6 +130,10 @@ function Overview() {
       setViewButton(viewOptionsFolded ? <BsFillGearFill /> : <GrClose />);
     }, 300);
   }, [viewOptionsFolded]);
+
+  /* Event Handlers */
+
+  const containerOnScroll = () => {};
 
   const selectOnClick = () => {
     setOptionsFolded(!optionsFolded);
@@ -156,33 +160,18 @@ function Overview() {
   };
 
   return (
-    <StyledOverview albumAppearance={albumAppearance}>
-      <StyledForm arrowDown={optionsFolded} onSubmit={formOnSubmit}>
-        <div className="select" onClick={selectOnClick}>
-          <TiArrowSortedDown />
-          <div>{currentField}</div>
-        </div>
-        {!optionsFolded && (
-          <div className="options">
-            {fields.map((field, i) => (
-              <div
-                key={i}
-                onClick={() => {
-                  optionOnClick(i);
-                }}
-              >
-                {field}
-              </div>
-            ))}
-          </div>
-        )}
-        <div className="field">
-          <input type="text" />
-          <button type="submit">
-            <HiMagnifyingGlass />
-          </button>
-        </div>
-      </StyledForm>
+    <StyledOverview
+      onScroll={containerOnScroll}
+      albumAppearance={albumAppearance}
+    >
+      <Searchbar
+        currentField={currentField}
+        fields={[...fields]}
+        formOnSubmit={formOnSubmit}
+        optionOnClick={optionOnClick}
+        optionsFolded={optionsFolded}
+        selectOnClick={selectOnClick}
+      />
       {results.length ? (
         <ul className="results">
           {results.map((result, i) => (
