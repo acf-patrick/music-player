@@ -1,3 +1,4 @@
+import { useRef } from "react";
 import { HiMagnifyingGlass } from "react-icons/hi2";
 import { TiArrowSortedDown } from "react-icons/ti";
 import { StyledForm } from "../styles";
@@ -25,20 +26,18 @@ function Searchbar({
         <TiArrowSortedDown />
         <div>{currentField}</div>
       </div>
-      {!optionsFolded && (
-        <div className="options">
-          {fields.map((field, i) => (
-            <div
-              key={i}
-              onClick={() => {
-                optionOnClick(i);
-              }}
-            >
-              {field}
-            </div>
-          ))}
-        </div>
-      )}
+      <div className="options">
+        {fields.map((field, i) => (
+          <div
+            key={i}
+            onClick={() => {
+              optionOnClick(i);
+            }}
+          >
+            {field}
+          </div>
+        ))}
+      </div>
       <div className="field">
         <input type="text" />
         <button type="submit">

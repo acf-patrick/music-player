@@ -1,16 +1,6 @@
 import styled, { keyframes } from "styled-components";
 
-const optionsGrow = keyframes`
-    0% {
-        transform: scaleY(0);
-    } 80% {
-        transfrom: scaleY(1.1);
-    } 100% {
-        transform: scaleY(1);
-    }
-`;
-
-const StyledForm = styled.form<{arrowDown: boolean}>`
+const StyledForm = styled.form<{ arrowDown: boolean }>`
   position: relative;
   display: flex;
   justify-content: space-between;
@@ -30,7 +20,7 @@ const StyledForm = styled.form<{arrowDown: boolean}>`
     user-select: none;
 
     svg {
-      transform: ${({arrowDown}) => `rotate(${arrowDown ? 0 : 180}deg)`};
+      transform: ${({ arrowDown }) => `rotate(${arrowDown ? 0 : 180}deg)`};
       transition: transform 200ms linear;
     }
   }
@@ -46,7 +36,8 @@ const StyledForm = styled.form<{arrowDown: boolean}>`
     backdrop-filter: blur(5px);
     box-shadow: 2px 3px 5px rgba(0, 0, 0, 0.4);
     transform-origin: top center;
-    animation: ${optionsGrow} 200ms ease-in-out forwards;
+    transform: ${({ arrowDown }) => `scaleY(${arrowDown ? 0 : 1})`};
+    transition: transform 200ms ease-in-out;
 
     div {
       color: #101010;

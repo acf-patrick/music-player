@@ -8,6 +8,7 @@ const StyledAppContainer = styled.div`
   background: ${({ theme }) => theme.colors.background};
   margin: auto;
   color: ${({ theme }) => theme.colors.text};
+  position: relative;
 `;
 
 export default StyledAppContainer;

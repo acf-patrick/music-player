@@ -11,12 +11,16 @@ const dropUp = keyframes`
 
 const StyledOverview = styled.div<{ albumAppearance: AlbumAppearance }>`
   display: flex;
-  flex-direction: column;
   overflow-y: auto;
-  padding: ${({ theme }) => theme.spacings.padding};
+  flex-direction: column;
+  padding: ${({ theme }) => theme.spacings.padding} 2rem 0;
 
-  ::-webkit-scrollbar {
-    display: none;
+  .results-wrapper {
+    overflow-y: auto;
+
+    ::-webkit-scrollbar {
+      display: none;
+    }
   }
 
   ul.results {

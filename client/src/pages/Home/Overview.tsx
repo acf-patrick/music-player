@@ -173,17 +173,19 @@ function Overview() {
         selectOnClick={selectOnClick}
       />
       {results.length ? (
-        <ul className="results">
-          {results.map((result, i) => (
-            <li key={i}>
-              <Result
-                result={result}
-                field={currentField}
-                albumAppearance={albumAppearance}
-              />
-            </li>
-          ))}
-        </ul>
+        <div className="results-wrapper">
+          <ul className="results">
+            {results.map((result, i) => (
+              <li key={i}>
+                <Result
+                  result={result}
+                  field={currentField}
+                  albumAppearance={albumAppearance}
+                />
+              </li>
+            ))}
+          </ul>
+        </div>
       ) : (
         <h1 className="no-result">
           <span>No result found 😞</span>
