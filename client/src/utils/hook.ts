@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Audio as Song } from "./models";
 import mockSongs from "./mockDatas";
 import jsmediatags from "jsmediatags";
-import { getSHA256 } from ".";
+import { getSHA256, durationToString } from ".";
 
 function getAudioLinks() {
   return mockSongs;
@@ -18,20 +18,7 @@ function getDuration(source: String, callback: (duration: String) => any) {
   const audio = new Audio();
   audio.onloadedmetadata = () => {
     if (isNaN(audio.duration)) callback("");
-    else {
-      let seconds = Math.ceil(audio.duration);
-      let minutes = Math.floor(seconds / 60);
-      seconds %= 60;
-      let hours = Math.floor(minutes / 60);
-      minutes %= 60;
-
-      const toStr = (n: number) => `${n < 10 ? "0" : ""}${n}`;
-      callback(
-        `${hours ? toStr(hours) + ":" : ""}${toStr(minutes) + ":"}${toStr(
-          seconds
-        )}`
-      );
-    }
+    else callback(durationToString(audio.duration));
   };
   audio.src = source.toString();
 }
@@ -57,8 +44,8 @@ function getMetadata(
       getDuration(source, (duration) => {
         audio.duration = duration;
         audio.cover = getImage(tags.picture.format, tags.picture.data);
-        
-        if (!audios.find(audio => audio.hash === hash)) {
+
+        if (!audios.find((audio) => audio.hash === hash)) {
           audios.push(audio);
           setAudios([...audios]);
         }
@@ -72,7 +59,6 @@ function getMetadata(
 
 export default function useAudios() {
   const [audios, setAudios] = useState<Song[]>([]);
-  const [loading, setLoading] = useState(false);
   const links = getAudioLinks();
 
   useEffect(() => {
@@ -88,11 +74,5 @@ export default function useAudios() {
     }
   }, []);
 
-  useEffect(() => {
-    if (links.length <= audios.length) {
-      setLoading(false);
-    }
-  }, [audios]);
-
-  return { loading, audios };
+  return audios;
 }

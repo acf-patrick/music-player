@@ -1,6 +1,7 @@
-import { AlbumAppearance, IAlbum } from "../utils/models";
+import { AlbumAppearance, Album as IAlbum } from "../utils/models";
 import { IoAlbums } from "react-icons/io5";
 import styled from "styled-components";
+import { durationToString } from "../utils";
 
 const StyledWithThumbnail = styled.div`
   display: flex;
@@ -61,7 +62,7 @@ const StyledGridCell = styled.div`
   }
 `;
 
-function Album({ appearance, name, artist, cover }: IAlbum) {
+function Album({ appearance, name, artist, cover, duration }: IAlbum) {
   let Container: any = null;
   switch (appearance) {
     case AlbumAppearance.GridCell:
@@ -74,6 +75,8 @@ function Album({ appearance, name, artist, cover }: IAlbum) {
       Container = StyledWithoutThumbnail;
       break;
     default:
+      Container = StyledWithThumbnail;
+      break;
   }
 
   return (
@@ -84,6 +87,7 @@ function Album({ appearance, name, artist, cover }: IAlbum) {
       <div>
         <div className="name">{name}</div>
         <div className="artist">{artist}</div>
+        <div className="duration">{durationToString(duration!)}</div>
       </div>
     </Container>
   );

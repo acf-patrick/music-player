@@ -1,10 +1,16 @@
 import { useState, useRef, useContext, useEffect, useMemo } from "react";
 import { BsFillGearFill } from "react-icons/bs";
 import { GrClose } from "react-icons/gr";
-import { AudioListContext } from "../../utils";
-import { StyledForm, StyledOverview } from "../../styles";
+import { DatasContext, stringToDuration } from "../../utils";
+import { StyledOverview } from "../../styles";
 import { Song, Searchbar } from "../../components";
-import { AlbumAppearance, Audio, IAlbum } from "../../utils/models";
+import {
+  AlbumAppearance,
+  Audio,
+  Album as IAlbum,
+  Genre,
+  Artist,
+} from "../../utils/models";
 import Album from "../../components/Album";
 
 // Convenience component for conditional rendering
@@ -31,48 +37,28 @@ function Result({
     );
   }
 
-  if (typeof result !== "object") {
-    if (field === "Genre")
-      return (
-        <div>
-          ♪<span>{result as String}</span>
-        </div>
-      );
-    if (field === "Artist")
-      return (
-        <div>
-          🎙️<span>{result as String}</span>
-        </div>
-      );
+  if (field === "Genre") {
+    const genre = result as Genre;
+    return (
+      <div>
+        ♪<span>{genre.name}</span>
+      </div>
+    );
+  }
+  if (field === "Artist") {
+    const artist = result as Artist;
+    return (
+      <div>
+        🎙️<span>{artist.name}</span>
+      </div>
+    );
   }
 
   return <></>;
 }
 
 function Overview() {
-  const audios = useContext(AudioListContext);
-  const { artists, genres, albums } = useMemo(() => {
-    // Creating array of unique elements from songs list
-
-    const artists = new Set<String>();
-    const genres = new Set<String>();
-    const albums: IAlbum[] = [];
-
-    for (let audio of audios) {
-      if (audio.artist) artists.add(audio.artist);
-      if (audio.genre) genres.add(audio.genre);
-      if (audio.album) {
-        if (!albums.find((album) => album.name === audio.album))
-          albums.push({
-            name: audio.album,
-            cover: audio.cover,
-            artist: audio.artist,
-          });
-      }
-    }
-
-    return { artists, genres, albums };
-  }, [audios]);
+  const { audios, artists, genres, albums } = useContext(DatasContext);
 
   const [results, setResults] = useState<Audio[] | String[] | IAlbum[]>([]);
 

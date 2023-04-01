@@ -9,6 +9,8 @@ const themes = {
   },
   borderRadius: "10px",
   sizes: {
+    minWidth: "1280px",
+    minHeight: "720px",
     image: {
       sm: "48px",
       md: "64px",

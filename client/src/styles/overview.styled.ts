@@ -1,14 +1,6 @@
 import styled, { keyframes } from "styled-components";
 import { AlbumAppearance } from "../utils/models";
 
-const dropUp = keyframes`
-  from {
-    transform: scaleY(0);
-  } to {
-    transform: scaleY(1);
-  }
-`;
-
 const StyledOverview = styled.div<{ albumAppearance: AlbumAppearance }>`
   display: flex;
   overflow-y: auto;
@@ -31,11 +23,13 @@ const StyledOverview = styled.div<{ albumAppearance: AlbumAppearance }>`
       albumAppearance === AlbumAppearance.GridCell ? "0.75rem" : "1rem"};
 
     list-style: none;
-    padding: 0;
+    padding: 0 2px;
 
     grid-template-columns: repeat(auto-fit, minmax(128px, 144px));
-    align-items: start;
-    justify-items: center;
+    grid-auto-rows: 1fr;
+    grid-gap: 0.5rem;
+    /* align-items: start;
+    justify-items: center; */
   }
 
   li {

@@ -1,8 +1,6 @@
 import styled from "styled-components";
 import Contents from "./Contents";
 import Overview from "./Overview";
-import { AudioListContext } from "../../utils";
-import { useContext } from "react";
 
 const StyledContainer = styled.div`
   width: 100%;
@@ -12,8 +10,6 @@ const StyledContainer = styled.div`
 `;
 
 function Home() {
-  const audios = useContext(AudioListContext);
-
   return (
     <StyledContainer>
       <Overview />
