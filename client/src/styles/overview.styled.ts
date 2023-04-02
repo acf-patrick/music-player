@@ -25,7 +25,7 @@ const StyledOverview = styled.div<{ albumAppearance: AlbumAppearance }>`
     list-style: none;
     padding: 0 2px;
 
-    grid-template-columns: repeat(auto-fit, minmax(128px, 144px));
+    grid-template-columns: repeat(auto-fit, minmax(128px, 160px));
     grid-auto-rows: 1fr;
     grid-gap: 0.5rem;
     /* align-items: start;
@@ -35,6 +35,7 @@ const StyledOverview = styled.div<{ albumAppearance: AlbumAppearance }>`
   li {
     padding: 0.5rem;
     cursor: pointer;
+    outline: none;
     border-radius: ${({ theme }) => theme.borderRadius};
     overflow: hidden;
     background: transparent;
@@ -63,7 +64,7 @@ const StyledOverview = styled.div<{ albumAppearance: AlbumAppearance }>`
     right: calc(50% + 32px);
     bottom: 32px;
     width: 46px;
-    aspect-ratio: 1;
+    height: 46px;
     border: none;
     outline: none;
     border-radius: 100%;

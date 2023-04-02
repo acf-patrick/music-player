@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { ThemeProvider } from "styled-components";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { DatasContext, stringToDuration } from "./utils";
@@ -11,12 +12,13 @@ import { Artist, Genre, Album } from "./utils/models";
 
 function App() {
   const audios = useAudios();
-  const { artists, genres, albums } = useMemo(() => {
-    const albums: Album[] = [];
-    const genres: Genre[] = [];
-    const artists: Artist[] = [];
+  const [artists, setArtists] = useState<Artist[]>([]);
+  const [genres, setGenres] = useState<Genre[]>([]);
+  const [albums, setAlbums] = useState<Album[]>([]);
 
-    for (let audio of audios) {
+  useEffect(() => {
+    if (audios.length > 0) {
+      const audio = audios[audios.length - 1];
       if (audio.album) {
         const album = albums.find((album) => album.name === audio.album);
         if (album) {
@@ -67,8 +69,6 @@ function App() {
         }
       }
     }
-
-    return { artists, genres, albums };
   }, [audios]);
 
   return (

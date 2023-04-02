@@ -5,7 +5,7 @@ import { StyledForm } from "../styles";
 
 interface ISearchbarProps {
   optionsFolded: boolean;
-  formOnSubmit: React.FormEventHandler<HTMLFormElement>;
+  inputOnEdit: React.ChangeEventHandler<HTMLInputElement>;
   selectOnClick: () => void;
   currentField: String;
   fields: String[];
@@ -14,14 +14,19 @@ interface ISearchbarProps {
 
 function Searchbar({
   optionsFolded,
-  formOnSubmit,
+  inputOnEdit,
   selectOnClick,
   currentField,
   fields,
   optionOnClick,
 }: ISearchbarProps) {
   return (
-    <StyledForm arrowDown={optionsFolded} onSubmit={formOnSubmit}>
+    <StyledForm
+      arrowDown={optionsFolded}
+      onSubmit={(e) => {
+        e.preventDefault;
+      }}
+    >
       <div className="select" onClick={selectOnClick}>
         <TiArrowSortedDown />
         <div>{currentField}</div>
@@ -39,7 +44,7 @@ function Searchbar({
         ))}
       </div>
       <div className="field">
-        <input type="text" />
+        <input type="text" name="keyword" onChange={inputOnEdit} />
         <button type="submit">
           <HiMagnifyingGlass />
         </button>

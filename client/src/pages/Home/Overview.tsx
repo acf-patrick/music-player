@@ -1,7 +1,7 @@
 import { useState, useRef, useContext, useEffect, useMemo } from "react";
 import { BsFillGearFill } from "react-icons/bs";
 import { GrClose } from "react-icons/gr";
-import { DatasContext, stringToDuration } from "../../utils";
+import { DatasContext } from "../../utils";
 import { StyledOverview } from "../../styles";
 import { Song, Searchbar } from "../../components";
 import {
@@ -33,6 +33,7 @@ function Result({
         cover={album.cover}
         artist={album.artist}
         name={album.name}
+        duration={album.duration}
       />
     );
   }
@@ -83,9 +84,8 @@ function Overview() {
   // Whether the options used to set album viewing are set or not
   const [viewOptionsFolded, setViewOptionsFolded] = useState(true);
 
-  useEffect(() => {
-    // Setting result view according to field chosen by the user
-
+  // Show all occurencies
+  const resetResults = () => {
     switch (currentField) {
       case "Song":
         setResults([...audios]);
@@ -104,6 +104,11 @@ function Overview() {
         break;
       default:
     }
+  };
+
+  useEffect(() => {
+    // Setting result view according to field chosen by the user
+    resetResults();
   }, [audios, currentField]);
 
   useEffect(() => {
@@ -141,8 +146,49 @@ function Overview() {
     setViewOptionsFolded(true);
   };
 
-  const formOnSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const inputOnEdit = (e: React.ChangeEvent<HTMLInputElement>) => {
     e.preventDefault();
+    const input = e.target as HTMLInputElement;
+    const keyword = input.value.toLowerCase();
+    if (!keyword) {
+      resetResults();
+      return;
+    }
+
+    switch (currentField) {
+      case "Album":
+        setResults(
+          albums.filter(
+            (album) => album.name.toLowerCase().indexOf(keyword) >= 0
+          )
+        );
+        break;
+      case "Genre":
+        setResults(
+          genres.filter(
+            (genre) => genre.name.toLowerCase().indexOf(keyword) >= 0
+          )
+        );
+        break;
+      case "Artist":
+        setResults(
+          artists.filter(
+            (artist) => artist.name.toLowerCase().indexOf(keyword) >= 0
+          )
+        );
+        break;
+      case "Song":
+        setResults(
+          audios.filter((audio) =>
+            audio.title
+              ? audio.title.toLowerCase().indexOf(keyword) >= 0
+              : false
+          )
+        );
+        break;
+      default:
+        break;
+    }
   };
 
   return (
@@ -153,7 +199,7 @@ function Overview() {
       <Searchbar
         currentField={currentField}
         fields={[...fields]}
-        formOnSubmit={formOnSubmit}
+        inputOnEdit={inputOnEdit}
         optionOnClick={optionOnClick}
         optionsFolded={optionsFolded}
         selectOnClick={selectOnClick}

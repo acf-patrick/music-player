@@ -27,7 +27,7 @@ function getMetadata(
   blob: Blob,
   source: String,
   audios: Song[],
-  setAudios: any
+  setAudios: (audios: Song[]) => void
 ) {
   jsmediatags.read(blob, {
     onSuccess: (datas: any) => {

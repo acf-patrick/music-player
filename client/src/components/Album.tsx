@@ -8,6 +8,18 @@ const StyledWithThumbnail = styled.div`
   align-items: center;
   gap: 0.75rem;
 
+  & > div:nth-of-type(2) {
+    flex-grow: 1;
+  }
+
+  .artist-duration {
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .duration {
+    color: rgba(100, 100, 100, 0.75);
+  }
   .cover {
     display: grid;
     background: black;
@@ -33,9 +45,28 @@ const StyledWithThumbnail = styled.div`
 `;
 
 const StyledWithoutThumbnail = styled.div`
+  padding-bottom: 0.25rem;
+  border-bottom: solid 1px #1E1E1E;
+
+  &:hover {
+    border: none;
+  }
+
+  & > div:nth-of-type(2) {
+    flex-grow: 1;
+  }
+
+  .duration {
+    color: rgba(100, 100, 100, 0.75);
+  }
   .artist {
     font-size: 0.75rem;
     color: grey;
+  }
+
+  .artist-duration {
+    display: flex;
+    justify-content: space-between;
   }
 
   .cover {
@@ -46,10 +77,20 @@ const StyledWithoutThumbnail = styled.div`
 `;
 
 const StyledGridCell = styled.div`
+  height: 100%;
+  padding: 0.25rem;
+
+  .duration {
+    display: none;
+  }
+
   .name {
     font-size: 0.75rem;
     font-weight: bold;
     color: #505050;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
   }
 
   .artist {
@@ -86,8 +127,10 @@ function Album({ appearance, name, artist, cover, duration }: IAlbum) {
       </div>
       <div>
         <div className="name">{name}</div>
-        <div className="artist">{artist}</div>
-        <div className="duration">{durationToString(duration!)}</div>
+        <div className="artist-duration">
+          <div className="artist">{artist}</div>
+          <div className="duration">{durationToString(duration!)}</div>
+        </div>
       </div>
     </Container>
   );
