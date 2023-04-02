@@ -24,7 +24,7 @@ function Searchbar({
     <StyledForm
       arrowDown={optionsFolded}
       onSubmit={(e) => {
-        e.preventDefault;
+        e.preventDefault();
       }}
     >
       <div className="select" onClick={selectOnClick}>

@@ -15,6 +15,49 @@ const StyledOverview = styled.div<{ albumAppearance: AlbumAppearance }>`
     }
   }
 
+  .sort-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-top: ${({ theme }) => theme.spacings.margin};
+    margin-bottom: 0.5rem;
+    padding-right: 0.5rem;
+
+    .count span {
+      font-size: 1.25rem;
+      margin-right: 0.25rem;
+      font-weight: bold;
+    }
+
+    .buttons {
+      display: flex;
+      gap: 10px;
+
+      button {
+        display: grid;
+        place-items: center;
+        border: none;
+        cursor: pointer;
+        font-size: 1.25rem;
+        border-radius: 7px;
+        width: 32px;
+        aspect-ratio: 1;
+        background: ${({ theme }) => theme.colors.bgSecondary};
+        outline: none;
+        transition: color: 300ms;
+
+        &:focus {
+          color: ${({ theme }) => theme.colors.hovered.border};
+          outline: solid 2px ${({ theme }) => theme.colors.hovered.border};
+        }
+      }
+    }
+  }
+
+  .sort-options {
+    display: none;
+  }
+
   ul.results {
     display: ${({ albumAppearance }) =>
       albumAppearance === AlbumAppearance.GridCell ? "grid" : "block"};

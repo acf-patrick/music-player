@@ -1,5 +1,10 @@
 import { useState, useRef, useContext, useEffect, useMemo } from "react";
+import { MdSort } from "react-icons/md";
 import { BsFillGearFill } from "react-icons/bs";
+import {
+  AiOutlineSortAscending,
+  AiOutlineSortDescending,
+} from "react-icons/ai";
 import { GrClose } from "react-icons/gr";
 import { DatasContext } from "../../utils";
 import { StyledOverview } from "../../styles";
@@ -10,6 +15,8 @@ import {
   Album as IAlbum,
   Genre,
   Artist,
+  AlbumSortOptions,
+  AudioSortOptions,
 } from "../../utils/models";
 import Album from "../../components/Album";
 
@@ -84,6 +91,14 @@ function Overview() {
   // Whether the options used to set album viewing are set or not
   const [viewOptionsFolded, setViewOptionsFolded] = useState(true);
 
+  const [sortDirection, setSortDirection] = useState<
+    "ascending" | "descending"
+  >("ascending");
+
+  const [sortBy, setSortBy] = useState<
+    typeof AlbumSortOptions[number] | typeof AudioSortOptions[number] | null
+  >(null);
+
   // Show all occurencies
   const resetResults = () => {
     switch (currentField) {
@@ -123,8 +138,6 @@ function Overview() {
   }, [viewOptionsFolded]);
 
   /* Event Handlers */
-
-  const containerOnScroll = () => {};
 
   const selectOnClick = () => {
     setOptionsFolded(!optionsFolded);
@@ -191,11 +204,16 @@ function Overview() {
     }
   };
 
+  const sortDirectionButtonOnClick = () => {
+    setSortDirection(
+      sortDirection === "ascending" ? "descending" : "ascending"
+    );
+  };
+
+  const sortByButtonOnClick = () => {};
+
   return (
-    <StyledOverview
-      onScroll={containerOnScroll}
-      albumAppearance={albumAppearance}
-    >
+    <StyledOverview albumAppearance={albumAppearance}>
       <Searchbar
         currentField={currentField}
         fields={[...fields]}
@@ -205,19 +223,51 @@ function Overview() {
         selectOnClick={selectOnClick}
       />
       {results.length ? (
-        <div className="results-wrapper">
-          <ul className="results">
-            {results.map((result, i) => (
-              <li key={i}>
-                <Result
-                  result={result}
-                  field={currentField}
-                  albumAppearance={albumAppearance}
-                />
-              </li>
-            ))}
-          </ul>
-        </div>
+        <>
+          <div className="sort-container">
+            {(currentField === "Song" || currentField === "Album") && (
+              <div className="buttons">
+                <button
+                  className="sort-direction"
+                  title={sortDirection}
+                  onClick={sortDirectionButtonOnClick}
+                >
+                  {sortDirection === "ascending" ? (
+                    <AiOutlineSortAscending />
+                  ) : (
+                    <AiOutlineSortDescending />
+                  )}
+                </button>
+                <button className="sort-by" onClick={sortByButtonOnClick}>
+                  <MdSort />
+                </button>
+                <div className="sort-options">
+                  {currentField === "Song" &&
+                    AudioSortOptions.map((option) => <div>{option}</div>)}
+                  {currentField === "Album" &&
+                    AlbumSortOptions.map((option) => <div>{option}</div>)}
+                </div>
+              </div>
+            )}
+            <div className="count">
+              <span>{results.length}</span>
+              {`result${results.length > 1 ? "s" : ""}`}
+            </div>
+          </div>
+          <div className="results-wrapper">
+            <ul className="results">
+              {results.map((result, i) => (
+                <li key={i}>
+                  <Result
+                    result={result}
+                    field={currentField}
+                    albumAppearance={albumAppearance}
+                  />
+                </li>
+              ))}
+            </ul>
+          </div>
+        </>
       ) : (
         <h1 className="no-result">
           <span>No result found 😞</span>
