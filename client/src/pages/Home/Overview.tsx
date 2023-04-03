@@ -1,4 +1,4 @@
-import { useState, useRef, useContext, useEffect, useMemo } from "react";
+import { useState, useRef, useContext, useEffect } from "react";
 import { MdSort } from "react-icons/md";
 import { BsFillGearFill } from "react-icons/bs";
 import {
@@ -8,7 +8,7 @@ import {
 import { GrClose } from "react-icons/gr";
 import { DatasContext } from "../../utils";
 import { StyledOverview } from "../../styles";
-import { Song, Searchbar } from "../../components";
+import { Song, Searchbar, Popup } from "../../components";
 import {
   AlbumAppearance,
   Audio,
@@ -99,6 +99,8 @@ function Overview() {
     typeof AlbumSortOptions[number] | typeof AudioSortOptions[number] | null
   >(null);
 
+  const [sortPopupShown, setSortPopupShown] = useState(false);
+
   // Show all occurencies
   const resetResults = () => {
     switch (currentField) {
@@ -127,6 +129,14 @@ function Overview() {
   }, [audios, currentField]);
 
   useEffect(() => {
+    setSortBy(null);
+  }, [currentField]);
+
+  useEffect(() => {
+    setResults(results.reverse());
+  }, [sortDirection]);
+
+  useEffect(() => {
     const button = viewSetterButton.current;
     if (button)
       button.style.transform = `rotate(${viewOptionsFolded ? 180 : 0}deg)`;
@@ -137,21 +147,28 @@ function Overview() {
     }, 300);
   }, [viewOptionsFolded]);
 
-  /* Event Handlers */
+  useEffect(() => {
+    if (sortBy) {
+      const sort = (arr: any[], key: string) => {
+        arr.sort((a, b) => {
+          if (a[key] < b[key]) return -1;
+          if (a[key] > b[key]) return 1;
+          return 0;
+        });
 
-  const selectOnClick = () => {
-    setOptionsFolded(!optionsFolded);
-  };
+        return sortDirection === "ascending" ? arr : arr.reverse();
+      };
+      setResults(sort([...results], sortBy.toString()));
+    }
+  }, [sortDirection, sortBy]);
+
+  /* Event Handlers */
 
   const optionOnClick = (index: number) => {
     setCurrentField(fields[index]);
     setAlbumAppearance(AlbumAppearance.WithThumbnail);
     setViewOptionsFolded(true);
     setOptionsFolded(true);
-  };
-
-  const viewSetterOnClick = () => {
-    setViewOptionsFolded(!viewOptionsFolded);
   };
 
   const viewOptionOnClick = (appearance: AlbumAppearance) => {
@@ -210,8 +227,6 @@ function Overview() {
     );
   };
 
-  const sortByButtonOnClick = () => {};
-
   return (
     <StyledOverview albumAppearance={albumAppearance}>
       <Searchbar
@@ -220,33 +235,57 @@ function Overview() {
         inputOnEdit={inputOnEdit}
         optionOnClick={optionOnClick}
         optionsFolded={optionsFolded}
-        selectOnClick={selectOnClick}
+        selectOnClick={() => {
+          setOptionsFolded(!optionsFolded);
+        }}
       />
       {results.length ? (
         <>
           <div className="sort-container">
             {(currentField === "Song" || currentField === "Album") && (
               <div className="buttons">
+                {sortBy && (
+                  <button
+                    className="sort-direction"
+                    title={sortDirection}
+                    onClick={sortDirectionButtonOnClick}
+                  >
+                    {sortDirection === "ascending" ? (
+                      <AiOutlineSortAscending />
+                    ) : (
+                      <AiOutlineSortDescending />
+                    )}
+                  </button>
+                )}
                 <button
-                  className="sort-direction"
-                  title={sortDirection}
-                  onClick={sortDirectionButtonOnClick}
+                  className="sort-by"
+                  onClick={() => {
+                    setSortPopupShown(!sortPopupShown);
+                  }}
                 >
-                  {sortDirection === "ascending" ? (
-                    <AiOutlineSortAscending />
-                  ) : (
-                    <AiOutlineSortDescending />
-                  )}
-                </button>
-                <button className="sort-by" onClick={sortByButtonOnClick}>
                   <MdSort />
                 </button>
-                <div className="sort-options">
-                  {currentField === "Song" &&
-                    AudioSortOptions.map((option) => <div>{option}</div>)}
-                  {currentField === "Album" &&
-                    AlbumSortOptions.map((option) => <div>{option}</div>)}
-                </div>
+                {sortPopupShown && (
+                  <Popup
+                    options={[
+                      ...(currentField === "Song"
+                        ? AudioSortOptions
+                        : AlbumSortOptions),
+                    ]}
+                    optionOnClick={(currentField === "Song"
+                      ? AudioSortOptions
+                      : AlbumSortOptions
+                    ).map((_, i) => {
+                      return {
+                        index: i,
+                        callback: (option) => {
+                          setSortBy(option as typeof sortBy);
+                          setSortPopupShown(false);
+                        },
+                      };
+                    })}
+                  />
+                )}
               </div>
             )}
             <div className="count">
@@ -278,7 +317,9 @@ function Overview() {
           <button
             className="view-setter"
             ref={viewSetterButton}
-            onClick={viewSetterOnClick}
+            onClick={() => {
+              setViewOptionsFolded(!viewOptionsFolded);
+            }}
           >
             {viewButton}
           </button>

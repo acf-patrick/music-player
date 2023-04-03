@@ -1,5 +1,6 @@
 export interface IPopupProps {
-  options: [String, (option: String) => void][];
+  options: String[];
+  optionOnClick?: { index: number; callback: (option: String) => void }[];
   separators?: number[]; // Option index where to place separator after
 }
 

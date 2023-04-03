@@ -30,6 +30,7 @@ const StyledOverview = styled.div<{ albumAppearance: AlbumAppearance }>`
     }
 
     .buttons {
+      position: relative;
       display: flex;
       gap: 10px;
 
@@ -44,7 +45,7 @@ const StyledOverview = styled.div<{ albumAppearance: AlbumAppearance }>`
         aspect-ratio: 1;
         background: ${({ theme }) => theme.colors.bgSecondary};
         outline: none;
-        transition: color: 300ms;
+        transition: color 300ms;
 
         &:focus {
           color: ${({ theme }) => theme.colors.hovered.border};
@@ -52,10 +53,6 @@ const StyledOverview = styled.div<{ albumAppearance: AlbumAppearance }>`
         }
       }
     }
-  }
-
-  .sort-options {
-    display: none;
   }
 
   ul.results {

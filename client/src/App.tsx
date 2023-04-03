@@ -48,6 +48,8 @@ function App() {
             songs: new Set([audio.hash]),
           });
         }
+
+        genres.sort((a, b) => (a.name < b.name ? -1 : a.name > b.name ? 1 : 0));
       }
 
       if (audio.artist) {
@@ -67,6 +69,10 @@ function App() {
             else artist.albums = new Set([audio.album]);
           }
         }
+
+        artists.sort((a, b) =>
+          a.name < b.name ? -1 : a.name > b.name ? 1 : 0
+        );
       }
     }
   }, [audios]);
