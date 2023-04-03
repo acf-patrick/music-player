@@ -26,7 +26,7 @@ const StyledForm = styled.form<{ arrowDown: boolean }>`
   }
 
   .options {
-    z-index: 10;
+    z-index: 20;
     position: absolute;
     top: 100%;
     left: 0;

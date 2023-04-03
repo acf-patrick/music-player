@@ -68,8 +68,6 @@ const StyledOverview = styled.div<{ albumAppearance: AlbumAppearance }>`
     grid-template-columns: repeat(auto-fit, minmax(128px, 160px));
     grid-auto-rows: 1fr;
     grid-gap: 0.5rem;
-    /* align-items: start;
-    justify-items: center; */
   }
 
   li {
@@ -127,7 +125,6 @@ const StyledOverview = styled.div<{ albumAppearance: AlbumAppearance }>`
 
   .view-options {
     position: absolute;
-    z-index: 10;
     right: calc(50% + 32px);
     bottom: 98px;
     border-radius: 5px;

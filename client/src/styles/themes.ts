@@ -1,15 +1,15 @@
 const themes = {
   colors: {
-    text: "#000",
+    text: "black",
     background: "#EFEFEF",
     bgSecondary: "#E3E3E3",
     contextMenu: {
       text: "#7F868D",
+      separator: "#CFCFCF",
       background: "rgba(255, 255, 255, 0.7)",
-      separator: "#F8F8F8",
       hovered: {
         text: "black",
-        background: "#FFECEE",
+        background: "rgba(43, 43, 43, 0.11)",
       },
     },
     hovered: {
