@@ -37,7 +37,7 @@ function Content() {
             By <span>Title</span>
           </div>
         </div>
-        <Queue songs={[]} />
+        <Queue songs={[...audios]} />
         <div className="player-placeholder"></div>
       </div>
     </StyledHomeContent>

@@ -43,7 +43,7 @@ const StyledHomeContent = styled.div`
     margin-bottom: 1rem;
   }
 
-  button {
+  .header button {
     width: 60px;
     height: 60px;
     border-radius: 100%;
