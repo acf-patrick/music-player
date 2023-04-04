@@ -40,7 +40,7 @@ const StyledForm = styled.form<{ arrowDown: boolean }>`
     transition: transform 200ms ease-in-out;
 
     div {
-      color: #101010;
+      color: ${({ theme }) => theme.colors.option};
       font-size: 1rem;
       padding: 0.4rem 1.75rem;
       cursor: pointer;

@@ -1,14 +1,14 @@
-import { useState, useRef, useContext, useEffect } from "react";
 import { MdSort } from "react-icons/md";
+import { GrClose } from "react-icons/gr";
+import { DatasContext } from "../../utils";
+import { StyledOverview } from "../../styles";
 import { BsFillGearFill } from "react-icons/bs";
+import { useState, useRef, useContext, useEffect } from "react";
+import { Song, Searchbar, Popup, Album } from "../../components";
 import {
   AiOutlineSortAscending,
   AiOutlineSortDescending,
 } from "react-icons/ai";
-import { GrClose } from "react-icons/gr";
-import { DatasContext } from "../../utils";
-import { StyledOverview } from "../../styles";
-import { Song, Searchbar, Popup } from "../../components";
 import {
   AlbumAppearance,
   Audio,
@@ -18,7 +18,6 @@ import {
   AlbumSortOptions,
   AudioSortOptions,
 } from "../../utils/models";
-import Album from "../../components/Album";
 
 // Convenience component for conditional rendering
 function Result({
@@ -101,26 +100,32 @@ function Overview() {
 
   const [sortPopupShown, setSortPopupShown] = useState(false);
 
-  // Show all occurencies
-  const resetResults = () => {
+  const getDefaultResults = () => {
     switch (currentField) {
       case "Song":
-        setResults([...audios]);
+        return [...audios];
         break;
       case "Artist":
-        setResults([...artists]);
+        return [...artists];
         break;
       case "Genre":
-        setResults([...genres]);
+        return [...genres];
         break;
       case "Album":
-        setResults([...albums]);
+        return [...albums];
         break;
       case "Playlist":
-        setResults([]);
+        return [];
         break;
       default:
     }
+
+    return [];
+  };
+
+  // Show all occurencies
+  const resetResults = () => {
+    setResults(getDefaultResults());
   };
 
   useEffect(() => {
@@ -330,13 +335,6 @@ function Overview() {
               }}
             >
               List with thumbnail
-            </div>
-            <div
-              onClick={() => {
-                viewOptionOnClick(AlbumAppearance.WithoutThumbnail);
-              }}
-            >
-              List without thumbnail
             </div>
             <div
               onClick={() => {

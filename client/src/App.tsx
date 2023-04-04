@@ -7,14 +7,14 @@ import { Home, Error } from "./pages";
 import { StyledAppContainer } from "./styles";
 import themes from "./styles/themes";
 import useAudios from "./utils/hook";
-import { useMemo } from "react";
-import { Artist, Genre, Album } from "./utils/models";
+import { Artist, Genre, Album, Audio } from "./utils/models";
 
 function App() {
   const audios = useAudios();
   const [artists, setArtists] = useState<Artist[]>([]);
   const [genres, setGenres] = useState<Genre[]>([]);
   const [albums, setAlbums] = useState<Album[]>([]);
+  const [queue, setQueue] = useState<Audio[]>([]);
 
   useEffect(() => {
     if (audios.length > 0) {
@@ -25,6 +25,11 @@ function App() {
           const songs = album.songs!;
           if (!songs.has(audio.hash)) {
             songs.add(audio.hash);
+            if (audio.year !== undefined)
+              album.year = Math.max(
+                album.year === undefined ? 0 : album.year,
+                audio.year.valueOf()
+              );
             album.duration! += stringToDuration(audio.duration?.toString()!);
           }
         } else {
@@ -33,6 +38,7 @@ function App() {
             artist: audio.artist ? audio.artist : "Unknown",
             cover: audio.cover,
             songs: new Set([audio.hash]),
+            year: audio.year?.valueOf(),
             duration: stringToDuration(audio.duration?.toString()!),
           });
         }
@@ -79,7 +85,7 @@ function App() {
 
   return (
     <ThemeProvider theme={themes}>
-      <DatasContext.Provider value={{ audios, albums, genres, artists }}>
+      <DatasContext.Provider value={{ audios, albums, genres, artists, queue }}>
         <StyledAppContainer>
           <Router>
             <Routes>

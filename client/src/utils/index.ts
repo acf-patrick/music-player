@@ -1,30 +1,24 @@
 import { createContext } from "react";
 import CryptoJs from "crypto-js";
-import { Album, Artist, Audio, Genre } from "./models";
-
-interface IDataList {
-  audios: Audio[];
-  albums: Album[];
-  artists: Artist[];
-  genres: Genre[];
-}
+import { IDataList } from "./models";
 
 export const DatasContext = createContext<IDataList>({
   audios: [],
   albums: [],
   artists: [],
   genres: [],
+  queue: [],
 });
 
-// async function getSHA256(blob: Blob) {
-//   const buffer = await blob.arrayBuffer();
-//   const arr = new Uint32Array(
-//     buffer.slice(0, 4 * Math.floor(buffer.byteLength / 4))
-//   );
-//   const wordArray = CryptoJs.lib.WordArray.create([...arr]);
+/* async function getSHA256(blob: Blob) {
+  const buffer = await blob.arrayBuffer();
+  const arr = new Uint32Array(
+    buffer.slice(0, 4 * Math.floor(buffer.byteLength / 4))
+  );
+  const wordArray = CryptoJs.lib.WordArray.create([...arr]);
 
-//   return CryptoJs.SHA256(wordArray).toString(CryptoJs.enc.Base64);
-// }
+  return CryptoJs.SHA256(wordArray).toString(CryptoJs.enc.Base64);
+} */
 
 // Convert number of seconds to hh:mm:ss
 export function durationToString(duration: number) {
@@ -86,4 +80,3 @@ export function levenshteinDistance(str1: String, str2: String) {
   }
   return track[str2.length][str1.length];
 }
-

@@ -6,7 +6,6 @@ export interface IPopupProps {
 
 export enum AlbumAppearance {
   WithThumbnail,
-  WithoutThumbnail,
   GridCell,
 }
 
@@ -38,6 +37,7 @@ export interface Album {
   artist?: String;
   cover?: String;
   duration?: number;
+  year?: number; // Year of the latest released song
   songs?: Set<String>; // List of song hash
 }
 
@@ -52,4 +52,12 @@ export interface Artist {
 export interface Genre {
   name: String;
   songs?: Set<String>; // List of song hash
+}
+
+export interface IDataList {
+  audios: Audio[];
+  albums: Album[];
+  artists: Artist[];
+  genres: Genre[];
+  queue: Audio[]; // List of played audios
 }

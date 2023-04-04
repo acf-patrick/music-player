@@ -3,6 +3,14 @@ const themes = {
     text: "black",
     background: "#EFEFEF",
     bgSecondary: "#E3E3E3",
+    homeContentBg: {
+      start: "#D3C8D3",
+      end: "#DAD3D5",
+    },
+    option: "#101010",
+    albumName: "#505050",
+    songTitle: "#303030",
+    placeholder: "rgba(0, 0, 0, 0.3)",
     contextMenu: {
       text: "#7F868D",
       separator: "#CFCFCF",

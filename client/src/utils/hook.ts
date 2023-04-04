@@ -44,7 +44,6 @@ function getMetadata(
       getDuration(source, (duration) => {
         audio.duration = duration;
         audio.cover = getImage(tags.picture.format, tags.picture.data);
-
         if (!audios.find((audio) => audio.hash === hash)) {
           audios.push(audio);
           setAudios([...audios]);

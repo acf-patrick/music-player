@@ -33,7 +33,7 @@ const StyledContainer = styled.div`
   .title {
     font-weight: bold;
     font-size: 1rem;
-    color: #303030;
+    color: ${({ theme }) => theme.colors.songTitle};
   }
 
   .artist,

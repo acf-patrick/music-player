@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import Contents from "./Contents";
+import Content from "./Content";
 import Overview from "./Overview";
 
 const StyledContainer = styled.div`
@@ -13,7 +13,7 @@ function Home() {
   return (
     <StyledContainer>
       <Overview />
-      <Contents />
+      <Content />
     </StyledContainer>
   );
 }

@@ -44,38 +44,6 @@ const StyledWithThumbnail = styled.div`
   }
 `;
 
-const StyledWithoutThumbnail = styled.div`
-  padding-bottom: 0.25rem;
-  border-bottom: solid 1px #1E1E1E;
-
-  &:hover {
-    border: none;
-  }
-
-  & > div:nth-of-type(2) {
-    flex-grow: 1;
-  }
-
-  .duration {
-    color: rgba(100, 100, 100, 0.75);
-  }
-  .artist {
-    font-size: 0.75rem;
-    color: grey;
-  }
-
-  .artist-duration {
-    display: flex;
-    justify-content: space-between;
-  }
-
-  .cover {
-    display: none;
-  }
-
-  padding-left: 0.5rem;
-`;
-
 const StyledGridCell = styled.div`
   height: 100%;
   padding: 0.25rem;
@@ -87,7 +55,7 @@ const StyledGridCell = styled.div`
   .name {
     font-size: 0.75rem;
     font-weight: bold;
-    color: #505050;
+    color: ${({ theme }) => theme.colors.albumName};
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
@@ -111,9 +79,6 @@ function Album({ appearance, name, artist, cover, duration }: IAlbum) {
       break;
     case AlbumAppearance.WithThumbnail:
       Container = StyledWithThumbnail;
-      break;
-    case AlbumAppearance.WithoutThumbnail:
-      Container = StyledWithoutThumbnail;
       break;
     default:
       Container = StyledWithThumbnail;

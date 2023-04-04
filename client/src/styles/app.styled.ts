@@ -9,6 +9,7 @@ const StyledAppContainer = styled.div`
   margin: auto;
   color: ${({ theme }) => theme.colors.text};
   position: relative;
+  overflow-y: auto;
 `;
 
 export default StyledAppContainer;
