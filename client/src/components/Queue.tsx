@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import styled from "styled-components";
 import { Audio } from "../utils/models";
 import { BsFillPlayFill } from "react-icons/bs";
@@ -19,27 +20,56 @@ const StyledContainer = styled.div`
   }
 
   li {
-    padding: 0.5rem 1rem 0.75rem 2rem;
+    padding: 1rem 1rem 0.75rem 2.25rem;
     color: white;
+    border-bottom: solid 1px rgba(0, 0, 0, 0.06);
+    background: transprent;
+    transition: background 500ms;
+    font-size: 0.85rem;
+
+    &:hover {
+      background: ${({ theme }) => theme.colors.song.bgHovered};
+    }
   }
 
   .song {
     display: flex;
     justify-content: space-between;
+    color: ${({ theme }) => theme.colors.song.color};
 
     button {
       cursor: pointer;
       background: transparent;
       border: none;
-      color: white;
+      color: ${({ theme }) => theme.colors.song.color};
+      font-size: 1.25rem;
+      display: grid;
+      place-items: center;
+    }
+
+    .right,
+    .left {
+      display: flex;
+      gap: 0.5rem;
+      align-items: center;
     }
   }
 `;
 
 function Queue({ songs }: { songs: Audio[] }) {
+  const queue = useMemo(() => {
+    return [...songs].sort((a, b) => {
+      if (a.title && b.title) {
+        if (a.title < b.title) return -1;
+        if (a.title > b.title) return 1;
+      }
+      return 0;
+    });
+  }, [songs]);
+
   return (
     <StyledContainer>
-      {songs ? (
+      {queue ? (
         <ul>
           {songs.map((song, i) => (
             <li key={i}>
