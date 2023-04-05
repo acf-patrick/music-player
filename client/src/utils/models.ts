@@ -60,4 +60,12 @@ export interface IDataList {
   artists: Artist[];
   genres: Genre[];
   queue: Audio[]; // List of played audios
+  playingSong: Audio | null; // Currently playing song
+  paused?: boolean; // true if current selected song has been paused
+}
+
+export interface IDataMutatorList {
+  setQueue?: (audios: Audio[]) => void;
+  setPlayingSong?: (audio: Audio | null) => void;
+  setPaused?: (paused: boolean) => void;
 }

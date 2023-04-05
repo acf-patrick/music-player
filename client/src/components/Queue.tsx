@@ -1,8 +1,9 @@
-import { useMemo } from "react";
+import { useContext, useMemo } from "react";
 import styled from "styled-components";
 import { Audio } from "../utils/models";
-import { BsFillPlayFill } from "react-icons/bs";
+import { BsFillPlayFill, BsPauseFill } from "react-icons/bs";
 import { GoKebabVertical } from "react-icons/go";
+import { DataMutatorsContext, DatasContext } from "../utils";
 
 const StyledContainer = styled.div`
   flex-grow: 1;
@@ -22,13 +23,23 @@ const StyledContainer = styled.div`
   li {
     padding: 1rem 1rem 0.75rem 2.25rem;
     color: white;
-    border-bottom: solid 1px rgba(0, 0, 0, 0.06);
+    border-bottom: solid 1px ${({ theme }) => theme.colors.song.borderBottom};
     background: transprent;
     transition: background 500ms;
     font-size: 0.85rem;
 
     &:hover {
       background: ${({ theme }) => theme.colors.song.bgHovered};
+    }
+  }
+
+  .empty-queue {
+    height: 100%;
+    display: grid;
+    place-items: center;
+
+    h1 {
+      font-size: 1.5rem;
     }
   }
 
@@ -43,6 +54,7 @@ const StyledContainer = styled.div`
       border: none;
       color: ${({ theme }) => theme.colors.song.color};
       font-size: 1.25rem;
+      padding: 5px;
       display: grid;
       place-items: center;
     }
@@ -56,42 +68,69 @@ const StyledContainer = styled.div`
   }
 `;
 
-function Queue({ songs }: { songs: Audio[] }) {
-  const queue = useMemo(() => {
-    return [...songs].sort((a, b) => {
-      if (a.title && b.title) {
-        if (a.title < b.title) return -1;
-        if (a.title > b.title) return 1;
-      }
-      return 0;
-    });
-  }, [songs]);
+function Queue({ songs: queue }: { songs: Audio[] }) {
+  const { playingSong, paused } = useContext(DatasContext);
+  const { setPlayingSong, setPaused } = useContext(DataMutatorsContext);
+
+  const playButtonOnClick = (song: Audio) => {
+    if (playingSong) {
+      setPaused!(song.hash === playingSong.hash ? !paused : false);
+    } else setPaused!(false);
+    setPlayingSong!(song);
+  };
+
+  const menuButtonOnClick = (e: React.MouseEvent<HTMLButtonElement>) => {};
 
   return (
     <StyledContainer>
       {queue ? (
         <ul>
-          {songs.map((song, i) => (
-            <li key={i}>
+          {queue.map((song, i) => (
+            <li
+              key={i}
+              onDoubleClick={() => {
+                playButtonOnClick(song);
+              }}
+            >
               <div className="song">
                 <div className="left">
-                  <button>
-                    <BsFillPlayFill />
+                  <button
+                    onClick={() => {
+                      playButtonOnClick(song);
+                    }}
+                  >
+                    {playingSong ? (
+                      playingSong.hash === song.hash ? (
+                        paused ? (
+                          <BsFillPlayFill />
+                        ) : (
+                          <BsPauseFill />
+                        )
+                      ) : (
+                        <BsFillPlayFill />
+                      )
+                    ) : (
+                      <BsFillPlayFill />
+                    )}
                   </button>
                   <span>{song.title}</span>
                 </div>
                 <div className="right">
                   <span>{song.duration}</span>
-                  <button>
-                    <GoKebabVertical />
-                  </button>
+                  <div className="menu-btn">
+                    <button onClick={menuButtonOnClick}>
+                      <GoKebabVertical />
+                    </button>
+                  </div>
                 </div>
               </div>
             </li>
           ))}
         </ul>
       ) : (
-        <h1>Played musics appear here. 🎧</h1>
+        <div className="empty-queue">
+          <h1>Played musics appear here. 🎧</h1>
+        </div>
       )}
     </StyledContainer>
   );

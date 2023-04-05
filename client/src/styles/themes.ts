@@ -10,6 +10,7 @@ const themes = {
       title: "#303030",
       border: "rgba(0, 0, 0, 0.6)",
       color: "black",
+      borderBottom: "rgba(0, 0, 0, 0.06)",
       bgHovered: "rgba(255, 255, 255, 0.29)",
     },
     homeContentBg: {

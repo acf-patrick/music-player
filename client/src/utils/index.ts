@@ -1,6 +1,6 @@
 import { createContext } from "react";
 import CryptoJs from "crypto-js";
-import { IDataList } from "./models";
+import { IDataList, IDataMutatorList } from "./models";
 
 export const DatasContext = createContext<IDataList>({
   audios: [],
@@ -8,7 +8,10 @@ export const DatasContext = createContext<IDataList>({
   artists: [],
   genres: [],
   queue: [],
+  playingSong: null,
 });
+
+export const DataMutatorsContext = createContext<IDataMutatorList>({});
 
 /* async function getSHA256(blob: Blob) {
   const buffer = await blob.arrayBuffer();

@@ -10,7 +10,7 @@ const showPlayButton = keyframes`
   }
 `;
 
-const StyledHomeContent = styled.div`
+const StyledHomeContent = styled.div<{ headerBg?: string }>`
   background: ${({ theme }) =>
     `linear-gradient(to bottom left, ${theme.colors.homeContentBg.start}, ${theme.colors.homeContentBg.end})`};
   background: ${({ theme }) => theme.colors.bgTertiary};
@@ -21,18 +21,32 @@ const StyledHomeContent = styled.div`
   .header {
     height: 32%;
     min-height: 230px;
-    background: url(/images/background.png);
-    background-size: cover;
 
     display: flex;
     flex-direction: column;
     justify-content: space-between;
     padding-left: ${({ theme }) => theme.spacings.padding};
+    position: relative;
+
+    &:before {
+      content: "";
+      display: block;
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      top: 0;
+      left: 0;
+      filter: ${({ headerBg }) => `blur(${headerBg ? "2px" : 0})`};
+      background: ${({ headerBg }) =>
+        `url(${headerBg ? headerBg : "/images/background.png"})`};
+      background-size: cover;
+    }
   }
 
   .texts {
     color: white;
     margin-top: 1rem;
+    z-index: 1;
 
     p {
       color: rgba(255, 255, 255, 0.5);

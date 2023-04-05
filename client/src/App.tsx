@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { ThemeProvider } from "styled-components";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import { DatasContext, stringToDuration } from "./utils";
+import { DatasContext, DataMutatorsContext, stringToDuration } from "./utils";
 import { Home, Error } from "./pages";
 
 import { StyledAppContainer } from "./styles";
@@ -15,6 +15,8 @@ function App() {
   const [genres, setGenres] = useState<Genre[]>([]);
   const [albums, setAlbums] = useState<Album[]>([]);
   const [queue, setQueue] = useState<Audio[]>([]);
+  const [paused, setPaused] = useState<boolean>(true);
+  const [playingSong, setPlayingSong] = useState<Audio | null>(null);
 
   useEffect(() => {
     if (audios.length > 0) {
@@ -85,15 +87,25 @@ function App() {
 
   return (
     <ThemeProvider theme={themes}>
-      <DatasContext.Provider value={{ audios, albums, genres, artists, queue }}>
-        <StyledAppContainer>
-          <Router>
-            <Routes>
-              <Route path="/" element={<Home />} />
-              <Route path="*" element={<Error />} />
-            </Routes>
-          </Router>
-        </StyledAppContainer>
+      <DatasContext.Provider
+        value={{ audios, albums, genres, artists, queue, playingSong, paused }}
+      >
+        <DataMutatorsContext.Provider
+          value={{
+            setQueue,
+            setPlayingSong,
+            setPaused
+          }}
+        >
+          <StyledAppContainer>
+            <Router>
+              <Routes>
+                <Route path="/" element={<Home />} />
+                <Route path="*" element={<Error />} />
+              </Routes>
+            </Router>
+          </StyledAppContainer>
+        </DataMutatorsContext.Provider>
       </DatasContext.Provider>
     </ThemeProvider>
   );

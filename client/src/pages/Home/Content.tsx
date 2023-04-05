@@ -6,12 +6,12 @@ import { StyledHomeContent } from "../../styles";
 import { Queue } from "../../components";
 
 function Content() {
-  const { audios, queue } = useContext(DatasContext);
+  const { audios, playingSong, queue } = useContext(DatasContext);
 
   const playButtonOnClick = () => {};
 
   return (
-    <StyledHomeContent>
+    <StyledHomeContent headerBg={playingSong?.cover?.toString()}>
       <div className="header">
         <div className="texts">
           <h1>Library</h1>
