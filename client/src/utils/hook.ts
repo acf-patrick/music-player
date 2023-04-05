@@ -16,6 +16,7 @@ function getImage(format: String, data: number[]) {
 
 function getDuration(source: String, callback: (duration: String) => any) {
   const audio = new Audio();
+  audio.preload = "metadata";
   audio.onloadedmetadata = () => {
     if (isNaN(audio.duration)) callback("");
     else callback(durationToString(audio.duration));

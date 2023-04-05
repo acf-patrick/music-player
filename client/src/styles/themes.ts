@@ -6,6 +6,9 @@ const themes = {
     option: "#101010",
     albumName: "#505050",
     placeholder: "rgba(0, 0, 0, 0.3)",
+    player: {
+      line: "#7000FF",
+    },
     song: {
       title: "#303030",
       border: "rgba(0, 0, 0, 0.6)",

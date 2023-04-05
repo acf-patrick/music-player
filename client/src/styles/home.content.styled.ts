@@ -40,6 +40,7 @@ const StyledHomeContent = styled.div<{ headerBg?: string }>`
       background: ${({ headerBg }) =>
         `url(${headerBg ? headerBg : "/images/background.png"})`};
       background-size: cover;
+      transition: background 500ms;
     }
   }
 
@@ -94,10 +95,14 @@ const StyledHomeContent = styled.div<{ headerBg?: string }>`
     margin: unset;
   }
 
-  .player-placeholder {
-    height: 14%;
-    min-height: 100px;
-    background: red;
+  .texts {
+    h1 {
+      text-shadow: 1px 3px rgba(0, 0, 0, 0.75);
+    }
+
+    p {
+      text-shadow: 0.5px 3px rgba(0, 0, 0, 0.75);
+    }
   }
 
   .inner {

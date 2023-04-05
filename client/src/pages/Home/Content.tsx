@@ -3,7 +3,7 @@ import { DatasContext } from "../../utils";
 import { CiSearch } from "react-icons/ci";
 import { FaPlay } from "react-icons/fa";
 import { StyledHomeContent } from "../../styles";
-import { Queue } from "../../components";
+import { Queue, Player } from "../../components";
 
 function Content() {
   const { audios, playingSong, queue } = useContext(DatasContext);
@@ -38,7 +38,7 @@ function Content() {
           </div>
         </div>
         <Queue songs={[...audios]} />
-        <div className="player-placeholder"></div>
+        {playingSong && <Player />}
       </div>
     </StyledHomeContent>
   );
