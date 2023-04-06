@@ -14,7 +14,7 @@ const slideUp = keyframes`
 const StyledContainer = styled.div`
   height: 14%;
   min-height: 100px;
-  background: red;
+  // background: red;
   animation: ${slideUp} 500ms both;
   position: relative;
 
@@ -77,8 +77,8 @@ function Player() {
       slide.style.backgroundSize = "0";
     }
   }, [playingSong]);
-  
 
+  // Number of seconds elapsed
   const [progression, setProgression] = useState(0);
 
   /* useEffect(() => {
@@ -108,11 +108,14 @@ function Player() {
             type="range"
             max={duration}
             name="slide"
+            style={{
+              backgroundSize: `${Math.floor(
+                (progression * 100) / duration
+              )}% 100%`,
+            }}
             onInput={(e) => {
               const input = e.target as HTMLInputElement;
-              input.style.backgroundSize = `${Math.ceil(
-                (parseInt(input.value) * 100) / duration
-              )}% 100%`;
+              setProgression(parseInt(input.value));
             }}
             defaultValue={0}
           />
