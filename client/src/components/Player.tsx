@@ -1,6 +1,7 @@
-import { useContext } from "react";
+import { useRef, useEffect, useState, useMemo, useContext } from "react";
 import styled, { keyframes } from "styled-components";
-import { DatasContext } from "../utils";
+import { DataMutatorsContext, DatasContext } from "../utils";
+import { stringToDuration } from "../utils";
 
 const slideUp = keyframes`
   from {
@@ -18,66 +19,104 @@ const StyledContainer = styled.div`
   position: relative;
 
   .slide {
-    position: relative;
-    left: 0;
-    top: 0;
     height: 3px;
-    //transform: translateY(-50%);
     display: flex;
     align-items: center;
-    justify-content: flex-end;
+    background: ${({ theme }) => theme.colors.song.borderBottom};
   }
 
-  // test
+  input {
+    height: 3px;
+    flex-grow: 1;
+    -webkit-appearance: none;
+    margin: unset;
+    background-image: ${({ theme }) =>
+      `linear-gradient(${theme.colors.player.line}, ${theme.colors.player.line})`};
+    background-size: 0 100%;
+    background-repeat: no-repeat;
 
-  .line {
-    width: 60%;
-  }
+    &::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 8px;
+      aspect-ratio: 1;
+      background: black;
+      border-radius: 100%;
+      outline: solid 0px transparent;
+      transition: outline 300ms;
+      background: ${({ theme }) => theme.colors.player.line};
 
-  .remainder {
-    width: calc(40% - 10px);
-  }
-
-  ///////
-
-  .line,
-  .circle {
-    background: ${({ theme }) => theme.colors.player.line};
-  }
-
-  .line,
-  .remainder {
-    height: 100%;
-  }
-
-  .circle {
-    // display: none;
-    cursor: pointer;
-    width: 10px;
-    height: 10px;
-    border-radius: 100%;
-    transform: scale(1);
-    transition: transform 300ms;
-
-    &:hover {
-      transform: scale(1.25);
+      &:hover {
+        cursor: pointer;
+        outline: solid 2px ${({ theme }) => theme.colors.player.line};
+      }
     }
-  }
-
-  .remainder {
-    // box-shadow: 0 -1px 5px rgba(0, 0, 0, 1);
   }
 `;
 
+let playerTimerHandle = 0;
+
 function Player() {
-  const { playingSong } = useContext(DatasContext);
+  const { paused, playingSong } = useContext(DatasContext);
+  const { setPaused } = useContext(DataMutatorsContext);
+
+  const slideRef = useRef<HTMLInputElement | null>(null);
+
+  // Song duration in seconds
+  const duration = useMemo(() => {
+    if (playingSong) {
+      if (playingSong.duration)
+        return stringToDuration(playingSong.duration.toString());
+    }
+    return 0;
+  }, [playingSong]);
+
+  useEffect(() => {
+    const slide = slideRef.current;
+    if (slide) {
+      slide.value = "0";
+      slide.style.backgroundSize = "0";
+    }
+  }, [playingSong]);
+  
+
+  const [progression, setProgression] = useState(0);
+
+  /* useEffect(() => {
+    if (!playerTimerHandle)
+      playerTimerHandle = setInterval(() => {
+        setProgression((progression) => progression + 1);
+      }, duration * 10);
+  }, [playingSong]);
+
+  useEffect(() => {}, []);
+
+  useEffect(() => {
+    if (progression >= 100) {
+      setPaused!(true);
+      clearInterval(playerTimerHandle);
+    }
+  }, [progression]); */
+
+  const slideOnMouseOver = (e: React.MouseEvent<HTMLDivElement>) => {};
 
   return (
     <StyledContainer>
       <div className="slide">
-        <span className="line"></span>
-        <span className="circle"></span>
-        <span className="remainder"></span>
+        {duration && (
+          <input
+            ref={slideRef}
+            type="range"
+            max={duration}
+            name="slide"
+            onInput={(e) => {
+              const input = e.target as HTMLInputElement;
+              input.style.backgroundSize = `${Math.ceil(
+                (parseInt(input.value) * 100) / duration
+              )}% 100%`;
+            }}
+            defaultValue={0}
+          />
+        )}
       </div>
     </StyledContainer>
   );
