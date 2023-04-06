@@ -1,14 +1,23 @@
 import { useContext } from "react";
-import { DatasContext } from "../../utils";
+import { DataMutatorsContext, DatasContext } from "../../utils";
 import { CiSearch } from "react-icons/ci";
-import { FaPlay } from "react-icons/fa";
+import { FaPause, FaPlay } from "react-icons/fa";
 import { StyledHomeContent } from "../../styles";
 import { Queue, Player } from "../../components";
 
 function Content() {
-  const { audios, playingSong, queue } = useContext(DatasContext);
+  const { audios, playingSong, paused, queue } = useContext(DatasContext);
+  const { setPlayingSong, setPaused } = useContext(DataMutatorsContext);
 
-  const playButtonOnClick = () => {};
+  const playButtonOnClick = () => {
+    if (playingSong) setPaused!(!paused);
+    else if (queue) {
+      if (queue.length) {
+        setPlayingSong!(queue[0]);
+        setPaused!(false);
+      }
+    }
+  };
 
   return (
     <StyledHomeContent headerBg={playingSong?.cover?.toString()}>
@@ -21,7 +30,7 @@ function Content() {
         </div>
         <div className="play-button">
           <button onClick={playButtonOnClick}>
-            <FaPlay />
+            {paused ? <FaPlay /> : <FaPause />}
           </button>
         </div>
       </div>
