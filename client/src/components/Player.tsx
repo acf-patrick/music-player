@@ -73,28 +73,37 @@ function Player() {
   // Number of seconds elapsed
   const [progression, setProgression] = useState(0);
 
+  const updateProgression = () => {
+    playerTimerHandle = setInterval(() => {
+      if (!paused) {
+        const slide = slideRef.current;
+        setProgression((progression) => {
+          if (slide) slide.value = `${progression + 1}`;
+          return progression + 1;
+        });
+      }
+    }, 1000);
+  };
+
   useEffect(() => {
     const slide = slideRef.current;
     if (slide) {
       slide.value = "0";
       slide.style.backgroundSize = "0";
     }
-
-    if (!playerTimerHandle)
-      playerTimerHandle = setInterval(() => {
-        setProgression((progression) => {
-          if (slide) slide.value = `${progression + 1}`;
-          return progression + 1;
-        });
-      }, 1000);
   }, [playingSong]);
 
   useEffect(() => {
-    if (progression >= duration) {
-      setPaused!(true);
-      clearInterval(playerTimerHandle);
-    }
+    if (progression >= duration) setPaused!(true);
   }, [progression]);
+
+  useEffect(() => {
+    if (paused) {
+      clearInterval(playerTimerHandle);
+    } else {
+      updateProgression();
+    }
+  }, [paused]);
 
   const slideOnMouseOver = (e: React.MouseEvent<HTMLDivElement>) => {};
 
