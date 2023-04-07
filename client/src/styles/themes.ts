@@ -6,6 +6,10 @@ const themes = {
     option: "#101010",
     albumName: "#505050",
     placeholder: "rgba(0, 0, 0, 0.3)",
+    tooltip: {
+      text: "white",
+      background: "black"
+    },
     player: {
       line: "#7000FF",
     },

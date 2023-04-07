@@ -1,6 +1,6 @@
 import { useRef, useEffect, useState, useMemo, useContext } from "react";
 import styled, { keyframes } from "styled-components";
-import { DataMutatorsContext, DatasContext } from "../utils";
+import { DataMutatorsContext, DatasContext, durationToString } from "../utils";
 import { stringToDuration } from "../utils";
 
 const slideUp = keyframes`
@@ -19,10 +19,38 @@ const StyledContainer = styled.div`
   position: relative;
 
   .slide {
+    position: relative;
     height: 3px;
     display: flex;
     align-items: center;
     background: ${({ theme }) => theme.colors.song.borderBottom};
+  }
+
+  .tooltip {
+    position: absolute;
+    top: calc(100% + 2px);
+    transform: translateX(-50%);
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    opacity: 0.25;
+    user-select: none;
+
+    .arrow {
+      width: 0;
+      height: 0;
+      border-left: solid 5px transparent;
+      border-right: solid 5px transparent;
+      border-bottom: solid 5px ${({ theme }) => theme.colors.tooltip.background};
+    }
+
+    .text {
+      color: ${({ theme }) => theme.colors.tooltip.text};
+      font-size: 0.75rem;
+      padding: 2px 5px;
+      border-radius: 5px;
+      background: ${({ theme }) => theme.colors.tooltip.background};
+    }
   }
 
   input {
@@ -61,6 +89,8 @@ function Player() {
 
   const slideRef = useRef<HTMLInputElement | null>(null);
 
+  const toolTipRef = useRef<HTMLDivElement | null>(null);
+
   // Song duration in seconds
   const duration = useMemo(() => {
     if (playingSong) {
@@ -72,6 +102,9 @@ function Player() {
 
   // Number of seconds elapsed
   const [progression, setProgression] = useState(0);
+
+  // Current mouse position on mouse over
+  const [mousePosition, setMousePosition] = useState("");
 
   const updateProgression = () => {
     if (!playerTimerHandle)
@@ -97,27 +130,62 @@ function Player() {
     }
   }, [paused]);
 
-  const slideOnMouseOver = (e: React.MouseEvent<HTMLDivElement>) => {};
+  const slideOnMouseMove = (e: React.MouseEvent<HTMLInputElement>) => {
+    const slide = slideRef.current;
+    if (slide) {
+      // input type range bouding box
+      const rect = slide.getBoundingClientRect();
+
+      // relative position of the mouse
+      const mouseX = e.clientX - rect.x;
+      if (0 <= mouseX && mouseX <= rect.width) {
+        const toolTip = toolTipRef.current;
+        if (toolTip) {
+          toolTip.style.display = "flex";
+          toolTip.style.left = `${(mouseX * 100) / rect.width}%`;
+        }
+
+        const time = durationToString(
+          Math.floor((parseInt(slide.max) * mouseX) / rect.width)
+        );
+
+        setMousePosition(time);
+      }
+    }
+  };
 
   return (
     <StyledContainer>
-      <div className="slide">
+      <div
+        className="slide"
+        onMouseLeave={() => {
+          setMousePosition("");
+        }}
+      >
         {duration && (
-          <input
-            ref={slideRef}
-            type="range"
-            max={duration}
-            name="slide"
-            style={{
-              backgroundSize: `${(progression * 100) / duration}% 100%`,
-            }}
-            onInput={(e) => {
-              const input = e.target as HTMLInputElement;
-              setProgression(parseInt(input.value));
-            }}
-            defaultValue={0}
-            value={progression}
-          />
+          <>
+            <input
+              ref={slideRef}
+              type="range"
+              max={duration}
+              name="slide"
+              style={{
+                backgroundSize: `${(progression * 100) / duration}% 100%`,
+              }}
+              onInput={(e) => {
+                const input = e.target as HTMLInputElement;
+                setProgression(parseInt(input.value));
+              }}
+              onMouseMove={slideOnMouseMove}
+              value={progression}
+            />
+            {mousePosition && (
+              <div className="tooltip" ref={toolTipRef}>
+                <span className="arrow"></span>
+                <span className="text">{mousePosition}</span>
+              </div>
+            )}
+          </>
         )}
       </div>
     </StyledContainer>

@@ -109,7 +109,7 @@ const StyledHomeContent = styled.div<{ headerBg?: string }>`
     display: flex;
     flex-direction: column;
     flex-grow: 1;
-    overflow-y: hidden;
+    overflow: hidden;
   }
 
   .searchbar {
