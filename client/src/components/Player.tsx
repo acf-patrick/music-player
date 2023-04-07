@@ -1,7 +1,19 @@
+import { BsFillVolumeUpFill, BsRepeat } from "react-icons/bs";
+import { IoMusicalNotesOutline } from "react-icons/io5";
+import {
+  TbPlayerTrackPrevFilled,
+  TbPlayerTrackNextFilled,
+  TbPlayerPlayFilled,
+} from "react-icons/tb";
 import { useRef, useEffect, useState, useMemo, useContext } from "react";
 import styled, { keyframes } from "styled-components";
-import { DataMutatorsContext, DatasContext, durationToString } from "../utils";
-import { stringToDuration } from "../utils";
+import {
+  DataMutatorsContext,
+  DatasContext,
+  stringToDuration,
+  durationToString,
+} from "../utils";
+import { StyledCover } from "../styles";
 
 const slideUp = keyframes`
   from {
@@ -14,9 +26,10 @@ const slideUp = keyframes`
 const StyledContainer = styled.div`
   height: 14%;
   min-height: 100px;
-  // background: red;
   animation: ${slideUp} 500ms both;
   position: relative;
+  display: flex;
+  flex-direction: column;
 
   .slide {
     position: relative;
@@ -24,6 +37,39 @@ const StyledContainer = styled.div`
     display: flex;
     align-items: center;
     background: ${({ theme }) => theme.colors.song.borderBottom};
+  }
+
+  .control {
+    flex-grow: 1;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    align-items: center;
+    // justify-content: space-between;
+    padding: 0 1.5rem;
+
+    &__left,
+    &__right {
+      display: flex;
+      gap: 1.5rem;
+      align-items: center;
+    }
+
+
+    .buttons {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+    }
+  }
+
+  .time {
+  }
+
+  .title {
+    max-width: 160px;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
   }
 
   .tooltip {
@@ -187,6 +233,45 @@ function Player() {
             )}
           </>
         )}
+      </div>
+      <div className="control">
+        <div className="control__left">
+          <StyledCover>
+            {playingSong?.cover ? (
+              <img src={playingSong?.cover?.toString()} alt="" />
+            ) : (
+              <IoMusicalNotesOutline />
+            )}
+          </StyledCover>
+          <div className="title">
+            {playingSong?.title ? playingSong?.title.toString() : "Unknown"}
+          </div>
+        </div>
+        <div className="buttons">
+          <button>
+            <TbPlayerTrackPrevFilled />
+          </button>
+          <button>
+            <TbPlayerPlayFilled />
+          </button>
+          <button>
+            <TbPlayerTrackNextFilled />
+          </button>
+        </div>
+        <div className="control__right">
+          <div className="time">
+            <span className="elapsed">
+              {durationToString(progression, false)} /{" "}
+            </span>
+            <span className="total">{durationToString(duration, false)}</span>
+          </div>
+          <button className="volume">
+            <BsFillVolumeUpFill />
+          </button>
+          <button className="repeat">
+            <BsRepeat />
+          </button>
+        </div>
       </div>
     </StyledContainer>
   );

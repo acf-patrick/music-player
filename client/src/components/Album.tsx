@@ -20,6 +20,7 @@ const StyledWithThumbnail = styled.div`
   .duration {
     color: rgba(100, 100, 100, 0.75);
   }
+
   .cover {
     display: grid;
     background: black;
@@ -30,7 +31,7 @@ const StyledWithThumbnail = styled.div`
 
   .artist {
     font-size: 0.75rem;
-    color: grey;
+    color: ${({ theme }) => theme.colors.album.artist.listItem};
   }
 
   svg {
@@ -62,7 +63,7 @@ const StyledGridCell = styled.div`
   }
 
   .artist {
-    color: black;
+    color: ${({ theme }) => theme.colors.album.artist.gridCell};
   }
 
   img {

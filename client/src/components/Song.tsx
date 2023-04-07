@@ -1,26 +1,10 @@
 import styled from "styled-components";
 import { Audio } from "../utils/models";
 import { IoMusicalNotesOutline } from "react-icons/io5";
+import { StyledCover } from "../styles";
 
 const StyledContainer = styled.div`
   display: flex;
-
-  .picture {
-    display: grid;
-    place-items: center;
-    border: 1px solid black;
-    background: #2d2727;
-
-    svg {
-      font-size: 1.5rem;
-      width: ${({ theme }) => theme.sizes.image.md};
-      color: white;
-    }
-
-    img {
-      max-width: ${({ theme }) => theme.sizes.image.md};
-    }
-  }
 
   .datas {
     display: flex;
@@ -52,13 +36,13 @@ const StyledContainer = styled.div`
 function Song({ datas }: { datas: Audio }) {
   return (
     <StyledContainer>
-      <div className="picture">
+      <StyledCover>
         {datas.cover ? (
           <img src={`${datas.cover}`} alt="" />
         ) : (
           <IoMusicalNotesOutline />
         )}
-      </div>
+      </StyledCover>
       <div className="datas">
         <div className="title">{datas.title ? datas.title : "Unknown"}</div>
         <div className="artist">{datas.artist ? datas.artist : "Unknown"}</div>

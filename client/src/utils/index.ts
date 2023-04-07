@@ -24,14 +24,14 @@ export const DataMutatorsContext = createContext<IDataMutatorList>({});
 } */
 
 // Convert number of seconds to hh:mm:ss
-export function durationToString(duration: number) {
+export function durationToString(duration: number, withLeadingZero = true) {
   let seconds = Math.ceil(duration);
   let minutes = Math.floor(seconds / 60);
   seconds %= 60;
   let hours = Math.floor(minutes / 60);
   minutes %= 60;
 
-  const toStr = (n: number) => `${n < 10 ? "0" : ""}${n}`;
+  const toStr = (n: number) => `${withLeadingZero && n < 10 ? "0" : ""}${n}`;
   return `${hours ? toStr(hours) + ":" : ""}${toStr(minutes) + ":"}${toStr(
     seconds
   )}`;

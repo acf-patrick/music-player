@@ -8,10 +8,16 @@ const themes = {
     placeholder: "rgba(0, 0, 0, 0.3)",
     tooltip: {
       text: "white",
-      background: "black"
+      background: "black",
     },
     player: {
       line: "#7000FF",
+    },
+    album: {
+      artist: {
+        gridCell: "black",
+        listItem: "grey",
+      },
     },
     song: {
       title: "#303030",
@@ -19,6 +25,10 @@ const themes = {
       color: "black",
       borderBottom: "rgba(0, 0, 0, 0.06)",
       bgHovered: "rgba(255, 255, 255, 0.29)",
+      cover: {
+        background: "#2d2727",
+        color: "white",
+      },
     },
     homeContentBg: {
       start: "#D3C8D3",
