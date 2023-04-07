@@ -27,7 +27,8 @@ const StyledHomeContent = styled.div<{ headerBg?: string }>`
     justify-content: space-between;
     padding-left: ${({ theme }) => theme.spacings.padding};
     position: relative;
-
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.7);
+    
     &:before {
       content: "";
       display: block;

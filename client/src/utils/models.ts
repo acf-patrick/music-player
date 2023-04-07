@@ -61,11 +61,18 @@ export interface IDataList {
   genres: Genre[];
   queue: Audio[]; // List of played audios
   playingSong: Audio | null; // Currently playing song
+  playingSongIndex: number; // Index of currently playing song in current queue
   paused?: boolean; // true if current selected song has been paused
 }
 
 export interface IDataMutatorList {
   setQueue?: (audios: Audio[]) => void;
+  setPlayingSongIndex?: (index: number) => void;
   setPlayingSong?: (audio: Audio | null) => void;
   setPaused?: (paused: boolean) => void;
+}
+
+export interface IPlayerProps {
+  previous?: Audio;
+  next?: Audio;
 }

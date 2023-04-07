@@ -17,6 +17,7 @@ function App() {
   const [queue, setQueue] = useState<Audio[]>([]);
   const [paused, setPaused] = useState<boolean>(true);
   const [playingSong, setPlayingSong] = useState<Audio | null>(null);
+  const [playingSongIndex, setPlayingSongIndex] = useState(-1);
 
   useEffect(() => {
     if (audios.length > 0) {
@@ -88,13 +89,31 @@ function App() {
   return (
     <ThemeProvider theme={themes}>
       <DatasContext.Provider
-        value={{ audios, albums, genres, artists, queue, playingSong, paused }}
+        value={{
+          audios,
+          albums,
+          genres,
+          artists,
+          queue,
+          playingSong,
+          paused,
+          playingSongIndex,
+        }}
       >
         <DataMutatorsContext.Provider
           value={{
             setQueue,
-            setPlayingSong,
-            setPaused
+            setPaused,
+            setPlayingSong: (song: Audio | null) => {
+              setPlayingSongIndex(-1);
+              setPlayingSong(song);
+            },
+            setPlayingSongIndex: (index: number) => {
+              if (index >= 0 && index < queue.length) {
+                setPlayingSongIndex(index);
+                setPlayingSong(queue[index]);
+              }
+            },
           }}
         >
           <StyledAppContainer>

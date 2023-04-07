@@ -9,6 +9,7 @@ export const DatasContext = createContext<IDataList>({
   genres: [],
   queue: [],
   playingSong: null,
+  playingSongIndex: -1,
 });
 
 export const DataMutatorsContext = createContext<IDataMutatorList>({});

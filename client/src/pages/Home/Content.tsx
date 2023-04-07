@@ -1,4 +1,4 @@
-import { useContext } from "react";
+import { useContext, useEffect } from "react";
 import { DataMutatorsContext, DatasContext } from "../../utils";
 import { CiSearch } from "react-icons/ci";
 import { FaPause, FaPlay } from "react-icons/fa";
@@ -6,8 +6,14 @@ import { StyledHomeContent } from "../../styles";
 import { Queue, Player } from "../../components";
 
 function Content() {
-  const { audios, playingSong, paused, queue } = useContext(DatasContext);
-  const { setPlayingSong, setPaused } = useContext(DataMutatorsContext);
+  const { audios, playingSong, playingSongIndex, paused, queue } =
+    useContext(DatasContext);
+  const { setPlayingSong, setPaused, setQueue } =
+    useContext(DataMutatorsContext);
+
+  useEffect(() => {
+    setQueue!([...audios]);
+  }, [audios]);
 
   const playButtonOnClick = () => {
     if (playingSong) setPaused!(!paused);
@@ -46,8 +52,25 @@ function Content() {
             By <span>Title</span>
           </div>
         </div>
-        <Queue songs={[...audios]} />
-        {playingSong && <Player />}
+        <Queue songs={[...queue]} />
+        {playingSong && (
+          <Player
+            previous={
+              queue.length
+                ? playingSongIndex > 0
+                  ? queue[playingSongIndex - 1]
+                  : undefined
+                : undefined
+            }
+            next={
+              queue.length
+                ? playingSongIndex < queue.length - 1
+                  ? queue[playingSongIndex + 1]
+                  : undefined
+                : undefined
+            }
+          />
+        )}
       </div>
     </StyledHomeContent>
   );

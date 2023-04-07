@@ -4,6 +4,7 @@ import {
   TbPlayerTrackPrevFilled,
   TbPlayerTrackNextFilled,
   TbPlayerPlayFilled,
+  TbPlayerPauseFilled,
 } from "react-icons/tb";
 import { useRef, useEffect, useState, useMemo, useContext } from "react";
 import styled, { keyframes } from "styled-components";
@@ -14,6 +15,7 @@ import {
   durationToString,
 } from "../utils";
 import { StyledCover } from "../styles";
+import { IPlayerProps } from "../utils/models";
 
 const slideUp = keyframes`
   from {
@@ -50,26 +52,52 @@ const StyledContainer = styled.div`
     &__left,
     &__right {
       display: flex;
-      gap: 1.5rem;
+      gap: 1rem;
       align-items: center;
     }
 
+    &__left {
+      justify-content: flex-start;
+    }
+
+    &__right {
+      justify-content: flex-end;
+    }
 
     .buttons {
       display: flex;
       gap: 1rem;
       justify-content: center;
     }
+
+    button {
+      font-size: 1.25rem;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      display: grid;
+      place-items: center;
+    }
+
+    .time .total,
+    &__right > button {
+      color: ${({ theme }) => theme.colors.player.color};
+    }
   }
 
-  .time {
-  }
-
-  .title {
+  .song {
     max-width: 160px;
     white-space: nowrap;
-    text-overflow: ellipsis;
-    overflow: hidden;
+
+    & > div {
+      text-overflow: ellipsis;
+      overflow: hidden;
+    }
+
+    .artist {
+      font-size: 0.75rem;
+      color: ${({ theme }) => theme.colors.album.artist.listItem};
+    }
   }
 
   .tooltip {
@@ -129,9 +157,9 @@ const StyledContainer = styled.div`
 
 let playerTimerHandle = 0;
 
-function Player() {
-  const { paused, playingSong } = useContext(DatasContext);
-  const { setPaused } = useContext(DataMutatorsContext);
+function Player({ previous, next }: IPlayerProps) {
+  const { paused, playingSong, playingSongIndex } = useContext(DatasContext);
+  const { setPaused, setPlayingSongIndex } = useContext(DataMutatorsContext);
 
   const slideRef = useRef<HTMLInputElement | null>(null);
 
@@ -164,7 +192,10 @@ function Player() {
   }, [playingSong]);
 
   useEffect(() => {
-    if (progression >= duration) setPaused!(true);
+    if (progression >= duration) {
+      setPaused!(true);
+      setProgression(0);
+    }
   }, [progression]);
 
   useEffect(() => {
@@ -243,18 +274,39 @@ function Player() {
               <IoMusicalNotesOutline />
             )}
           </StyledCover>
-          <div className="title">
-            {playingSong?.title ? playingSong?.title.toString() : "Unknown"}
+          <div className="song">
+            <div className="title">
+              {playingSong?.title ? playingSong?.title.toString() : "Unknown"}
+            </div>
+            <div className="artist">
+              {playingSong?.artist ? playingSong?.artist.toString() : "Unknown"}
+            </div>
           </div>
         </div>
         <div className="buttons">
-          <button>
+          <button
+            onClick={() => {
+              setPlayingSongIndex!(playingSongIndex - 1);
+            }}
+            disabled={!previous}
+            title={previous ? "" : "No previous song"}
+          >
             <TbPlayerTrackPrevFilled />
           </button>
-          <button>
-            <TbPlayerPlayFilled />
+          <button
+            onClick={() => {
+              setPaused!(!paused);
+            }}
+          >
+            {paused ? <TbPlayerPlayFilled /> : <TbPlayerPauseFilled />}
           </button>
-          <button>
+          <button
+            onClick={() => {
+              setPlayingSongIndex!(playingSongIndex + 1);
+            }}
+            disabled={!next}
+            title={next ? "" : "Reached end of the queue"}
+          >
             <TbPlayerTrackNextFilled />
           </button>
         </div>

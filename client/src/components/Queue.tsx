@@ -1,4 +1,4 @@
-import { useContext, useMemo } from "react";
+import { useContext } from "react";
 import styled from "styled-components";
 import { Audio } from "../utils/models";
 import { BsFillPlayFill, BsPauseFill } from "react-icons/bs";
@@ -69,45 +69,43 @@ const StyledContainer = styled.div`
 `;
 
 function Queue({ songs: queue }: { songs: Audio[] }) {
-  const { playingSong, paused } = useContext(DatasContext);
-  const { setPlayingSong, setPaused } = useContext(DataMutatorsContext);
+  const { playingSong, playingSongIndex, paused } = useContext(DatasContext);
+  const { setPlayingSong, setPlayingSongIndex, setPaused } =
+    useContext(DataMutatorsContext);
 
-  const playButtonOnClick = (song: Audio) => {
+  const playButtonOnClick = (index: number) => {
+    const song = queue[index];
     if (playingSong) {
       setPaused!(song.hash === playingSong.hash ? !paused : false);
     } else setPaused!(false);
-    setPlayingSong!(song);
+    setPlayingSongIndex!(index);
   };
 
   const menuButtonOnClick = (e: React.MouseEvent<HTMLButtonElement>) => {};
 
   return (
     <StyledContainer>
-      {queue ? (
+      {queue && queue.length ? (
         <ul>
           {queue.map((song, i) => (
             <li
               key={i}
               onDoubleClick={() => {
-                playButtonOnClick(song);
+                playButtonOnClick(i);
               }}
             >
               <div className="song">
                 <div className="left">
                   <button
                     onClick={() => {
-                      playButtonOnClick(song);
+                      playButtonOnClick(i);
                     }}
                   >
-                    {playingSong ? (
-                      playingSong.hash === song.hash ? (
-                        paused ? (
-                          <BsFillPlayFill />
-                        ) : (
-                          <BsPauseFill />
-                        )
-                      ) : (
+                    {playingSongIndex === i ? (
+                      paused ? (
                         <BsFillPlayFill />
+                      ) : (
+                        <BsPauseFill />
                       )
                     ) : (
                       <BsFillPlayFill />

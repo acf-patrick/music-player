@@ -12,6 +12,7 @@ const themes = {
     },
     player: {
       line: "#7000FF",
+      color: "#464646",
     },
     album: {
       artist: {
