@@ -74,23 +74,14 @@ function Player() {
   const [progression, setProgression] = useState(0);
 
   const updateProgression = () => {
-    playerTimerHandle = setInterval(() => {
-      if (!paused) {
-        const slide = slideRef.current;
-        setProgression((progression) => {
-          if (slide) slide.value = `${progression + 1}`;
-          return progression + 1;
-        });
-      }
-    }, 1000);
+    if (!playerTimerHandle)
+      playerTimerHandle = setInterval(() => {
+        setProgression((progression) => progression + 1);
+      }, 1000);
   };
 
   useEffect(() => {
-    const slide = slideRef.current;
-    if (slide) {
-      slide.value = "0";
-      slide.style.backgroundSize = "0";
-    }
+    setProgression(0);
   }, [playingSong]);
 
   useEffect(() => {
@@ -100,6 +91,7 @@ function Player() {
   useEffect(() => {
     if (paused) {
       clearInterval(playerTimerHandle);
+      playerTimerHandle = 0;
     } else {
       updateProgression();
     }
@@ -124,6 +116,7 @@ function Player() {
               setProgression(parseInt(input.value));
             }}
             defaultValue={0}
+            value={progression}
           />
         )}
       </div>
