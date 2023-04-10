@@ -13,6 +13,7 @@ const themes = {
     player: {
       line: "#7000FF",
       color: "#464646",
+      activated: "#655DBB",
     },
     album: {
       artist: {

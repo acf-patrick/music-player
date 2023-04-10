@@ -1,4 +1,11 @@
-import { BsFillVolumeUpFill, BsRepeat } from "react-icons/bs";
+import {
+  BsFillVolumeUpFill,
+  BsFillVolumeDownFill,
+  BsRepeat,
+  BsRepeat1,
+  BsFillVolumeOffFill,
+  BsFillVolumeMuteFill,
+} from "react-icons/bs";
 import { IoMusicalNotesOutline } from "react-icons/io5";
 import {
   TbPlayerTrackPrevFilled,
@@ -15,7 +22,7 @@ import {
   durationToString,
 } from "../utils";
 import { StyledCover } from "../styles";
-import { IPlayerProps } from "../utils/models";
+import { Howl, Howler } from "howler";
 
 const slideUp = keyframes`
   from {
@@ -70,6 +77,10 @@ const StyledContainer = styled.div`
       justify-content: center;
     }
 
+    .activated {
+      color: ${({ theme }) => theme.colors.player.activated};
+    }
+
     button {
       font-size: 1.25rem;
       background: transparent;
@@ -86,7 +97,10 @@ const StyledContainer = styled.div`
   }
 
   .song {
-    max-width: 160px;
+    @media (max-width: 1428px) {
+      max-width: 148px;
+    }
+
     white-space: nowrap;
 
     & > div {
@@ -130,6 +144,7 @@ const StyledContainer = styled.div`
   input {
     height: 3px;
     flex-grow: 1;
+    appearance: none;
     -webkit-appearance: none;
     margin: unset;
     background-image: ${({ theme }) =>
@@ -140,7 +155,24 @@ const StyledContainer = styled.div`
     &::-webkit-slider-thumb {
       -webkit-appearance: none;
       width: 8px;
-      aspect-ratio: 1;
+      height: 8px;
+      background: black;
+      border-radius: 100%;
+      outline: solid 0px transparent;
+      transition: outline 300ms;
+      background: ${({ theme }) => theme.colors.player.line};
+
+      &:hover {
+        cursor: pointer;
+        outline: solid 2px ${({ theme }) => theme.colors.player.line};
+      }
+    }
+
+    &::-moz-range-thumb {
+      appearance: none;
+      -webkit-appearance: none;
+      width: 8px;
+      height: 8px;
       background: black;
       border-radius: 100%;
       outline: solid 0px transparent;
@@ -157,12 +189,12 @@ const StyledContainer = styled.div`
 
 let playerTimerHandle = 0;
 
-function Player({ previous, next }: IPlayerProps) {
-  const { paused, playingSong, playingSongIndex } = useContext(DatasContext);
+function Player() {
+  const { paused, queue, playingSong, playingSongIndex } =
+    useContext(DatasContext);
   const { setPaused, setPlayingSongIndex } = useContext(DataMutatorsContext);
 
   const slideRef = useRef<HTMLInputElement | null>(null);
-
   const toolTipRef = useRef<HTMLDivElement | null>(null);
 
   // Song duration in seconds
@@ -180,6 +212,30 @@ function Player({ previous, next }: IPlayerProps) {
   // Current mouse position on mouse over
   const [mousePosition, setMousePosition] = useState("");
 
+  // Currently playing Song
+  const [song, setSong] = useState<Howl | null>(null);
+
+  // infinitely : 1, no-repeat: 0, repeat once: 2
+  enum Repeat {
+    NO_REPEAT = 0,
+    ONCE = 2,
+    INFINITELY = 1,
+  }
+  const [repeat, setRepeat] = useState<Repeat>(0);
+
+  const [volume, setVolume_] = useState(100 * Howler.volume());
+  const setVolume = (volume: number) => {
+    setVolume_(volume);
+    Howler.volume(volume / 100);
+  };
+
+  const VolumeIcon = useMemo(() => {
+    if (volume === 0) return BsFillVolumeMuteFill;
+    if (volume <= 25) return BsFillVolumeOffFill;
+    if (25 < volume && volume <= 50) return BsFillVolumeDownFill;
+    return BsFillVolumeUpFill;
+  }, [volume]);
+
   const updateProgression = () => {
     if (!playerTimerHandle)
       playerTimerHandle = setInterval(() => {
@@ -189,12 +245,28 @@ function Player({ previous, next }: IPlayerProps) {
 
   useEffect(() => {
     setProgression(0);
+
+    if (playingSong) {
+      Howler.unload();
+      const song = new Howl({
+        src: playingSong.source.toString(),
+        autoplay: true,
+        onload: (id) => {},
+        onloaderror: (id, error) => {},
+      });
+      setSong(song);
+      setPaused!(false);
+    }
   }, [playingSong]);
 
   useEffect(() => {
     if (progression >= duration) {
-      setPaused!(true);
-      setProgression(0);
+      if (playingSongIndex < queue.length - 1) {
+        setPlayingSongIndex!(playingSongIndex + 1);
+      } else {
+        setPaused!(true);
+        setProgression(0);
+      }
     }
   }, [progression]);
 
@@ -202,10 +274,19 @@ function Player({ previous, next }: IPlayerProps) {
     if (paused) {
       clearInterval(playerTimerHandle);
       playerTimerHandle = 0;
+      song?.pause();
     } else {
       updateProgression();
+      song?.play();
     }
   }, [paused]);
+
+  const sliderOnClick = (e: React.FormEvent<HTMLInputElement>) => {
+    const input = e.target as HTMLInputElement;
+    const progression = parseInt(input.value);
+    setProgression(progression);
+    song?.seek(progression);
+  };
 
   const slideOnMouseMove = (e: React.MouseEvent<HTMLInputElement>) => {
     const slide = slideRef.current;
@@ -249,10 +330,7 @@ function Player({ previous, next }: IPlayerProps) {
               style={{
                 backgroundSize: `${(progression * 100) / duration}% 100%`,
               }}
-              onInput={(e) => {
-                const input = e.target as HTMLInputElement;
-                setProgression(parseInt(input.value));
-              }}
+              onInput={sliderOnClick}
               onMouseMove={slideOnMouseMove}
               value={progression}
             />
@@ -288,8 +366,8 @@ function Player({ previous, next }: IPlayerProps) {
             onClick={() => {
               setPlayingSongIndex!(playingSongIndex - 1);
             }}
-            disabled={!previous}
-            title={previous ? "" : "No previous song"}
+            disabled={playingSongIndex === 0}
+            title={playingSongIndex > 0 ? "" : "No previous song"}
           >
             <TbPlayerTrackPrevFilled />
           </button>
@@ -304,8 +382,12 @@ function Player({ previous, next }: IPlayerProps) {
             onClick={() => {
               setPlayingSongIndex!(playingSongIndex + 1);
             }}
-            disabled={!next}
-            title={next ? "" : "Reached end of the queue"}
+            disabled={playingSongIndex === queue.length - 1}
+            title={
+              playingSongIndex < queue.length - 1
+                ? ""
+                : "Reached end of the queue"
+            }
           >
             <TbPlayerTrackNextFilled />
           </button>
@@ -317,11 +399,16 @@ function Player({ previous, next }: IPlayerProps) {
             </span>
             <span className="total">{durationToString(duration, false)}</span>
           </div>
-          <button className="volume">
-            <BsFillVolumeUpFill />
+          <button className="volume" title={`${volume}`}>
+            <VolumeIcon />
           </button>
-          <button className="repeat">
-            <BsRepeat />
+          <button
+            className={`repeat ${repeat != Repeat.NO_REPEAT && "activated"}`}
+            onClick={() => {
+              setRepeat((repeat + 1) % 3);
+            }}
+          >
+            {repeat === Repeat.ONCE ? <BsRepeat1 /> : <BsRepeat />}
           </button>
         </div>
       </div>

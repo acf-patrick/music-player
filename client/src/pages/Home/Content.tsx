@@ -8,7 +8,7 @@ import { Queue, Player } from "../../components";
 function Content() {
   const { audios, playingSong, playingSongIndex, paused, queue } =
     useContext(DatasContext);
-  const { setPlayingSong, setPaused, setQueue } =
+  const { setPlayingSongIndex, setPaused, setQueue } =
     useContext(DataMutatorsContext);
 
   useEffect(() => {
@@ -19,7 +19,7 @@ function Content() {
     if (playingSong) setPaused!(!paused);
     else if (queue) {
       if (queue.length) {
-        setPlayingSong!(queue[0]);
+        setPlayingSongIndex!(0);
         setPaused!(false);
       }
     }
@@ -52,25 +52,8 @@ function Content() {
             By <span>Title</span>
           </div>
         </div>
-        <Queue songs={[...queue]} />
-        {playingSong && (
-          <Player
-            previous={
-              queue.length
-                ? playingSongIndex > 0
-                  ? queue[playingSongIndex - 1]
-                  : undefined
-                : undefined
-            }
-            next={
-              queue.length
-                ? playingSongIndex < queue.length - 1
-                  ? queue[playingSongIndex + 1]
-                  : undefined
-                : undefined
-            }
-          />
-        )}
+        <Queue />
+        {playingSong ? <Player /> : <></>}
       </div>
     </StyledHomeContent>
   );

@@ -71,8 +71,3 @@ export interface IDataMutatorList {
   setPlayingSong?: (audio: Audio | null) => void;
   setPaused?: (paused: boolean) => void;
 }
-
-export interface IPlayerProps {
-  previous?: Audio;
-  next?: Audio;
-}

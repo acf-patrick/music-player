@@ -9,6 +9,9 @@ import themes from "./styles/themes";
 import useAudios from "./utils/hook";
 import { Artist, Genre, Album, Audio } from "./utils/models";
 
+// Set global volume to 50% by default
+// Howler.volume(0.5);
+
 function App() {
   const audios = useAudios();
   const [artists, setArtists] = useState<Artist[]>([]);
@@ -45,6 +48,8 @@ function App() {
             duration: stringToDuration(audio.duration?.toString()!),
           });
         }
+
+        setAlbums([...albums]);
       }
 
       if (audio.genre) {
@@ -59,6 +64,7 @@ function App() {
         }
 
         genres.sort((a, b) => (a.name < b.name ? -1 : a.name > b.name ? 1 : 0));
+        setGenres([...genres]);
       }
 
       if (audio.artist) {
@@ -82,6 +88,7 @@ function App() {
         artists.sort((a, b) =>
           a.name < b.name ? -1 : a.name > b.name ? 1 : 0
         );
+        setArtists([...artists]);
       }
     }
   }, [audios]);

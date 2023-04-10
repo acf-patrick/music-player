@@ -27,8 +27,7 @@ function getDuration(source: String, callback: (duration: String) => any) {
 function getMetadata(
   blob: Blob,
   source: String,
-  audios: Song[],
-  setAudios: (audios: Song[]) => void
+  setAudios: React.Dispatch<React.SetStateAction<Song[]>>
 ) {
   jsmediatags.read(blob, {
     onSuccess: (datas: any) => {
@@ -45,10 +44,11 @@ function getMetadata(
       getDuration(source, (duration) => {
         audio.duration = duration;
         audio.cover = getImage(tags.picture.format, tags.picture.data);
-        if (!audios.find((audio) => audio.hash === hash)) {
-          audios.push(audio);
-          setAudios([...audios]);
-        }
+        setAudios((audios) => {
+          if (!audios.find((audio) => audio.hash === hash))
+            return [...audios, audio];
+          return audios;
+        });
       });
     },
     onError: (error: any) => {
@@ -66,7 +66,7 @@ export default function useAudios() {
       fetch(`${link}`)
         .then((res) => res.blob())
         .then((blob) => {
-          getMetadata(blob, link, audios, setAudios);
+          getMetadata(blob, link, setAudios);
         })
         .catch((error) => {
           console.error(error);
