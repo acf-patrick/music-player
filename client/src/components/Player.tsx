@@ -91,7 +91,7 @@ const StyledContainer = styled.div`
     }
 
     .time .total,
-    &__right > button {
+    &__right button {
       color: ${({ theme }) => theme.colors.player.color};
     }
   }
@@ -224,9 +224,11 @@ function Player() {
   const [repeat, setRepeat] = useState<Repeat>(0);
 
   const [volume, setVolume_] = useState(100 * Howler.volume());
-  const setVolume = (volume: number) => {
-    setVolume_(volume);
-    Howler.volume(volume / 100);
+  const [prevVolume, setPrevVolume] = useState(volume);
+  const setVolume = (v: number) => {
+    setPrevVolume(volume);
+    setVolume_(v);
+    Howler.volume(v / 100);
   };
 
   const VolumeIcon = useMemo(() => {
@@ -288,6 +290,25 @@ function Player() {
     song?.seek(progression);
   };
 
+  const onMouseWheel = (delta: number) => {
+    const offset = delta > 0 ? 1 : -1;
+    song?.seek(progression + offset);
+    setProgression(progression + offset);
+  };
+
+  const volumeOnClick = () => {
+    if (volume === 0) setVolume(prevVolume);
+    else setVolume(0);
+  };
+
+  const volumeOnMouseWheel = (e: React.WheelEvent<HTMLButtonElement>) => {
+    const offset = e.deltaY < 0 ? 1 : -1;
+    let v = volume + offset * 5;
+    if (v < 0) v = 0;
+    if (v > 100) v = 100;
+    setVolume(v);
+  };
+
   const slideOnMouseMove = (e: React.MouseEvent<HTMLInputElement>) => {
     const slide = slideRef.current;
     if (slide) {
@@ -331,6 +352,7 @@ function Player() {
                 backgroundSize: `${(progression * 100) / duration}% 100%`,
               }}
               onInput={sliderOnClick}
+              onWheel={(e) => onMouseWheel(e.deltaY)}
               onMouseMove={slideOnMouseMove}
               value={progression}
             />
@@ -393,13 +415,18 @@ function Player() {
           </button>
         </div>
         <div className="control__right">
-          <div className="time">
+          <div className="time" onWheel={(e) => onMouseWheel(e.deltaY)}>
             <span className="elapsed">
               {durationToString(progression, false)} /{" "}
             </span>
             <span className="total">{durationToString(duration, false)}</span>
           </div>
-          <button className="volume" title={`${volume}`}>
+          <button
+            className="volume"
+            title={`${volume ? volume : "Muted"}`}
+            onClick={volumeOnClick}
+            onWheel={volumeOnMouseWheel}
+          >
             <VolumeIcon />
           </button>
           <button

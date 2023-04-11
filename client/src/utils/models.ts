@@ -2,6 +2,7 @@ export interface IPopupProps {
   options: String[];
   optionOnClick?: { index: number; callback: (option: String) => void }[];
   separators?: number[]; // Option index where to place separator after
+  inverted?: boolean; // If false, render the popup to the right
 }
 
 export enum AlbumAppearance {

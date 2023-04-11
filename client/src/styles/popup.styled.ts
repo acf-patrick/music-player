@@ -2,20 +2,20 @@ import styled, { keyframes } from "styled-components";
 
 const grow = keyframes`
   0% {
-    transform: scaleY(0) translateX(100%);
+    transform: scaleY(0);
   } 75% {
-    transform: scaleY(1.125) translateX(100%);
+    transform: scaleY(1.125);
   } 100% {
-    transform: scaleY(1) translateX(100%);
+    transform: scaleY(1);
   }
 `;
 
-const StyledPopup = styled.div`
+const StyledPopup = styled.div<{ inverted: boolean }>`
   display: flex;
   flex-direction: column;
   position: absolute;
-  top: 100%;
-  right: 0;
+  top: 50%;
+  ${({ inverted }) => (inverted ? "right" : "left")}: 100%;
   z-index: 10;
   border-radius: 10px;
   backdrop-filter: blur(5px);

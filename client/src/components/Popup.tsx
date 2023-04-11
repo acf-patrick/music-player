@@ -2,9 +2,9 @@ import { IPopupProps } from "../utils/models";
 import { StyledPopup } from "../styles";
 
 // Renders a context menu on the bottom right position of the direct relative container
-function Popup({ options, optionOnClick, separators }: IPopupProps) {
+function Popup({ options, optionOnClick, separators, inverted }: IPopupProps) {
   return (
-    <StyledPopup>
+    <StyledPopup inverted={inverted!}>
       {options.map((option, i) => (
         <div key={i}>
           <div
