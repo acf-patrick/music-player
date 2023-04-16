@@ -10,7 +10,7 @@ const grow = keyframes`
   }
 `;
 
-const StyledPopup = styled.div<{ inverted: boolean }>`
+const StyledPopup = styled.div<{ position: string[] }>`
   display: flex;
   flex-direction: column;
   position: absolute;

@@ -1,6 +1,6 @@
-import { useContext, useEffect } from "react";
+import { useContext, useState } from "react";
 import styled from "styled-components";
-import { Audio } from "../utils/models";
+import Popup from "./Popup";
 import { BsFillPlayFill, BsPauseFill } from "react-icons/bs";
 import { GoKebabVertical } from "react-icons/go";
 import { DataMutatorsContext, DatasContext } from "../utils";
@@ -66,12 +66,17 @@ const StyledContainer = styled.div`
       align-items: center;
     }
   }
+
+  .menu-btn {
+    position: relative;
+  }
 `;
 
 function Queue() {
   const { playingSong, playingSongIndex, queue, paused } =
     useContext(DatasContext);
   const { setPlayingSongIndex, setPaused } = useContext(DataMutatorsContext);
+  const [contextMenu, setContextMenu] = useState(false);
 
   const playButtonOnClick = (index: number) => {
     const song = queue[index];
@@ -119,6 +124,7 @@ function Queue() {
                     <button onClick={menuButtonOnClick}>
                       <GoKebabVertical />
                     </button>
+                    {contextMenu && <Popup options={["test", "test", "test"]} />}
                   </div>
                 </div>
               </div>

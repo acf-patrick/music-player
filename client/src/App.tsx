@@ -10,7 +10,7 @@ import useAudios from "./utils/hook";
 import { Artist, Genre, Album, Audio } from "./utils/models";
 
 // Set global volume to 50% by default
-// Howler.volume(0.5);
+Howler.volume(0);
 
 function App() {
   const audios = useAudios();
