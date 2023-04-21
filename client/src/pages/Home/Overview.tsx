@@ -74,7 +74,7 @@ function Overview() {
 
   const fields = ["Song", "Artist", "Genre", "Playlist", "Album"] as const;
   const [currentField, setCurrentField] =
-    useState<typeof fields[number]>("Song");
+    useState<(typeof fields)[number]>("Song");
 
   // How album items will be displayed
   const [albumAppearance, setAlbumAppearance] = useState(
@@ -95,7 +95,7 @@ function Overview() {
   >("ascending");
 
   const [sortBy, setSortBy] = useState<
-    typeof AlbumSortOptions[number] | typeof AudioSortOptions[number] | null
+    (typeof AlbumSortOptions)[number] | (typeof AudioSortOptions)[number] | null
   >(null);
 
   const [sortPopupShown, setSortPopupShown] = useState(false);
@@ -272,19 +272,14 @@ function Overview() {
                 </button>
                 {sortPopupShown && (
                   <Popup
-                    options={[
-                      ...(currentField === "Song"
-                        ? AudioSortOptions
-                        : AlbumSortOptions),
-                    ]}
-                    optionOnClick={(currentField === "Song"
+                    options={(currentField === "Song"
                       ? AudioSortOptions
                       : AlbumSortOptions
-                    ).map((_, i) => {
+                    ).map((option, i) => {
                       return {
-                        index: i,
-                        callback: (option) => {
-                          setSortBy(option as typeof sortBy);
+                        text: option,
+                        callback: () => {
+                          setSortBy(option);
                           setSortPopupShown(false);
                         },
                       };

@@ -1,8 +1,15 @@
+import { CSSProperties } from "styled-components";
+
+type PopupOption = {
+  text: string;
+  callback?: () => void;
+  options?: PopupOption[];
+  styles?: CSSProperties; // Applied when Option is on hover
+};
+
 export interface IPopupProps {
-  options: String[];
-  optionOnClick?: { index: number; callback: (option: String) => void }[];
+  options: PopupOption[] | string[];
   separators?: number[]; // Option index where to place separator after
-  inverted?: boolean; // If false, render the popup to the right
 }
 
 export enum AlbumAppearance {

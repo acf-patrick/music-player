@@ -1,44 +1,50 @@
 import { IPopupProps } from "../utils/models";
-import { StyledPopup } from "../styles";
-import { useRef, useState, useEffect, useMemo } from "react";
+import { StyledPopup, StyledPopupOption } from "../styles";
+import { useRef, useMemo, useEffect, useState } from "react";
 
 // Renders a context menu on the bottom right position of the direct relative container
-function Popup({ options, optionOnClick, separators }: IPopupProps) {
-  const containerRef = useRef<HTMLDivElement | null>(null);
-  const position = useMemo(() => {
+function Popup({ options, separators }: IPopupProps) {
+  const containerRef = useRef<HTMLUListElement | null>(null);
+
+  const [position, setPosition] = useState(["bottom", "right"]);
+  useEffect(() => {
     const container = containerRef.current;
     if (container) {
-      let [v, h] = ["bottom", "right"];
+      container.focus();
+      let [v, h] = [...position];
       const rect = container.getBoundingClientRect();
-      if (rect.x + rect.width > window.innerWidth) v = "left";
-      if (rect.y + rect.height > window.innerHeight) h = "top";
-      return [v, h];
+      if (rect.right > window.innerWidth) h = "left";
+      if (rect.y > window.innerHeight * 0.65) v = "top";
+      setPosition([v, h]);
     }
-
-    return ["bottom", "right"];
   }, [containerRef]);
 
   return (
-    <StyledPopup position={["bottom", "right"]} ref={containerRef}>
+    <StyledPopup position={position} ref={containerRef}>
       {options.map((option, i) => (
-        <div key={i}>
-          <div
+        <li key={i}>
+          <StyledPopupOption
             className="option"
+            override={
+              typeof option === "string"
+                ? {}
+                : option.styles
+                ? option.styles
+                : {}
+            }
             onClick={() => {
-              if (optionOnClick) {
-                const obj = optionOnClick.find((obj) => obj.index === i);
-                if (obj) {
-                  obj.callback(option);
-                }
+              if (typeof option !== "string") {
+                const optionOnClick = option.callback;
+                if (optionOnClick) optionOnClick();
               }
             }}
           >
-            {option}
-          </div>
+            {typeof option === "string" ? option : option.text}
+          </StyledPopupOption>
           {separators &&
             separators.indexOf(i) >= 0 &&
             i < options.length - 1 && <div className="separator"></div>}
-        </div>
+        </li>
       ))}
     </StyledPopup>
   );

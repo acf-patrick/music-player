@@ -70,7 +70,7 @@ const StyledOverview = styled.div<{ albumAppearance: AlbumAppearance }>`
     grid-gap: 0.5rem;
   }
 
-  li {
+  ul.results>li {
     padding: 0.5rem;
     cursor: pointer;
     outline: none;
