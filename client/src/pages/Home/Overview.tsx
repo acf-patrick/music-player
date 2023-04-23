@@ -248,7 +248,12 @@ function Overview() {
         <>
           <div className="sort-container">
             {(currentField === "Song" || currentField === "Album") && (
-              <div className="buttons">
+              <div
+                className="buttons"
+                onMouseLeave={() => {
+                  setSortPopupShown(false);
+                }}
+              >
                 {sortBy && (
                   <button
                     className="sort-direction"

@@ -25,6 +25,7 @@ const themes = {
       title: "#303030",
       border: "rgba(0, 0, 0, 0.6)",
       color: "black",
+      playing: "rgba(0, 0, 0, 0.125)",
       borderBottom: "rgba(0, 0, 0, 0.06)",
       bgHovered: "rgba(255, 255, 255, 0.29)",
       cover: {
@@ -40,6 +41,7 @@ const themes = {
       text: "#7F868D",
       separator: "#CFCFCF",
       background: "rgba(255, 255, 255, 0.7)",
+      searchbar: "rgba(117, 117, 117, 0.2)",
       hovered: {
         text: "black",
         background: "rgba(43, 43, 43, 0.11)",
@@ -59,6 +61,11 @@ const themes = {
   sizes: {
     minWidth: "1280px",
     minHeight: "720px",
+    contextMenu: {
+      minWidth: "128px",
+      maxWidth: "228px",
+      maxHeight: "148px",
+    },
     image: {
       sm: "48px",
       md: "64px",

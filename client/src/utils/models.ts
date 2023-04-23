@@ -1,14 +1,15 @@
 import { CSSProperties } from "styled-components";
 
-type PopupOption = {
+export type PopupOption = {
   text: string;
   callback?: () => void;
-  options?: PopupOption[];
+  options?: IPopupProps;
   styles?: CSSProperties; // Applied when Option is on hover
 };
 
 export interface IPopupProps {
-  options: PopupOption[] | string[];
+  options: PopupOption[];
+  searchbar?: string; // Placeholder text for a searchbar
   separators?: number[]; // Option index where to place separator after
 }
 

@@ -1,6 +1,6 @@
 import { useContext, useState, FC } from "react";
 import styled from "styled-components";
-import { Audio } from "../utils/models";
+import { Audio, PopupOption } from "../utils/models";
 import { DatasContext, DataMutatorsContext } from "../utils";
 import { BsFillPlayFill, BsPauseFill } from "react-icons/bs";
 import { GoKebabVertical } from "react-icons/go";
@@ -38,7 +38,7 @@ const Song: FC<{
   index: number;
   song: Audio;
 }> = ({ index, song }) => {
-  const contextMenuOptions = [
+  const contextMenuOptions: PopupOption[] = [
     {
       text: "Play",
     },
@@ -47,6 +47,15 @@ const Song: FC<{
     },
     {
       text: "Add to playlist",
+      options: {
+        options: [
+          { text: "My First Playlist" },
+          { text: "My Other Playlist" },
+          { text: "My Third Playlist" },
+          { text: "My Fourth Playlist" },
+        ],
+        searchbar: "Find a playlist",
+      },
     },
     {
       text: "Show album",
@@ -102,7 +111,12 @@ const Song: FC<{
       </div>
       <div className="right">
         <span>{song.duration}</span>
-        <div className="menu-btn">
+        <div
+          className="menu-btn"
+          onMouseLeave={() => {
+            setContextMenu(false);
+          }}
+        >
           <button onClick={menuButtonOnClick}>
             <GoKebabVertical />
           </button>
@@ -139,7 +153,11 @@ const StyledContainer = styled.div`
     font-size: 0.85rem;
 
     &:hover {
-      background: ${({ theme }) => theme.colors.song.bgHovered};
+      background: ${({ theme }) => theme.colors.song.bgHovered} !important;
+    }
+
+    &.playing {
+      background: ${({ theme }) => theme.colors.song.playing};
     }
   }
 
@@ -158,7 +176,6 @@ function Queue() {
   const { playingSong, playingSongIndex, queue, paused } =
     useContext(DatasContext);
   const { setPlayingSongIndex, setPaused } = useContext(DataMutatorsContext);
-  const [contextMenu, setContextMenu] = useState(false);
 
   const playButtonOnClick = (index: number) => {
     const song = queue[index];
@@ -166,10 +183,6 @@ function Queue() {
     if (playingSong) {
       setPaused!(song.hash === playingSong.hash ? !paused : false);
     } else setPaused!(false);
-  };
-
-  const menuButtonOnClick = (e: React.MouseEvent<HTMLButtonElement>) => {
-    setContextMenu((contextMenu) => !contextMenu);
   };
 
   return (
@@ -182,6 +195,7 @@ function Queue() {
               onDoubleClick={() => {
                 playButtonOnClick(i);
               }}
+              className={i === playingSongIndex && !paused ? "playing" : ""}
             >
               <Song index={i} song={{ ...song }} />
             </li>
