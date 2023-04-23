@@ -8,12 +8,18 @@ import { IoIosArrowForward } from "react-icons/io";
 function Popup({ options, separators, searchbar }: IPopupProps) {
   const containerRef = useRef<HTMLDivElement | null>(null);
 
+  const [searchResults, setSearchResults] = useState([...options]);
+
+  const [childrenShown, setChildrenShown] = useState(
+    options.map((option) => false)
+  );
+
   const [position, setPosition] = useState(["bottom", "right"]);
   useEffect(() => {
     const container = containerRef.current;
     if (container) {
       container.focus();
-      let [v, h] = [...position];
+      let [v, h] = position;
       const rect = container.getBoundingClientRect();
       if (rect.right > window.innerWidth) h = "left";
       if (rect.y > window.innerHeight * 0.65) v = "top";
@@ -21,9 +27,15 @@ function Popup({ options, separators, searchbar }: IPopupProps) {
     }
   }, [containerRef]);
 
-  const [childrenShown, setChildrenShown] = useState(
-    options.map((option) => false)
-  );
+  const searchbarOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value.toLowerCase();
+    if (value) {
+      const results = [] as typeof searchResults;
+      for (const option of options)
+        if (option.text.toLowerCase().indexOf(value) >= 0) results.push(option);
+      setSearchResults(results);
+    } else setSearchResults([...options]);
+  };
 
   const optionOnHover = (index: number) => {
     setChildrenShown((childrenShown) => {
@@ -49,13 +61,17 @@ function Popup({ options, separators, searchbar }: IPopupProps) {
         <div className="bar">
           <div>
             <RxMagnifyingGlass />
-            <input type="text" placeholder={searchbar} />
+            <input
+              type="text"
+              placeholder={searchbar}
+              onChange={searchbarOnChange}
+            />
           </div>
         </div>
       )}
       <div className="list">
         <ul>
-          {options.map((option, i) => (
+          {(searchbar ? searchResults : options).map((option, i) => (
             <li
               key={i}
               onMouseEnter={() => {

@@ -11,7 +11,6 @@ import { Artist, Genre, Album, Audio } from "./utils/models";
 
 // Set global volume to 50% by default
 Howler.volume(0);
-
 function App() {
   const audios = useAudios();
   const [artists, setArtists] = useState<Artist[]>([]);
