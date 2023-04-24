@@ -20,6 +20,11 @@ base64="0.21.0"
 serde = { version = "1.0", features = ["derive"] }
 tauri = { version = "1.2.4", features = ["dialog-open", "protocol-asset"] }
 tauri-api = "0.7.6"
+audiotags = "0.4.1"
+
+[dependencies.rusqlite]
+version = "0.29.0"
+features = ["bundled"]
 
 [features]
 # by default Tauri runs in production mode
