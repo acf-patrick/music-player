@@ -1,3 +1,4 @@
+use lofty::{Picture, PictureType, Probe, TaggedFileExt};
 use rusqlite::Connection;
 use rusqlite::{Error, Error::SqlInputError};
 use std::fs;
@@ -12,55 +13,55 @@ fn manage_db_error(result: Result<usize, Error>) {
 }
 
 /// Create database tables
-pub fn create_database(db_name: &str) -> bool {
-    if let Ok(conn) = Connection::open(db_name) {
-        // Tables created according to type definition in "types"
+pub fn create_database(db_name: &str) -> Result<Connection, Error> {
+    let conn = Connection::open(db_name)?;
+    // Tables created according to type definition in "types"
 
-        manage_db_error(conn.execute(
-            "CREATE TABLE image(
-			id TEXT PRIMARY KEY,
-			data BLOB);",
-            (),
-        ));
+    manage_db_error(conn.execute(
+        r#"CREATE TABLE "image"(
+			"id" TEXT NOT NULL PRIMARY KEY,
+			"mime_type" TEXT,
+			"data" BLOB);"#,
+        (),
+    ));
 
-        manage_db_error(conn.execute(
-            "CREATE TABLE album(
-				title TEXT PRIMARY KEY,
-				artist TEXT,
-				cover TEXT,
-				track_count INT,
-				FOREIGN KEY(cover) REFERENCES image(id));",
-            (),
-        ));
+    manage_db_error(conn.execute(
+        r#"CREATE TABLE "album"(
+				"title" TEXT NOT NULL PRIMARY KEY,
+				"artist" TEXT,
+				"cover" TEXT,
+				"track_count" INT,
+				FOREIGN KEY("cover") REFERENCES image("id"));"#,
+        (),
+    ));
 
-        manage_db_error(conn.execute(
-            "CREATE TABLE song(
-        id TEXT PRIMARY KEY,
-        path TEXT,
-        year INT,
-        title TEXT,
-        artist TEXT,
-        track_number INT,
-        cover TEXT,
-        album TEXT,
-        duration INT,
-        FOREIGN KEY(cover) REFERENCES image(id),
-        FOREIGN KEY(album) REFERENCES album(title));",
-            (),
-        ));
+    manage_db_error(conn.execute(
+        r#"CREATE TABLE "song"(
+        "id" TEXT NOT NULL PRIMARY KEY,
+        "path" TEXT,
+        "year" INT,
+        "title" TEXT,
+        "artist" TEXT,
+		"genre" TEXT,
+        "track_number" INT,
+        "cover" TEXT,
+        "album" TEXT,
+        "duration" INT,
+        FOREIGN KEY("cover") REFERENCES image("id"),
+        FOREIGN KEY("album") REFERENCES album("title"));"#,
+        (),
+    ));
 
-        manage_db_error(conn.execute(
-            "CREATE TABLE playlist(
-          id INT PRIMARY KEY,
-          name TEXT,
-          song TEXT,
-          FOREIGN KEY(song) REFERENCES song(id));",
-            (),
-        ));
-    } else {
-        return false;
-    }
-    true
+    manage_db_error(conn.execute(
+        r#"CREATE TABLE "playlist"(
+          "id" INT NOT NULL PRIMARY KEY,
+          "name" TEXT,
+          "song" TEXT,
+          FOREIGN KEY("song") REFERENCES song("id"));"#,
+        (),
+    ));
+
+    Ok(conn)
 }
 
 /// Scan audio files inside given directory
@@ -102,4 +103,48 @@ pub fn generate_audio_id(src_path: &str) -> String {
     }
 
     String::new()
+}
+
+pub fn store_audio_metadatas(audio_path: &str, conn: &Connection) -> bool {
+    let audio_id = generate_audio_id(audio_path);
+    if audio_id.is_empty() {
+        eprintln!("Unable to read {audio_path}");
+        return false;
+    }
+
+    let tagged = Probe::open(audio_path)
+        .expect(&format!("{audio_path} invaid path."))
+        .read()
+        .expect("Unable to open {audio_path}");
+
+    if let Some(tags) = tagged.primary_tag() {
+        let pics = tags.pictures();
+        let mut cover: Option<&Picture> = None;
+
+        if pics.len() == 1 {
+            cover = Some(&pics[0]);
+        } else {
+            for pic in pics {
+                if pic.pic_type() == PictureType::CoverFront {
+                    cover = Some(pic);
+                    break;
+                }
+            }
+        }
+
+        if let Some(cover) = cover {
+            let cover_id = sha256::digest(cover.data());
+            if !cover_id.is_empty() {
+                let mime_type = cover.mime_type().to_string();
+                manage_db_error(conn.execute(
+                    "INSERT INTO image VALUES(?, ?, ?)",
+                    (&cover_id, &mime_type, cover.data()),
+                ));
+            }
+        }
+    } else {
+        println!("{audio_path} : no tags to read.");
+    }
+
+    true
 }
