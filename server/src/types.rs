@@ -2,7 +2,7 @@
 pub struct Song {
     pub id: String,   // generated using SHA256
     pub path: String, // path to the audio file
-	pub year: Option<u8>,
+    pub year: Option<u8>,
     pub title: Option<String>,
     pub artist: Option<String>,
     pub track_number: Option<u8>,
@@ -14,7 +14,7 @@ pub struct Song {
 #[derive(Debug)]
 pub struct Album {
     pub title: String,
-	pub artist: Option<String>,
+    pub artist: Option<String>,
     pub cover: Option<String>,   // ID to one of image table record
     pub track_count: Option<u8>, // number of tracks
 }
