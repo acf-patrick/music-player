@@ -21,6 +21,7 @@ serde = { version = "1.0", features = ["derive"] }
 tauri = { version = "1.2.4", features = ["dialog-open", "protocol-asset"] }
 tauri-api = "0.7.6"
 lofty = "0.12.1"
+indicatif = "0.17.3"
 
 [dependencies.rusqlite]
 version = "0.29.0"

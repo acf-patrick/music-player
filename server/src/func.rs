@@ -51,6 +51,8 @@ pub fn create_database(db_name: &str) -> Result<Connection, Error> {
         (),
     ));
 
+	println!("{} Database created", '\u{1F680}');
+
     Ok(conn)
 }
 
