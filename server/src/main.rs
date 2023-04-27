@@ -1,6 +1,7 @@
 use func::{create_database, scan_audio_files, store_audio_metadatas};
 mod query;
 mod func;
+mod types;
 
 /* #![cfg_attr(
     all(not(debug_assertions), target_os = "windows"),

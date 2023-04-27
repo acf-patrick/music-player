@@ -1,5 +1,6 @@
-use lofty::{Picture, PictureType, Probe, TaggedFileExt};
-use rusqlite::Connection;
+use super::types;
+use lofty::{Accessor, AudioFile, Picture, PictureType, Probe, TaggedFileExt};
+use rusqlite::{params, Connection};
 use rusqlite::{Error, Error::SqlInputError};
 use std::fs;
 
@@ -26,35 +27,24 @@ pub fn create_database(db_name: &str) -> Result<Connection, Error> {
     ));
 
     manage_db_error(conn.execute(
-        r#"CREATE TABLE "album"(
-				"title" TEXT NOT NULL PRIMARY KEY,
-				"artist" TEXT,
-				"cover" TEXT,
-				"track_count" INT,
-				FOREIGN KEY("cover") REFERENCES image("id"));"#,
-        (),
-    ));
-
-    manage_db_error(conn.execute(
         r#"CREATE TABLE "song"(
         "id" TEXT NOT NULL PRIMARY KEY,
         "path" TEXT,
-        "year" INT,
+        "year" INTEGER,
         "title" TEXT,
         "artist" TEXT,
 		"genre" TEXT,
-        "track_number" INT,
+        "track_number" INTEGER,
         "cover" TEXT,
         "album" TEXT,
-        "duration" INT,
-        FOREIGN KEY("cover") REFERENCES image("id"),
-        FOREIGN KEY("album") REFERENCES album("title"));"#,
+        "duration" INTEGER,
+        FOREIGN KEY("cover") REFERENCES image("id"));"#,
         (),
     ));
 
     manage_db_error(conn.execute(
         r#"CREATE TABLE "playlist"(
-          "id" INT NOT NULL PRIMARY KEY,
+          "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
           "name" TEXT,
           "song" TEXT,
           FOREIGN KEY("song") REFERENCES song("id"));"#,
@@ -112,12 +102,52 @@ pub fn store_audio_metadatas(audio_path: &str, conn: &Connection) -> bool {
         return false;
     }
 
+    let mut song = types::Song {
+        id: audio_id,
+        path: audio_path.to_owned(),
+        album: Some(String::new()),
+        year: Some(0),
+        title: Some(String::new()),
+        artist: Some(String::new()),
+        genre: Some(String::new()),
+        track_number: Some(0),
+        cover: Some(String::new()),
+        duration: Some(0),
+    };
+
     let tagged = Probe::open(audio_path)
         .expect(&format!("{audio_path} invaid path."))
         .read()
         .expect("Unable to open {audio_path}");
 
     if let Some(tags) = tagged.primary_tag() {
+        if let Some(year) = tags.year() {
+            song.year = Some(year);
+        }
+
+        if let Some(title) = tags.title() {
+            song.title = Some(title.to_string());
+        }
+
+        if let Some(artist) = tags.artist() {
+            song.artist = Some(artist.to_string());
+        }
+
+        if let Some(genre) = tags.genre() {
+            song.genre = Some(genre.to_string());
+        }
+
+        if let Some(track_number) = tags.track() {
+            song.track_number = Some(track_number);
+        }
+
+        if let Some(album) = tags.album() {
+            song.album = Some(album.to_string());
+        }
+
+        let duration = tagged.properties().duration();
+        song.duration = Some(duration.as_secs());
+
         let pics = tags.pictures();
         let mut cover: Option<&Picture> = None;
 
@@ -136,12 +166,32 @@ pub fn store_audio_metadatas(audio_path: &str, conn: &Connection) -> bool {
             let cover_id = sha256::digest(cover.data());
             if !cover_id.is_empty() {
                 let mime_type = cover.mime_type().to_string();
+                song.cover = Some(cover_id.clone());
+
+                // save image into database
                 manage_db_error(conn.execute(
                     "INSERT INTO image VALUES(?, ?, ?)",
                     (&cover_id, &mime_type, cover.data()),
                 ));
             }
         }
+		
+        // save song into database
+        manage_db_error(conn.execute(
+            r#"INSERT INTO song VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"#,
+            (
+                &song.id,
+                &song.path,
+                &song.year,
+                &song.title,
+                &song.artist,
+                &song.genre,
+                &song.track_number,
+                &song.cover,
+                &song.album,
+                &song.duration,
+            ),
+        ));
     } else {
         println!("{audio_path} : no tags to read.");
     }
