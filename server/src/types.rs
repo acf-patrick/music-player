@@ -1,7 +1,7 @@
 #[derive(Debug)]
 pub struct Image {
     pub id: String, // generated using SHA256
-	pub mime_type: String,
+    pub mime_type: String,
     pub data: Vec<u8>,
 }
 
@@ -12,7 +12,7 @@ pub struct Song {
     pub year: Option<u32>,
     pub title: Option<String>,
     pub artist: Option<String>,
-	pub genre: Option<String>,
+    pub genre: Option<String>,
     pub track_number: Option<u32>,
     pub cover: Option<String>, // ID to one of image table record
     pub album: Option<String>, // title of one of album table record
@@ -28,7 +28,7 @@ pub struct Playlist {
 
 #[derive(Debug)]
 pub struct Album {
-	pub id: u32,
+    pub id: u32,
     pub title: String,
     pub artist: Option<String>,
     pub cover: Option<String>,   // ID to one of image table record

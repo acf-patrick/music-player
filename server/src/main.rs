@@ -4,16 +4,7 @@ mod func;
 mod query;
 mod types;
 
-/* #![cfg_attr(
-    all(not(debug_assertions), target_os = "windows"),
-    windows_subsystem = "windows"
-)] */
-
 fn main() {
-    /* tauri::Builder::default()
-    .run(tauri::generate_context!())
-    .expect("error while running tauri application"); */
-
     if let Ok(conn) = create_database("database.db") {
         println!("{} Searching audio files", '\u{1F50E}');
         let files = scan_audio_files("D:/FIT_Apprenti_Vague_006/music-player/client/public");

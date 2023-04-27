@@ -51,7 +51,7 @@ pub fn create_database(db_name: &str) -> Result<Connection, Error> {
         (),
     ));
 
-	println!("{} Database created", '\u{1F680}');
+    println!("{} Database created", '\u{1F680}');
 
     Ok(conn)
 }
@@ -95,6 +95,24 @@ pub fn generate_audio_id(src_path: &str) -> String {
     }
 
     String::new()
+}
+
+fn save_song(song: &types::Song, conn: &Connection) {
+    manage_db_error(conn.execute(
+        r#"INSERT INTO song VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"#,
+        (
+            &song.id,
+            &song.path,
+            &song.year,
+            &song.title,
+            &song.artist,
+            &song.genre,
+            &song.track_number,
+            &song.cover,
+            &song.album,
+            &song.duration,
+        ),
+    ));
 }
 
 pub fn store_audio_metadatas(audio_path: &str, conn: &Connection) -> bool {
@@ -177,23 +195,8 @@ pub fn store_audio_metadatas(audio_path: &str, conn: &Connection) -> bool {
                 ));
             }
         }
-		
-        // save song into database
-        manage_db_error(conn.execute(
-            r#"INSERT INTO song VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"#,
-            (
-                &song.id,
-                &song.path,
-                &song.year,
-                &song.title,
-                &song.artist,
-                &song.genre,
-                &song.track_number,
-                &song.cover,
-                &song.album,
-                &song.duration,
-            ),
-        ));
+
+        save_song(&song, conn);
     } else {
         println!("{audio_path} : no tags to read.");
     }
