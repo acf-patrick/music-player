@@ -9,6 +9,7 @@ pub struct Image {
 pub struct Song {
     pub id: String,   // generated using SHA256
     pub path: String, // path to the audio file
+    pub liked: bool,
     pub year: Option<u32>,
     pub title: Option<String>,
     pub artist: Option<String>,

@@ -18,6 +18,19 @@ export enum AlbumAppearance {
   GridCell,
 }
 
+export interface Song {
+  id: string;
+  path: string; // Audio source
+  year?: number;
+  title?: string;
+  artist?: string;
+  genre?: string;
+  trackNumber?: number;
+  cover?: string; // ID to one of image table record
+  album?: string;
+  duration?: number;
+}
+
 export interface Audio {
   source: String;
   hash: String; // SHA256sum

@@ -8,9 +8,11 @@ import { StyledAppContainer } from "./styles";
 import themes from "./styles/themes";
 import useAudios from "./utils/hook";
 import { Artist, Genre, Album, Audio } from "./utils/models";
+import { getSongs } from "./providers/song.provider";
 
 // Set global volume to 50% by default
 Howler.volume(0);
+getSongs().then((data) => console.log(data));
 function App() {
   const audios = useAudios();
   const [artists, setArtists] = useState<Artist[]>([]);
