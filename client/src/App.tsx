@@ -12,7 +12,7 @@ import { getSongs } from "./providers/song.provider";
 
 // Set global volume to 50% by default
 Howler.volume(0);
-getSongs().then((data) => console.log(data));
+
 function App() {
   const audios = useAudios();
   const [artists, setArtists] = useState<Artist[]>([]);

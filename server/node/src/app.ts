@@ -22,20 +22,25 @@ app.get("/album", (req, res) => {
 
   const name = req.query.name;
   db.each(
-    name
-      ? `SELECT album, artist, duration FROM song WHERE album LIKE '%${name}%'`
-      : "SELECT album, artist, duration FROM song",
-    (err, row: { album: string; artist: string; duration: number }) => {
+    `SELECT album, artist, duration, cover FROM song${
+      name ? ` WHERE album LIKE '%${name}%'` : ""
+    }`,
+    (
+      err,
+      row: { album: string; artist: string; duration: number; cover?: string }
+    ) => {
       const stored = albums.find((album) => album.name === row.album);
       if (stored) {
         if (stored.artists.indexOf(row.artist) < 0)
           stored.artists.push(row.artist);
         stored.duration += row.duration;
+        if (!stored.cover && row.cover) stored.cover = row.cover;
       } else {
         const album: Album = {
           name: row.album,
           artists: [],
           duration: row.duration,
+          cover: row.cover,
         };
         album.artists.push(row.artist);
         albums.push(album);
@@ -82,10 +87,29 @@ app.get("/genres", (req, res) => {
   );
 });
 
-// /song?title=&page=
+app.get("/image/:id", (req, res) => {
+  if (req.params.id) {
+    db.get(
+      "SELECT * FROM image WHERE id = ?",
+      req.params.id,
+      (
+        err,
+        row: {
+          id: string;
+          mime_type: string;
+          data: any;
+        }
+      ) => {
+        res.json(row);
+      }
+    );
+  } else res.sendStatus(404);
+});
+
+// /song?title=&artist=&page
 app.get("/song", (req, res) => {
   const handler = (err: Error | null, rows: unknown[]) => {
-    if (err || !rows) res.sendStatus(404);
+    if (err || rows.length === 0) res.sendStatus(404);
     else {
       const totalPage = Math.ceil(rows.length / pageLength);
       let pageIndex = 0;
@@ -107,14 +131,18 @@ app.get("/song", (req, res) => {
     }
   };
 
-  if (req.query.title)
-    // Failed to fetch if params are put in the array below 🤔
-    db.all(
-      `SELECT * FROM song WHERE title LIKE '%${req.query.title}%'`,
-      [],
-      handler
-    );
-  else db.all("SELECT * FROM song", [], handler);
+  const len = Object.keys(req.query).length;
+  if (len > 0) {
+    let i = 0;
+    let condition = "";
+    for (let key in req.query) {
+      condition += `${key} LIKE '%${req.query[key]}%'`;
+      if (i < len - 1) condition += " AND ";
+      i++;
+    }
+
+    db.all(`SELECT * FROM song WHERE(${condition})`, [], handler);
+  } else db.all("SELECT * FROM song", [], handler);
 });
 
 app.get("/song/:id", (req, res) => {

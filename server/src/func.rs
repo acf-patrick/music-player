@@ -125,8 +125,8 @@ pub fn store_audio_metadatas(audio_path: &str, conn: &Connection) -> bool {
     }
 
     let mut path = String::new();
-    if let Some(back_slash) = audio_path.find('\\') {
-      for i in back_slash..audio_path.len() {
+    if let Some(back_slash) = audio_path.find("public") {
+      for i in (back_slash + 6)..audio_path.len() {
         path.push(char::from(audio_path.as_bytes()[i]));
       }
     } else {
