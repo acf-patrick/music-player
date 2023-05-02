@@ -1,7 +1,8 @@
+import { useMemo, useState, useEffect } from "react";
 import { AlbumAppearance, Album as IAlbum } from "../utils/models";
 import { IoAlbums } from "react-icons/io5";
 import styled from "styled-components";
-import { durationToString } from "../utils";
+import { durationToString, getImage } from "../utils";
 
 const StyledWithThumbnail = styled.div`
   display: flex;
@@ -72,7 +73,43 @@ const StyledGridCell = styled.div`
   }
 `;
 
-function Album({ appearance, name, artist, cover, duration }: IAlbum) {
+function Album({
+  appearance,
+  title,
+  artists,
+  cover: coverId,
+  duration,
+}: IAlbum) {
+  const [cover, setCover] = useState("");
+  useEffect(() => {
+    if (coverId)
+      fetch(`/api/image/${coverId}`)
+        .then((res) => res.json())
+        .then(
+          (data: {
+            id: string;
+            mime_type: string;
+            data: { type: string; data: number[] };
+          }) => {
+            setCover(getImage(data.mime_type, data.data.data));
+          }
+        )
+        .catch((error) => {
+          console.error(error);
+        });
+  }, [coverId]);
+
+  const artist = useMemo(() => {
+    let artist = "";
+    if (artists) {
+      for (let i = 0; i < artists.length; ++i) {
+        artist += artists[i];
+        if (i) artist += ", ";
+      }
+      return artist;
+    } else return "";
+  }, [artists]);
+
   let Container: any = null;
   switch (appearance) {
     case AlbumAppearance.GridCell:
@@ -92,7 +129,7 @@ function Album({ appearance, name, artist, cover, duration }: IAlbum) {
         {cover ? <img src={`${cover}`} alt="" /> : <IoAlbums />}
       </div>
       <div>
-        <div className="name">{name}</div>
+        <div className="name">{title}</div>
         <div className="artist-duration">
           <div className="artist">{artist}</div>
           <div className="duration">{durationToString(duration!)}</div>

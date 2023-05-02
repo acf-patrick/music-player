@@ -20,31 +20,19 @@ export enum AlbumAppearance {
 
 export interface Song {
   id: string;
-  path: string; // Audio source
+  path: string; // Song source
+  liked: boolean;
   year?: number;
   title?: string;
   artist?: string;
   genre?: string;
-  trackNumber?: number;
+  track_number?: number;
   cover?: string; // ID to one of image table record
   album?: string;
-  duration?: number;
+  duration: number;
 }
 
-export interface Audio {
-  source: String;
-  hash: String; // SHA256sum
-  duration?: String;
-  track?: Number;
-  title?: String;
-  album?: String;
-  artist?: String;
-  cover?: String;
-  genre?: String;
-  year?: Number;
-}
-
-export const AudioSortOptions = [
+export const SongSortOptions = [
   "title",
   "duration",
   "album",
@@ -54,42 +42,26 @@ export const AudioSortOptions = [
 ] as const;
 
 export interface Album {
-  name: String;
-  appearance?: AlbumAppearance;
-  artist?: String;
-  cover?: String;
+  title: string;
+  artists?: string[];
   duration?: number;
+  cover?: string;
   year?: number; // Year of the latest released song
-  songs?: Set<String>; // List of song hash
+  appearance?: AlbumAppearance;
 }
 
 export const AlbumSortOptions = ["name", "artist", "duration"] as const;
 
-export interface Artist {
-  name: String;
-  albums?: Set<String>; // List of album names
-  songs?: Set<String>; // List of song hash
-}
-
-export interface Genre {
-  name: String;
-  songs?: Set<String>; // List of song hash
-}
-
 export interface IDataList {
-  audios: Audio[];
-  albums: Album[];
-  artists: Artist[];
-  genres: Genre[];
-  queue: Audio[]; // List of played audios
-  playingSong: Audio | null; // Currently playing song
+  queue: Song[]; // List of played songs
+  playingSong: Song | null; // Currently playing song
   playingSongIndex: number; // Index of currently playing song in current queue
   paused?: boolean; // true if current selected song has been paused
 }
 
 export interface IDataMutatorList {
-  setQueue?: (audios: Audio[]) => void;
+  setQueue?: (songs: Song[]) => void;
   setPlayingSongIndex?: (index: number) => void;
-  setPlayingSong?: (audio: Audio | null) => void;
+  setPlayingSong?: (song: Song | null) => void;
   setPaused?: (paused: boolean) => void;
 }

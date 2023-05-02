@@ -3,10 +3,6 @@ import CryptoJs from "crypto-js";
 import { IDataList, IDataMutatorList } from "./models";
 
 export const DatasContext = createContext<IDataList>({
-  audios: [],
-  albums: [],
-  artists: [],
-  genres: [],
   queue: [],
   playingSong: null,
   playingSongIndex: -1,
@@ -83,4 +79,10 @@ export function levenshteinDistance(str1: String, str2: String) {
     }
   }
   return track[str2.length][str1.length];
+}
+
+export function getImage(format: string, data: number[]) {
+  let str = "";
+  for (let byte of data) str += String.fromCharCode(byte);
+  return `data:${format};base64,${btoa(str)}`;
 }

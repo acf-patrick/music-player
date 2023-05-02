@@ -1,78 +1,89 @@
 import { useState, useEffect } from "react";
-import { Audio as Song } from "./models";
-import mockSongs from "./mockDatas";
-import jsmediatags from "jsmediatags";
-import { getSHA256, durationToString } from ".";
+import { Song, Album } from "./models";
+import { getImage } from ".";
 
-function getAudioLinks() {
-  return mockSongs;
-}
-
-function getImage(format: String, data: number[]) {
-  let str = "";
-  for (let byte of data) str += String.fromCharCode(byte);
-  return `data:${format};base64,${btoa(str)}`;
-}
-
-function getDuration(source: String, callback: (duration: String) => any) {
-  const audio = new Audio();
-  audio.preload = "metadata";
-  audio.onloadedmetadata = () => {
-    if (isNaN(audio.duration)) callback("");
-    else callback(durationToString(audio.duration));
-  };
-  audio.src = source.toString();
-}
-
-function getMetadata(
-  blob: Blob,
-  source: String,
-  setAudios: React.Dispatch<React.SetStateAction<Song[]>>
-) {
-  jsmediatags.read(blob, {
-    onSuccess: (datas: any) => {
-      const hash = getSHA256(source);
-      const tags = datas.tags;
-      const audio: Song = { source: source, hash: hash };
-      audio.album = tags.album;
-      audio.artist = tags.artist;
-      audio.genre = tags.genre;
-      audio.title = tags.title;
-      audio.track = parseInt(tags.track);
-      audio.year = parseInt(tags.year);
-
-      getDuration(source, (duration) => {
-        audio.duration = duration;
-        audio.cover = getImage(tags.picture.format, tags.picture.data);
-        setAudios((audios) => {
-          if (!audios.find((audio) => audio.hash === hash))
-            return [...audios, audio];
-          return audios;
-        });
-      });
-    },
-    onError: (error: any) => {
-      console.error(error);
-    },
-  });
-}
-
-export default function useAudios() {
-  const [audios, setAudios] = useState<Song[]>([]);
-  const links = getAudioLinks();
-
+export function useImage(coverId: string) {
+  const [cover, setCover] = useState("");
   useEffect(() => {
-    for (let link of links) {
-      fetch(`${link}`)
-        .then((res) => res.blob())
-        .then((blob) => {
-          getMetadata(blob, link, setAudios);
-        })
+    if (coverId)
+      fetch(`/api/image/${coverId}`)
+        .then((res) => res.json())
+        .then(
+          (data: {
+            id: string;
+            mime_type: string;
+            data: { type: string; data: number[] };
+          }) => {
+            setCover(getImage(data.mime_type, data.data.data));
+          }
+        )
         .catch((error) => {
           console.error(error);
         });
-    }
+  }, [coverId]);
+  return cover;
+}
+
+export function useSongs() {
+  const [songs, setSongs] = useState<Song[]>([]);
+
+  useEffect(() => {
+    fetch("/api/song")
+      .then((res) => res.json())
+      .then(
+        (data: {
+          songs: Song[];
+          paging: {
+            index: number;
+            total: number;
+          };
+        }) => {
+          setSongs(data.songs);
+        }
+      )
+      .catch((error) => {
+        console.error(error);
+      });
   }, []);
 
-  return audios;
+  return songs;
+}
+
+export function useArtists() {
+  const [artists, setArtists] = useState<string[]>([]);
+
+  useEffect(() => {
+    fetch("/api/artists")
+      .then((res) => res.json())
+      .then((data) => setArtists(data))
+      .catch((error) => console.error(error));
+  }, []);
+
+  return artists;
+}
+
+export function useGenres() {
+  const [genres, setGenres] = useState<string[]>([]);
+
+  useEffect(() => {
+    fetch("/api/genres")
+      .then((res) => res.json())
+      .then((data) => setGenres(data))
+      .catch((error) => console.error(error));
+  }, []);
+
+  return genres;
+}
+
+export function useAlbums() {
+  const [albums, setAlbums] = useState<Album[]>([]);
+
+  useEffect(() => {
+    fetch("/api/album")
+      .then((res) => res.json())
+      .then((data) => setAlbums(data))
+      .catch((error) => console.error(error));
+  }, []);
+
+  return albums;
 }

@@ -1,19 +1,23 @@
 import { useContext, useEffect } from "react";
 import { DataMutatorsContext, DatasContext } from "../../utils";
+import { Song } from "../../utils/models";
 import { CiSearch } from "react-icons/ci";
 import { FaPause, FaPlay } from "react-icons/fa";
 import { StyledHomeContent } from "../../styles";
 import { Queue, Player } from "../../components";
+import { useImage } from "../../utils/hook";
 
-function Content() {
-  const { audios, playingSong, playingSongIndex, paused, queue } =
-    useContext(DatasContext);
+function Content({ songs }: { songs: Song[] }) {
+  const { playingSong, paused, queue } = useContext(DatasContext);
   const { setPlayingSongIndex, setPaused, setQueue } =
     useContext(DataMutatorsContext);
 
+  const coverId = playingSong?.cover ? playingSong?.cover : "";
+  const cover = useImage(coverId);
+
   useEffect(() => {
-    setQueue!([...audios]);
-  }, [audios]);
+    setQueue!([...songs]);
+  }, [songs]);
 
   const playButtonOnClick = () => {
     if (playingSong) setPaused!(!paused);
@@ -26,12 +30,12 @@ function Content() {
   };
 
   return (
-    <StyledHomeContent headerBg={playingSong?.cover?.toString()}>
+    <StyledHomeContent headerBg={cover}>
       <div className="header">
         <div className="texts">
           <h1>Library</h1>
           <p>
-            {audios.length} song{audios.length > 1 ? "s" : ""}
+            {songs.length} song{songs.length > 1 ? "s" : ""}
           </p>
         </div>
         <div className="play-button">

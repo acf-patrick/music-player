@@ -1,6 +1,5 @@
 import { MdSort } from "react-icons/md";
 import { GrClose } from "react-icons/gr";
-import { DatasContext } from "../../utils";
 import { StyledOverview } from "../../styles";
 import { BsFillGearFill } from "react-icons/bs";
 import { useState, useRef, useContext, useEffect } from "react";
@@ -11,13 +10,12 @@ import {
 } from "react-icons/ai";
 import {
   AlbumAppearance,
-  Audio,
+  Song as Audio,
   Album as IAlbum,
-  Genre,
-  Artist,
+  SongSortOptions,
   AlbumSortOptions,
-  AudioSortOptions,
 } from "../../utils/models";
+import { useAlbums, useArtists, useGenres, useSongs } from "../../utils/hook";
 
 // Convenience component for conditional rendering
 function Result({
@@ -25,7 +23,7 @@ function Result({
   field,
   albumAppearance,
 }: {
-  result: String | Audio | IAlbum;
+  result: string | Audio | IAlbum;
   field: string;
   albumAppearance: AlbumAppearance;
 }) {
@@ -37,37 +35,39 @@ function Result({
       <Album
         appearance={albumAppearance}
         cover={album.cover}
-        artist={album.artist}
-        name={album.name}
+        artists={album.artists}
+        title={album.title}
         duration={album.duration}
       />
     );
   }
 
-  if (field === "Genre") {
-    const genre = result as Genre;
-    return (
-      <div>
-        ♪<span>{genre.name}</span>
-      </div>
-    );
-  }
-  if (field === "Artist") {
-    const artist = result as Artist;
-    return (
-      <div>
-        🎙️<span>{artist.name}</span>
-      </div>
-    );
+  if (typeof result === "string") {
+    if (field === "Genre") {
+      return (
+        <div>
+          ♪<span>{result as string}</span>
+        </div>
+      );
+    }
+    if (field === "Artist") {
+      return (
+        <div>
+          🎙️<span>{result as string}</span>
+        </div>
+      );
+    }
   }
 
   return <></>;
 }
 
-function Overview() {
-  const { audios, artists, genres, albums } = useContext(DatasContext);
+function Overview({ songs }: { songs: Audio[] }) {
+  const artists = useArtists();
+  const genres = useGenres();
+  const albums = useAlbums();
 
-  const [results, setResults] = useState<Audio[] | String[] | IAlbum[]>([]);
+  const [results, setResults] = useState<Audio[] | string[] | IAlbum[]>([]);
 
   // Whether the select options are shown or not
   const [optionsFolded, setOptionsFolded] = useState(true);
@@ -95,7 +95,7 @@ function Overview() {
   >("ascending");
 
   const [sortBy, setSortBy] = useState<
-    (typeof AlbumSortOptions)[number] | (typeof AudioSortOptions)[number] | null
+    (typeof AlbumSortOptions)[number] | (typeof SongSortOptions)[number] | null
   >(null);
 
   const [sortPopupShown, setSortPopupShown] = useState(false);
@@ -103,7 +103,7 @@ function Overview() {
   const getDefaultResults = () => {
     switch (currentField) {
       case "Song":
-        return [...audios];
+        return [...songs];
         break;
       case "Artist":
         return [...artists];
@@ -131,7 +131,7 @@ function Overview() {
   useEffect(() => {
     // Setting result view according to field chosen by the user
     resetResults();
-  }, [audios, currentField]);
+  }, [songs, currentField]);
 
   useEffect(() => {
     setSortBy(null);
@@ -194,30 +194,24 @@ function Overview() {
       case "Album":
         setResults(
           albums.filter(
-            (album) => album.name.toLowerCase().indexOf(keyword) >= 0
+            (album) => album.title.toLowerCase().indexOf(keyword) >= 0
           )
         );
         break;
       case "Genre":
         setResults(
-          genres.filter(
-            (genre) => genre.name.toLowerCase().indexOf(keyword) >= 0
-          )
+          genres.filter((genre) => genre.toLowerCase().indexOf(keyword) >= 0)
         );
         break;
       case "Artist":
         setResults(
-          artists.filter(
-            (artist) => artist.name.toLowerCase().indexOf(keyword) >= 0
-          )
+          artists.filter((artist) => artist.toLowerCase().indexOf(keyword) >= 0)
         );
         break;
       case "Song":
         setResults(
-          audios.filter((audio) =>
-            audio.title
-              ? audio.title.toLowerCase().indexOf(keyword) >= 0
-              : false
+          songs.filter((song) =>
+            song.title ? song.title.toLowerCase().indexOf(keyword) >= 0 : false
           )
         );
         break;
@@ -278,7 +272,7 @@ function Overview() {
                 {sortPopupShown && (
                   <Popup
                     options={(currentField === "Song"
-                      ? AudioSortOptions
+                      ? SongSortOptions
                       : AlbumSortOptions
                     ).map((option, i) => {
                       return {

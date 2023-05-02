@@ -22,25 +22,35 @@ app.get("/album", (req, res) => {
 
   const name = req.query.name;
   db.each(
-    `SELECT album, artist, duration, cover FROM song${
+    `SELECT album, artist, duration, year, cover FROM song${
       name ? ` WHERE album LIKE '%${name}%'` : ""
     }`,
     (
       err,
-      row: { album: string; artist: string; duration: number; cover?: string }
+      row: {
+        album: string;
+        artist: string;
+        duration: number;
+        year: number;
+        cover?: string;
+      }
     ) => {
-      const stored = albums.find((album) => album.name === row.album);
+      const stored = albums.find((album) => album.title === row.album);
       if (stored) {
         if (stored.artists.indexOf(row.artist) < 0)
           stored.artists.push(row.artist);
         stored.duration += row.duration;
+        stored.track_count++;
+        if (row.year > stored.year) stored.year = row.year;
         if (!stored.cover && row.cover) stored.cover = row.cover;
       } else {
         const album: Album = {
-          name: row.album,
+          title: row.album,
           artists: [],
+          year: row.year,
           duration: row.duration,
           cover: row.cover,
+          track_count: 1,
         };
         album.artists.push(row.artist);
         albums.push(album);

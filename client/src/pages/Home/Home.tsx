@@ -1,6 +1,7 @@
 import styled from "styled-components";
 import Content from "./Content";
 import Overview from "./Overview";
+import { useSongs } from "../../utils/hook";
 
 const StyledContainer = styled.div`
   width: 100%;
@@ -10,10 +11,12 @@ const StyledContainer = styled.div`
 `;
 
 function Home() {
+  const songs = useSongs();
+
   return (
     <StyledContainer>
-      <Overview />
-      <Content />
+      <Overview songs={songs} />
+      <Content songs={songs} />
     </StyledContainer>
   );
 }

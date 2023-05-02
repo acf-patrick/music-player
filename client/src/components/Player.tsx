@@ -23,6 +23,7 @@ import {
 } from "../utils";
 import { StyledCover } from "../styles";
 import { Howl, Howler } from "howler";
+import { useImage } from "../utils/hook";
 
 const slideUp = keyframes`
   from {
@@ -197,14 +198,8 @@ function Player() {
   const slideRef = useRef<HTMLInputElement | null>(null);
   const toolTipRef = useRef<HTMLDivElement | null>(null);
 
-  // Song duration in seconds
-  const duration = useMemo(() => {
-    if (playingSong) {
-      if (playingSong.duration)
-        return stringToDuration(playingSong.duration.toString());
-    }
-    return 0;
-  }, [playingSong]);
+  const coverId = playingSong?.cover ? playingSong?.cover : "";
+  const cover = useImage(coverId);
 
   // Number of seconds elapsed
   const [progression, setProgression] = useState(0);
@@ -251,7 +246,7 @@ function Player() {
     if (playingSong) {
       Howler.unload();
       const song = new Howl({
-        src: playingSong.source.toString(),
+        src: playingSong.path,
         autoplay: true,
         onload: (id) => {},
         onloaderror: (id, error) => {},
@@ -262,7 +257,7 @@ function Player() {
   }, [playingSong]);
 
   useEffect(() => {
-    if (progression >= duration) {
+    if (progression >= playingSong!.duration) {
       if (playingSongIndex < queue.length - 1) {
         setPlayingSongIndex!(playingSongIndex + 1);
       } else {
@@ -341,15 +336,17 @@ function Player() {
           setMousePosition("");
         }}
       >
-        {duration && (
+        {playingSong!.duration && (
           <>
             <input
               ref={slideRef}
               type="range"
-              max={duration}
+              max={playingSong!.duration}
               name="slide"
               style={{
-                backgroundSize: `${(progression * 100) / duration}% 100%`,
+                backgroundSize: `${
+                  (progression * 100) / playingSong!.duration
+                }% 100%`,
               }}
               onInput={sliderOnClick}
               onWheel={(e) => onMouseWheel(e.deltaY)}
@@ -368,11 +365,7 @@ function Player() {
       <div className="control">
         <div className="control__left">
           <StyledCover>
-            {playingSong?.cover ? (
-              <img src={playingSong?.cover?.toString()} alt="" />
-            ) : (
-              <IoMusicalNotesOutline />
-            )}
+            {cover ? <img src={cover} alt="" /> : <IoMusicalNotesOutline />}
           </StyledCover>
           <div className="song">
             <div className="title">
@@ -419,7 +412,9 @@ function Player() {
             <span className="elapsed">
               {durationToString(progression, false)} /{" "}
             </span>
-            <span className="total">{durationToString(duration, false)}</span>
+            <span className="total">
+              {durationToString(playingSong!.duration, false)}
+            </span>
           </div>
           <button
             className="volume"

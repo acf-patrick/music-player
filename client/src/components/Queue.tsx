@@ -1,7 +1,7 @@
 import { useContext, useState, FC } from "react";
 import styled from "styled-components";
-import { Audio, PopupOption } from "../utils/models";
-import { DatasContext, DataMutatorsContext } from "../utils";
+import { Song as Audio, PopupOption } from "../utils/models";
+import { DatasContext, DataMutatorsContext, durationToString } from "../utils";
 import { BsFillPlayFill, BsPauseFill } from "react-icons/bs";
 import { GoKebabVertical } from "react-icons/go";
 import { Popup } from ".";
@@ -81,7 +81,7 @@ const Song: FC<{
     const song = queue[index];
     setPlayingSongIndex!(index);
     if (playingSong) {
-      setPaused!(song.hash === playingSong.hash ? !paused : false);
+      setPaused!(song.id === playingSong.id ? !paused : false);
     } else setPaused!(false);
   };
 
@@ -110,7 +110,7 @@ const Song: FC<{
         <span>{song.title}</span>
       </div>
       <div className="right">
-        <span>{song.duration}</span>
+        <span>{durationToString(song.duration!)}</span>
         <div
           className="menu-btn"
           onMouseLeave={() => {
@@ -181,7 +181,7 @@ function Queue() {
     const song = queue[index];
     setPlayingSongIndex!(index);
     if (playingSong) {
-      setPaused!(song.hash === playingSong.hash ? !paused : false);
+      setPaused!(song.id === playingSong.id ? !paused : false);
     } else setPaused!(false);
   };
 

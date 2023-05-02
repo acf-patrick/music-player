@@ -1,7 +1,10 @@
+import { useState, useEffect } from "react";
 import styled from "styled-components";
-import { Audio } from "../utils/models";
+import { Song as Audio } from "../utils/models";
 import { IoMusicalNotesOutline } from "react-icons/io5";
 import { StyledCover } from "../styles";
+import { durationToString, getImage } from "../utils";
+import { useImage } from "../utils/hook";
 
 const StyledContainer = styled.div`
   display: flex;
@@ -34,20 +37,18 @@ const StyledContainer = styled.div`
 `;
 
 function Song({ datas }: { datas: Audio }) {
+  const cover = useImage(datas.cover ? datas.cover : "");
+
   return (
     <StyledContainer>
       <StyledCover>
-        {datas.cover ? (
-          <img src={`${datas.cover}`} alt="" />
-        ) : (
-          <IoMusicalNotesOutline />
-        )}
+        {cover ? <img src={`${cover}`} alt="" /> : <IoMusicalNotesOutline />}
       </StyledCover>
       <div className="datas">
         <div className="title">{datas.title ? datas.title : "Unknown"}</div>
         <div className="artist">{datas.artist ? datas.artist : "Unknown"}</div>
         <div className="album">{datas.album ? datas.album : "Unknown"}</div>
-        <div className="duration">{datas.duration}</div>
+        <div className="duration">{durationToString(datas.duration!)}</div>
       </div>
     </StyledContainer>
   );
