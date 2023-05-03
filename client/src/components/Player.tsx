@@ -18,7 +18,6 @@ import styled, { keyframes } from "styled-components";
 import {
   DataMutatorsContext,
   DatasContext,
-  stringToDuration,
   durationToString,
 } from "../utils";
 import { StyledCover } from "../styles";
@@ -101,7 +100,8 @@ const StyledContainer = styled.div`
     @media (max-width: 1428px) {
       max-width: 148px;
     }
-
+    
+    max-width: 180px;
     white-space: nowrap;
 
     & > div {

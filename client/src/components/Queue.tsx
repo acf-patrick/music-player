@@ -1,10 +1,11 @@
-import { useContext, useState, FC } from "react";
+import { useContext, useEffect, useState, FC } from "react";
 import styled from "styled-components";
 import { Song as Audio, PopupOption } from "../utils/models";
 import { DatasContext, DataMutatorsContext, durationToString } from "../utils";
 import { BsFillPlayFill, BsPauseFill } from "react-icons/bs";
 import { GoKebabVertical } from "react-icons/go";
 import { Popup } from ".";
+import { getSong } from "../utils/hook";
 
 const StyledSong = styled.div`
   display: flex;
@@ -36,8 +37,9 @@ const StyledSong = styled.div`
 
 const Song: FC<{
   index: number;
+  queue: Audio[];
   song: Audio;
-}> = ({ index, song }) => {
+}> = ({ index, queue, song }) => {
   const contextMenuOptions: PopupOption[] = [
     {
       text: "Play",
@@ -72,8 +74,7 @@ const Song: FC<{
     },
   ];
 
-  const { queue, paused, playingSong, playingSongIndex } =
-    useContext(DatasContext);
+  const { paused, playingSong, playingSongIndex } = useContext(DatasContext);
   const { setPlayingSongIndex, setPaused } = useContext(DataMutatorsContext);
   const [contextMenu, setContextMenu] = useState(false);
 
@@ -172,10 +173,18 @@ const StyledContainer = styled.div`
   }
 `;
 
-function Queue() {
-  const { playingSong, playingSongIndex, queue, paused } =
-    useContext(DatasContext);
+function Queue({ songs }: { songs: string[] }) {
+  const { playingSong, playingSongIndex, paused } = useContext(DatasContext);
   const { setPlayingSongIndex, setPaused } = useContext(DataMutatorsContext);
+
+  const [queue, setQueue] = useState<Audio[]>([]);
+  useEffect(() => {
+    songs.forEach((id) => {
+      getSong(id)
+        .then((data) => setQueue((queue) => [...queue, data]))
+        .catch((err) => console.error(err));
+    });
+  }, [songs]);
 
   const playButtonOnClick = (index: number) => {
     const song = queue[index];
@@ -197,7 +206,7 @@ function Queue() {
               }}
               className={i === playingSongIndex && !paused ? "playing" : ""}
             >
-              <Song index={i} song={{ ...song }} />
+              <Song index={i} queue={queue} song={{ ...song }} />
             </li>
           ))}
         </ul>

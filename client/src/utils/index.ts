@@ -1,6 +1,7 @@
 import { createContext } from "react";
-import CryptoJs from "crypto-js";
 import { IDataList, IDataMutatorList } from "./models";
+
+export { default as findDominantColor } from "./colors";
 
 export const DatasContext = createContext<IDataList>({
   queue: [],
@@ -9,16 +10,6 @@ export const DatasContext = createContext<IDataList>({
 });
 
 export const DataMutatorsContext = createContext<IDataMutatorList>({});
-
-/* async function getSHA256(blob: Blob) {
-  const buffer = await blob.arrayBuffer();
-  const arr = new Uint32Array(
-    buffer.slice(0, 4 * Math.floor(buffer.byteLength / 4))
-  );
-  const wordArray = CryptoJs.lib.WordArray.create([...arr]);
-
-  return CryptoJs.SHA256(wordArray).toString(CryptoJs.enc.Base64);
-} */
 
 // Convert number of seconds to hh:mm:ss
 export function durationToString(duration: number, withLeadingZero = true) {
@@ -51,10 +42,6 @@ export function stringToDuration(duration: string) {
   }
 
   return hours * 3600 + minutes * 60 + seconds;
-}
-
-export function getSHA256(source: String) {
-  return CryptoJs.SHA256(source.toString()).toString(CryptoJs.enc.Base64);
 }
 
 // Compute difference between two sequences

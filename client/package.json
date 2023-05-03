@@ -10,7 +10,6 @@
   },
   "dependencies": {
     "@tauri-apps/api": "^1.2.0",
-    "crypto-js": "^4.1.1",
     "howler": "^2.2.3",
     "jsmediatags": "3.9.3",
     "react": "^18.2.0",

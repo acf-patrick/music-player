@@ -1,6 +1,11 @@
 import { useState, useEffect } from "react";
 import { Song, Album } from "./models";
-import { getImage } from ".";
+import { findDominantColor, getImage } from ".";
+
+export async function getSong(songId: string): Promise<Song> {
+  const res = await fetch(`/api/song/${songId}`);
+  return await res.json();
+}
 
 export function useImage(coverId: string) {
   const [cover, setCover] = useState("");
@@ -14,7 +19,9 @@ export function useImage(coverId: string) {
             mime_type: string;
             data: { type: string; data: number[] };
           }) => {
-            setCover(getImage(data.mime_type, data.data.data));
+            const datas = data.data.data;
+            console.log(findDominantColor(datas));
+            setCover(getImage(data.mime_type, datas));
           }
         )
         .catch((error) => {

@@ -16,7 +16,7 @@ function Content({ songs }: { songs: Song[] }) {
   const cover = useImage(coverId);
 
   useEffect(() => {
-    setQueue!([...songs]);
+    setQueue!(songs.map((song) => song.id));
   }, [songs]);
 
   const playButtonOnClick = () => {
@@ -56,7 +56,7 @@ function Content({ songs }: { songs: Song[] }) {
             By <span>Title</span>
           </div>
         </div>
-        <Queue />
+        <Queue songs={queue} />
         {playingSong ? <Player /> : <></>}
       </div>
     </StyledHomeContent>

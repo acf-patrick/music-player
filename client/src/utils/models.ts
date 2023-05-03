@@ -53,14 +53,14 @@ export interface Album {
 export const AlbumSortOptions = ["name", "artist", "duration"] as const;
 
 export interface IDataList {
-  queue: Song[]; // List of played songs
+  queue: string[]; // List of played songs
   playingSong: Song | null; // Currently playing song
   playingSongIndex: number; // Index of currently playing song in current queue
   paused?: boolean; // true if current selected song has been paused
 }
 
 export interface IDataMutatorList {
-  setQueue?: (songs: Song[]) => void;
+  setQueue?: (songIds: string[]) => void;
   setPlayingSongIndex?: (index: number) => void;
   setPlayingSong?: (song: Song | null) => void;
   setPaused?: (paused: boolean) => void;
