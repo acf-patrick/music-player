@@ -5,12 +5,14 @@ interface Pixel {
 }
 function getRgbArray(data: number[]) {
   const values: Pixel[] = [];
-  for (let i = 0; i < data.length; i += 4)
-    values.push({
-      r: data[i],
-      g: data[i + 1],
-      b: data[i + 2],
-    });
+  const step = data.length % 3 ? 4 : 3;
+  for (let i = 0; i < data.length; i += step)
+    if (data.length - 4 >= i)
+      values.push({
+        r: data[i],
+        g: data[i + 1],
+        b: data[i + 2],
+      });
   return values;
 }
 
@@ -74,6 +76,12 @@ function quantization(values: Pixel[], depth: number): Pixel[] {
 }
 
 // Find dominant color
-export default function findDominantColor(datas: number[]) {
-  return quantization(getRgbArray(datas), 0);
+export default async function createColorPalette(
+  datas: number[]
+): Promise<Pixel[]> {
+  return new Promise((res, rej) => {
+    const pixels = quantization(getRgbArray(datas), 0);
+    if (pixels.length) res(pixels);
+    else rej("Unable to extract color palette.");
+  });
 }

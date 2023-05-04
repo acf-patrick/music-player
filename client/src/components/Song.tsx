@@ -3,7 +3,7 @@ import styled from "styled-components";
 import { Song as Audio } from "../utils/models";
 import { IoMusicalNotesOutline } from "react-icons/io5";
 import { StyledCover } from "../styles";
-import { durationToString, getImage } from "../utils";
+import { durationToString, createDataUri } from "../utils";
 import { useImage } from "../utils/hook";
 
 const StyledContainer = styled.div`

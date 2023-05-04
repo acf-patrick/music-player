@@ -1,7 +1,7 @@
 import { createContext } from "react";
 import { IDataList, IDataMutatorList } from "./models";
 
-export { default as findDominantColor } from "./colors";
+export { default as createColorPalette } from "./colors";
 
 export const DatasContext = createContext<IDataList>({
   queue: [],
@@ -68,7 +68,7 @@ export function levenshteinDistance(str1: String, str2: String) {
   return track[str2.length][str1.length];
 }
 
-export function getImage(format: string, data: number[]) {
+export function createDataUri(format: string, data: number[]) {
   let str = "";
   for (let byte of data) str += String.fromCharCode(byte);
   return `data:${format};base64,${btoa(str)}`;

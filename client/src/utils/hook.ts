@@ -1,10 +1,22 @@
 import { useState, useEffect } from "react";
-import { Song, Album } from "./models";
-import { findDominantColor, getImage } from ".";
+import { Song, Image, Album } from "./models";
+import { createDataUri } from ".";
 
 export async function getSong(songId: string): Promise<Song> {
   const res = await fetch(`/api/song/${songId}`);
   return await res.json();
+}
+
+export async function getImageData(id: string) {
+  const res = await fetch(`/api/image/${id}`);
+  const datas: Image = await res.json();
+  return datas.data.data;
+}
+
+export async function getImageUri(id: string) {
+  const res = await fetch(`/api/image/${id}`);
+  const datas = await res.json();
+  return createDataUri(datas.mime_type, datas.data.data);
 }
 
 export function useImage(coverId: string) {
@@ -13,17 +25,10 @@ export function useImage(coverId: string) {
     if (coverId)
       fetch(`/api/image/${coverId}`)
         .then((res) => res.json())
-        .then(
-          (data: {
-            id: string;
-            mime_type: string;
-            data: { type: string; data: number[] };
-          }) => {
-            const datas = data.data.data;
-            console.log(findDominantColor(datas));
-            setCover(getImage(data.mime_type, datas));
-          }
-        )
+        .then((data: Image) => {
+          const datas = data.data.data;
+          setCover(createDataUri(data.mime_type, datas));
+        })
         .catch((error) => {
           console.error(error);
         });
@@ -82,9 +87,34 @@ export function useGenres() {
   return genres;
 }
 
+export function useAlbumsByArtist(artist: string) {
+  const [albums, setAlbums] = useState<Album[]>([]);
+  useEffect(() => {
+    fetch(`/api/album?artist=${artist}`)
+      .then((res) => res.json())
+      .then((data) => setAlbums(data))
+      .catch((err) => console.error(err));
+  }, [artist]);
+
+  return albums;
+}
+
+export function useAlbum(name: string) {
+  const [album, setAlbum] = useState<Album | null>(null);
+  useEffect(() => {
+    fetch(`/api/album?name=${name}`)
+      .then((res) => res.json())
+      .then((data) => {
+        setAlbum(data[0]);
+      })
+      .catch((err) => console.error(err));
+  }, [name]);
+
+  return album;
+}
+
 export function useAlbums() {
   const [albums, setAlbums] = useState<Album[]>([]);
-
   useEffect(() => {
     fetch("/api/album")
       .then((res) => res.json())

@@ -2,6 +2,7 @@ import express from "express";
 import * as dotenv from "dotenv";
 import * as sqlite from "sqlite3";
 import { Album } from "./models";
+import { createCondition } from "./func";
 
 dotenv.config();
 
@@ -17,52 +18,56 @@ const db = new sqlite.Database(database, sqlite.OPEN_READWRITE, (err) => {
 
 const app = express();
 
+// /album?name=&artist=
 app.get("/album", (req, res) => {
-  const albums: Album[] = [];
+  const conditions = createCondition(req.query);
 
-  const name = req.query.name;
-  db.each(
-    `SELECT album, artist, duration, year, cover FROM song${
-      name ? ` WHERE album LIKE '%${name}%'` : ""
-    }`,
-    (
-      err,
-      row: {
-        album: string;
-        artist: string;
-        duration: number;
-        year: number;
-        cover?: string;
-      }
-    ) => {
-      const stored = albums.find((album) => album.title === row.album);
-      if (stored) {
-        if (stored.artists.indexOf(row.artist) < 0)
-          stored.artists.push(row.artist);
-        stored.duration += row.duration;
-        stored.track_count++;
-        if (row.year > stored.year) stored.year = row.year;
-        if (!stored.cover && row.cover) stored.cover = row.cover;
-      } else {
-        const album: Album = {
-          title: row.album,
-          artists: [],
-          year: row.year,
-          duration: row.duration,
-          cover: row.cover,
-          track_count: 1,
-        };
-        album.artists.push(row.artist);
-        albums.push(album);
-      }
-    },
-    (err, count) => {
-      if (err) console.error(err);
+  if (conditions.length) {
+    const albums: Album[] = [];
+    db.each(
+      `SELECT album, artist, duration, year, cover FROM song WHERE(${conditions})`.replace(
+        "name",
+        "album"
+      ),
+      (
+        err,
+        row: {
+          album: string;
+          artist: string;
+          duration: number;
+          year: number;
+          cover?: string;
+        }
+      ) => {
+        const stored = albums.find((album) => album.title === row.album);
+        if (stored) {
+          if (stored.artists.indexOf(row.artist) < 0)
+            stored.artists.push(row.artist);
+          stored.duration += row.duration;
+          stored.track_count++;
+          if (row.year > stored.year) stored.year = row.year;
+          if (!stored.cover && row.cover) stored.cover = row.cover;
+        } else {
+          const album: Album = {
+            title: row.album,
+            artists: [],
+            year: row.year,
+            duration: row.duration,
+            cover: row.cover,
+            track_count: 1,
+          };
+          album.artists.push(row.artist);
+          albums.push(album);
+        }
+      },
+      (err, count) => {
+        if (err) console.error(err);
 
-      if (err || !count) res.sendStatus(404);
-      else res.json(albums);
-    }
-  );
+        if (err || !count) res.sendStatus(404);
+        else res.json(albums);
+      }
+    );
+  } else res.sendStatus(404);
 });
 
 app.get("/artists", (req, res) => {
@@ -141,18 +146,10 @@ app.get("/song", (req, res) => {
     }
   };
 
-  const len = Object.keys(req.query).length;
-  if (len > 0) {
-    let i = 0;
-    let condition = "";
-    for (let key in req.query) {
-      condition += `${key} LIKE '%${req.query[key]}%'`;
-      if (i < len - 1) condition += " AND ";
-      i++;
-    }
-
-    db.all(`SELECT * FROM song WHERE(${condition})`, [], handler);
-  } else db.all("SELECT * FROM song", [], handler);
+  const conditions = createCondition(req.query);
+  if (conditions.length)
+    db.all(`SELECT * FROM song WHERE(${conditions})`, [], handler);
+  else db.all("SELECT * FROM song", [], handler);
 });
 
 app.get("/song/:id", (req, res) => {

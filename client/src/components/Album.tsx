@@ -2,7 +2,7 @@ import { useMemo, useState, useEffect } from "react";
 import { AlbumAppearance, Album as IAlbum } from "../utils/models";
 import { IoAlbums } from "react-icons/io5";
 import styled from "styled-components";
-import { durationToString, getImage } from "../utils";
+import { durationToString, createDataUri } from "../utils";
 
 const StyledWithThumbnail = styled.div`
   display: flex;
@@ -91,7 +91,7 @@ function Album({
             mime_type: string;
             data: { type: string; data: number[] };
           }) => {
-            setCover(getImage(data.mime_type, data.data.data));
+            setCover(createDataUri(data.mime_type, data.data.data));
           }
         )
         .catch((error) => {

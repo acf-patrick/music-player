@@ -50,6 +50,12 @@ export interface Album {
   appearance?: AlbumAppearance;
 }
 
+export interface Image {
+  id: string;
+  mime_type: string;
+  data: { type: string; data: number[] };
+}
+
 export const AlbumSortOptions = ["name", "artist", "duration"] as const;
 
 export interface IDataList {
