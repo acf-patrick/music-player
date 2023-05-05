@@ -5,7 +5,7 @@ import { DatasContext, DataMutatorsContext, durationToString } from "../utils";
 import { BsFillPlayFill, BsPauseFill } from "react-icons/bs";
 import { GoKebabVertical } from "react-icons/go";
 import { Popup } from ".";
-import { getSong } from "../utils/hook";
+import { getSong } from "../utils/providers";
 
 const StyledSong = styled.div`
   display: flex;

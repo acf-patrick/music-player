@@ -2,23 +2,6 @@ import { useState, useEffect } from "react";
 import { Song, Image, Album } from "./models";
 import { createDataUri } from ".";
 
-export async function getSong(songId: string): Promise<Song> {
-  const res = await fetch(`/api/song/${songId}`);
-  return await res.json();
-}
-
-export async function getImageData(id: string) {
-  const res = await fetch(`/api/image/${id}`);
-  const datas: Image = await res.json();
-  return datas.data.data;
-}
-
-export async function getImageUri(id: string) {
-  const res = await fetch(`/api/image/${id}`);
-  const datas = await res.json();
-  return createDataUri(datas.mime_type, datas.data.data);
-}
-
 export function useImage(coverId: string) {
   const [cover, setCover] = useState("");
   useEffect(() => {
@@ -116,7 +99,7 @@ export function useAlbum(name: string) {
 export function useAlbums() {
   const [albums, setAlbums] = useState<Album[]>([]);
   useEffect(() => {
-    fetch("/api/album")
+    fetch("/api/albums")
       .then((res) => res.json())
       .then((data) => setAlbums(data))
       .catch((error) => console.error(error));

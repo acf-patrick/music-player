@@ -7,7 +7,7 @@ import { Home, Album, Error } from "./pages";
 import { StyledAppContainer } from "./styles";
 import themes from "./styles/themes";
 import { Song } from "./utils/models";
-import { getSong } from "./utils/hook";
+import { getSong } from "./utils/providers";
 
 // Set global volume to 50% by default
 Howler.volume(0);

@@ -47,7 +47,7 @@ function findBiggestColorRange(rgbValues: Pixel[]) {
 }
 
 function quantization(values: Pixel[], depth: number): Pixel[] {
-  const MAX_DEPTH = 4;
+  const MAX_DEPTH = 5;
   if (depth === MAX_DEPTH || values.length === 0) {
     const color = values.reduce(
       (prev, curr) => {

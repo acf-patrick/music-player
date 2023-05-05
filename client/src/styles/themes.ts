@@ -20,6 +20,10 @@ const themes = {
         gridCell: "black",
         listItem: "grey",
       },
+      page: {
+        artist: "#2F2F2F",
+        name: "#4D4D4D",
+      },
     },
     song: {
       title: "#303030",

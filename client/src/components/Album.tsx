@@ -1,4 +1,5 @@
 import { useMemo, useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { AlbumAppearance, Album as IAlbum } from "../utils/models";
 import { IoAlbums } from "react-icons/io5";
 import styled from "styled-components";
@@ -80,6 +81,8 @@ function Album({
   cover: coverId,
   duration,
 }: IAlbum) {
+  const navigate = useNavigate();
+
   const [cover, setCover] = useState("");
   useEffect(() => {
     if (coverId)
@@ -110,7 +113,12 @@ function Album({
     } else return "";
   }, [artists]);
 
-  let Container: any = null;
+  const handleOnClick = () => {
+    navigate(`/album/${btoa(title)}`);
+  };
+
+  const containers = [StyledGridCell, StyledWithThumbnail] as const;
+  let Container: (typeof containers)[number] | null = null;
   switch (appearance) {
     case AlbumAppearance.GridCell:
       Container = StyledGridCell;
@@ -124,7 +132,7 @@ function Album({
   }
 
   return (
-    <Container>
+    <Container onClick={handleOnClick}>
       <div className="cover">
         {cover ? <img src={`${cover}`} alt="" /> : <IoAlbums />}
       </div>

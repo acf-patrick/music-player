@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
-import { getImageData, getImageUri, useAlbum } from "../../utils/hook";
+import { getImageData, getImageUri } from "../../utils/providers";
+import { useAlbum } from "../../utils/hook";
 import { useParams } from "react-router-dom";
 import AlbumList from "./AlbumList";
 import SongList from "./SongList";
@@ -8,9 +9,11 @@ import { createColorPalette, createDataUri } from "../../utils";
 
 const slideRight = keyframes`
   from {
-    transform: translate(0, -50%) rotate(180deg);
+    bottom: 50%;
+    transform: translate(0, 50%) rotate(180deg);
   } to {
-    transform: translate(50%, -50%) rotate(360deg);   
+    bottom: 0;
+    transform: translateX(50%) rotate(360deg);
   }
 `;
 
@@ -28,7 +31,7 @@ const StyledContainer = styled.div`
 
 const StyledAlbumCover = styled.div<{
   colors: string[];
-  src: string;
+  bg: string;
   show: boolean;
 }>`
   background: linear-gradient(to top, ${({ colors }) => colors.join(", ")});
@@ -44,7 +47,7 @@ const StyledAlbumCover = styled.div<{
 
   .square,
   .circle {
-    background: ${({ src }) => `url(${src})`};
+    background: ${({ bg }) => `url(${bg})`};
     background-size: cover;
   }
 
@@ -54,17 +57,31 @@ const StyledAlbumCover = styled.div<{
     position: relative;
     z-index: 2;
     box-shadow: 1px 0 3px black;
+
+    // 3D shadow
+    &::after {
+      content: "";
+      display: block;
+      width: 100%;
+      height: 16px;
+      position: absolute;
+      left: 0;
+      bottom: -32px;
+      border-radius: 100%;
+      filter: blur(5px);
+      background: linear-gradient(to right, transparent, black, transparent);
+      // box-shadow: 0 0 15px black inset;
+    }
   }
 
   .circle {
     width: 216px;
     aspect-ratio: 1;
     position: absolute;
-    top: 50%;
     right: 0;
     border-radius: 100%;
     border: 1px solid black;
-    animation: ${slideRight} 1s both ease-out;
+    animation: ${slideRight} 1s 1s both ease-out;
 
     .inner {
       z-index: 100;
@@ -81,7 +98,7 @@ const StyledAlbumCover = styled.div<{
 `;
 
 export default function Album() {
-  // QmxhY2t3YXRlciBQYXJr
+  // VGVybWluYWwgUmVkdXg=
   const { name } = useParams();
   const [colors, setColors] = useState<string[]>([]);
   const [uri, setUri] = useState("");
@@ -103,8 +120,7 @@ export default function Album() {
                 const len = palette.length;
                 console.log(palette);
                 setColors(
-                  // [palette[len - 2], palette[len - 1]]
-                  palette.map(
+                  [palette[0], palette[1]].map(
                     (color) =>
                       `#${color.r.toString(16)}${color.g.toString(
                         16
@@ -122,7 +138,11 @@ export default function Album() {
   return (
     <StyledContainer>
       <div className="overview">
-        <StyledAlbumCover colors={colors} src={uri} show={uri.length > 0}>
+        <StyledAlbumCover
+          colors={colors}
+          bg={uri}
+          show={colors.length > 0 && uri.length > 0}
+        >
           <div className="cover">
             <div className="square"></div>
             <div className="circle">
@@ -130,7 +150,7 @@ export default function Album() {
             </div>
           </div>
         </StyledAlbumCover>
-        <AlbumList />
+        <AlbumList artists={album?.artists} />
       </div>
       <SongList />
     </StyledContainer>

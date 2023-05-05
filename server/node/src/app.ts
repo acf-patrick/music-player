@@ -70,6 +70,50 @@ app.get("/album", (req, res) => {
   } else res.sendStatus(404);
 });
 
+app.get("/albums", (req, res) => {
+  const albums: Album[] = [];
+  db.each(
+    "SELECT album, artist, duration, year, cover FROM song",
+    (
+      err,
+      row: {
+        album: string;
+        artist: string;
+        duration: number;
+        year: number;
+        cover?: string;
+      }
+    ) => {
+      const stored = albums.find((album) => album.title === row.album);
+      if (stored) {
+        if (stored.artists.indexOf(row.artist) < 0)
+          stored.artists.push(row.artist);
+        stored.duration += row.duration;
+        stored.track_count++;
+        if (row.year > stored.year) stored.year = row.year;
+        if (!stored.cover && row.cover) stored.cover = row.cover;
+      } else {
+        const album: Album = {
+          title: row.album,
+          artists: [],
+          year: row.year,
+          duration: row.duration,
+          cover: row.cover,
+          track_count: 1,
+        };
+        album.artists.push(row.artist);
+        albums.push(album);
+      }
+    },
+    (err, count) => {
+      if (err) console.error(err);
+
+      if (err || !count) res.sendStatus(404);
+      else res.json(albums);
+    }
+  );
+});
+
 app.get("/artists", (req, res) => {
   const artists: string[] = [];
   db.each(

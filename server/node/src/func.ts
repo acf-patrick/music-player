@@ -3,7 +3,7 @@ export function createCondition<Query extends object>(query: Query) {
   let i = 0;
   let condition = "";
   for (let key in query) {
-    condition += `${key} LIKE '%${query[key]}%'`;
+    condition += `${key} LIKE "%${query[key]}%"`;
     if (i < len - 1) condition += " AND ";
     i++;
   }
