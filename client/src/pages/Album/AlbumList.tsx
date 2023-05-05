@@ -13,7 +13,7 @@ const StyledContainer = styled.div`
   }
 
   .list {
-    margin: 0 1rem;
+    margin: 0 1.5rem;
     overflow-x: auto;
 
     &::-webkit-scrollbar {
@@ -38,6 +38,7 @@ const AlbumCard = styled.div<{ cover?: string }>`
     position: relative;
     width: 100px;
     aspect-ratio: 1;
+    border: 1px solid black;
     border-radius: 100%;
     background: ${({ cover }) => `url(${cover})`};
     background-size: cover;

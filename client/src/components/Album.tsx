@@ -102,17 +102,6 @@ function Album({
         });
   }, [coverId]);
 
-  const artist = useMemo(() => {
-    let artist = "";
-    if (artists) {
-      for (let i = 0; i < artists.length; ++i) {
-        artist += artists[i];
-        if (i) artist += ", ";
-      }
-      return artist;
-    } else return "";
-  }, [artists]);
-
   const handleOnClick = () => {
     navigate(`/album/${btoa(title)}`);
   };
@@ -139,7 +128,7 @@ function Album({
       <div>
         <div className="name">{title}</div>
         <div className="artist-duration">
-          <div className="artist">{artist}</div>
+          <div className="artist">{artists?.join(", ")}</div>
           <div className="duration">{durationToString(duration!)}</div>
         </div>
       </div>
