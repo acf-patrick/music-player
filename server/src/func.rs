@@ -126,16 +126,16 @@ pub fn store_audio_metadatas(audio_path: &str, conn: &Connection) -> bool {
 
     let mut path = String::new();
     if let Some(back_slash) = audio_path.find("public") {
-      for i in (back_slash + 6)..audio_path.len() {
-        path.push(char::from(audio_path.as_bytes()[i]));
-      }
+        for i in (back_slash + 6)..audio_path.len() {
+            path.push(char::from(audio_path.as_bytes()[i]));
+        }
     } else {
-      path = audio_path.to_owned();
+        path = audio_path.to_owned();
     }
 
     let mut song = types::Song {
         id: audio_id,
-        path: path,
+        path,
         liked: false,
         album: Some(String::new()),
         year: Some(0),
@@ -159,6 +159,13 @@ pub fn store_audio_metadatas(audio_path: &str, conn: &Connection) -> bool {
 
         if let Some(title) = tags.title() {
             song.title = Some(title.to_string());
+        } else {
+            if let Some(i) = audio_path.rfind("\\") {
+                song.title = Some(audio_path[(i + 1)..].to_string());
+            } else {
+                let i = audio_path.rfind("/").unwrap();
+                song.title = Some(audio_path[(i + 1)..].to_string());
+            }
         }
 
         if let Some(artist) = tags.artist() {

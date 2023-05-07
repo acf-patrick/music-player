@@ -119,12 +119,31 @@ export default function Album() {
               .then((palette) => {
                 const len = palette.length;
                 console.log(palette);
+                const colors = [
+                  { r: 0, g: 0, b: 0 },
+                  { r: 0, g: 0, b: 0 },
+                ];
+
+                for (let i = 0; i < len / 2; ++i) {
+                  colors[1].r += palette[i].r;
+                  colors[1].g += palette[i].g;
+                  colors[1].b += palette[i].b;
+                }
+                for (let i = len - 2; i < len; ++i) {
+                  colors[0].r += palette[i].r;
+                  colors[0].g += palette[i].g;
+                  colors[0].b += palette[i].b;
+                }
+
+                for (let i = 0; i < 2; ++i) {
+                  colors[i].r /= len / 2;
+                  colors[i].g /= len / 2;
+                  colors[i].b /= len / 2;
+                }
+
                 setColors(
-                  [palette[0], palette[1]].map(
-                    (color) =>
-                      `#${color.r.toString(16)}${color.g.toString(
-                        16
-                      )}${color.b.toString(16)}`
+                  colors.map(
+                    (color) => `rgb(${color.r}, ${color.g}, ${color.b})`
                   )
                 );
               })
