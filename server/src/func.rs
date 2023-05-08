@@ -134,17 +134,17 @@ pub fn store_audio_metadatas(audio_path: &str, conn: &Connection) -> bool {
     }
 
     let mut song = types::Song {
-        id: audio_id,
-        path,
+        id: audio_id.clone(),
+        path: path.clone(),
         liked: false,
-        album: Some(String::new()),
-        year: Some(0),
-        title: Some(String::new()),
-        artist: Some(String::new()),
-        genre: Some(String::new()),
-        track_number: Some(0),
-        cover: Some(String::new()),
-        duration: Some(0),
+        album: None,
+        year: None,
+        title: None,
+        artist: None,
+        genre: None,
+        track_number: None,
+        cover: None,
+        duration: None,
     };
 
     let tagged = Probe::open(audio_path)
@@ -217,6 +217,27 @@ pub fn store_audio_metadatas(audio_path: &str, conn: &Connection) -> bool {
 
         save_song(&song, conn);
     } else {
+        let mut title = String::new();
+        if let Some(i) = audio_path.rfind("\\") {
+            title = audio_path[(i + 1)..].to_string();
+        } else {
+            let i = audio_path.rfind("/").unwrap();
+            title = audio_path[(i + 1)..].to_string();
+        }
+        let song = types::Song {
+            id: audio_id,
+            path,
+            liked: false,
+            album: None,
+            year: None,
+            title: Some(title),
+            artist: None,
+            genre: None,
+            track_number: None,
+            cover: None,
+            duration: None,
+        };
+        save_song(&song, &conn);
         println!("{audio_path} : no tags to read.");
     }
 

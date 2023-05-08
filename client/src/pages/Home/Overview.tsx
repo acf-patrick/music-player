@@ -15,7 +15,7 @@ import {
   SongSortOptions,
   AlbumSortOptions,
 } from "../../utils/models";
-import { useAlbums, useArtists, useGenres, useSongs } from "../../utils/hook";
+import { useAlbums, useArtists, useGenres } from "../../utils/hook";
 
 // Convenience component for conditional rendering
 function Result({

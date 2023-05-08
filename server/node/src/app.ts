@@ -190,8 +190,9 @@ app.get("/song", (req, res) => {
     }
   };
 
+  const keys = Object.keys(req.query);
   const conditions = createCondition(req.query);
-  if (conditions.length)
+  if (conditions.length && keys.length !== 1 && keys[0] !== "page")
     db.all(`SELECT * FROM song WHERE(${conditions})`, [], handler);
   else db.all("SELECT * FROM song", [], handler);
 });
@@ -203,7 +204,7 @@ app.get("/song/:id", (req, res) => {
   });
 });
 
-app.get("/", (req, res) => {
+app.get("/", (_, res) => {
   res.send("ayeeee");
 });
 

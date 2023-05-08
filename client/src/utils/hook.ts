@@ -19,26 +19,41 @@ export function useImage(coverId: string) {
   return cover;
 }
 
+interface Response {
+  songs: Song[];
+  paging: {
+    index: number;
+    total: number;
+  };
+}
+
 export function useSongs() {
   const [songs, setSongs] = useState<Song[]>([]);
 
   useEffect(() => {
-    fetch("/api/song")
-      .then((res) => res.json())
-      .then(
-        (data: {
-          songs: Song[];
-          paging: {
-            index: number;
-            total: number;
-          };
-        }) => {
-          setSongs(data.songs);
+    const fetchSongs = async () => {
+      let songs: Song[] = [];
+
+      try {
+        const res = await fetch("/api/song");
+        const datas: Response = await res.json();
+        songs = datas.songs;
+
+        for (let i = 1; i < datas.paging.total; ++i) {
+          const res = await fetch(`/api/song?page=${i}`);
+          const datas: Response = await res.json();
+          songs = songs.concat(datas.songs);
         }
-      )
-      .catch((error) => {
+      } catch (error) {
         console.error(error);
-      });
+      }
+
+      return songs;
+    };
+
+    fetchSongs().then((songs) => {
+      setSongs(songs);
+    });
   }, []);
 
   return songs;

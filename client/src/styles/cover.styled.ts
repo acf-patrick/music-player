@@ -15,6 +15,8 @@ const StyledCover = styled.div`
 
   img {
     max-width: ${({ theme }) => theme.sizes.image.md};
+    aspect-ratio: 1;
+    object-fit: cover;
   }
 `;
 

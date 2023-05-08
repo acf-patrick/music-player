@@ -7,13 +7,15 @@ mod types;
 
 fn main() {
     let DATABASE = "node/database.db";
-    if let Ok(_) = fs::remove_file(DATABASE) {}
+    if let Err(error) = fs::remove_file(DATABASE) {
+      eprintln!("{error}");
+    }
     if let Ok(conn) = create_database(DATABASE) {
         scan_folder(
             if env::consts::OS == "linux" {
                 "/home/acf-patrick/projects/music-player/client/public"
             } else {
-                "D:/FIT_Apprenti_Vague_006/music-player/client/public"
+                "D:/FIT_Apprenti_Vague_006/music-player/client/public/test"
             },
             &conn,
         );
