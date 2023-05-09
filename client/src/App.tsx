@@ -1,15 +1,13 @@
 import { useState } from "react";
-import {
-  RouterProvider,
-} from "react-router-dom";
+import { RouterProvider } from "react-router-dom";
 import { DatasContext, DataMutatorsContext } from "./utils";
 
 import { StyledAppContainer } from "./styles";
 import { Song } from "./utils/models";
 import { getSong } from "./utils/providers";
 import { ThemeProvider } from "styled-components";
+import { router } from "./router";
 import themes from "./styles/themes";
-import router from "./router";
 
 // Set global volume to 50% by default
 Howler.volume(0);

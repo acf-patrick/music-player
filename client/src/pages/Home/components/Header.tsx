@@ -6,6 +6,7 @@ import {
   AiOutlineSortAscending,
   AiOutlineSortDescending,
 } from "react-icons/ai";
+import { fields } from "../../../router";
 
 interface HeaderProps {
   field: string;
@@ -25,9 +26,6 @@ export default function Header({
   searchInputOnEdit,
   count,
 }: HeaderProps) {
-  const fields = ["Song", "Artist", "Genre", "Album", "Playlist"];
-  const routes = ["/", "artists", "genres", "albums", "playlists"];
-
   const navigate = useNavigate();
 
   const [sortPopupShown, setSortPopupShown] = useState(false);
@@ -44,14 +42,14 @@ export default function Header({
     <>
       <Searchbar
         currentField={field}
-        fields={fields}
+        fields={fields.map((field) => field.name)}
         inputOnEdit={(e) => {
           e.preventDefault();
           searchInputOnEdit(e.target.value);
         }}
         optionOnClick={(i) => {
-          if (field !== fields[i]) {
-            navigate(routes[i]);
+          if (field !== fields[i].name) {
+            navigate(fields[i].path);
           }
         }}
       />

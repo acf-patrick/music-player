@@ -1,11 +1,14 @@
 import styled from "styled-components";
-import { useRef, useEffect, useState, useContext } from "react";
+import { useRef, useEffect, useState } from "react";
 import { BsFillGearFill } from "react-icons/bs";
 import { GrClose } from "react-icons/gr";
 import Header from "./Header";
-import { Album } from "../../../components";
-import { AlbumAppearance } from "../../../utils/models";
-import { SearchValueContext } from "../Overview";
+import { Album, NoResult } from "../../../components";
+import {
+  Album as TAlbum,
+  AlbumAppearance,
+  AlbumSortOptions,
+} from "../../../utils/models";
 import { useAlbums } from "../../../utils/hook";
 import { StyledOverview as StyledContainer } from "../../../styles";
 
@@ -76,10 +79,13 @@ const StyledViewSetter = styled.div`
 `;
 
 export default function Albums() {
-  const searchValue = useContext(SearchValueContext);
-
   // List of albums
   const albums = useAlbums();
+  const [results, setResults] = useState<TAlbum[]>([]);
+
+  useEffect(() => {
+    setResults(albums);
+  }, [albums]);
 
   const viewOptionsRef = useRef<HTMLDivElement | null>(null);
   const viewSetterButtonRef = useRef<HTMLButtonElement | null>(null);
@@ -111,22 +117,73 @@ export default function Albums() {
     setViewOptionsFolded(true);
   };
 
+  const searchInputOnEdit = (value: string) => {
+    const keyword = value.toLowerCase();
+    if (!keyword) {
+      setResults(albums);
+      return;
+    }
+
+    setResults(
+      albums.filter((album) =>
+        album.title ? album.title.toLowerCase().indexOf(keyword) >= 0 : false
+      )
+    );
+  };
+
+  const sortOptionOnUpdate = (
+    sortDirection: "ascending" | "descending",
+    sortBy: string
+  ) => {
+    setResults((results) => {
+      const sorted = [...results].sort((a, b) => {
+        if (sortBy === "artist") {
+          if (a.artists && b.artists) {
+            if (a.artists.join(", ") < b.artists.join(", ")) return -1;
+            if (a.artists.join(", ") > b.artists.join(", ")) return 1;
+          }
+        } else if (sortBy === "name") {
+          if (a.title < b.title) return -1;
+          if (a.title > b.title) return 1;
+        } else {
+          if (a.duration && b.duration) {
+            if (a.duration < b.duration) return -1;
+            if (a.duration > b.duration) return 1;
+          }
+        }
+        return 0;
+      });
+
+      return sortDirection === "ascending" ? sorted : sorted.reverse();
+    });
+  };
+
   return (
     <StyledContainer>
-      <Header   />
-      <div className="list-wrapper">
-        <ul
-          className={`list ${
-            albumAppearance === AlbumAppearance.GridCell && "grid"
-          }`}
-        >
-          {albums.map((album, i) => (
-            <li key={i}>
-              <Album {...album} appearance={albumAppearance} />
-            </li>
-          ))}
-        </ul>
-      </div>
+      <Header
+        count={results.length}
+        field="Album"
+        searchInputOnEdit={searchInputOnEdit}
+        sortOptionOnUpdate={sortOptionOnUpdate}
+        sortOptions={[...AlbumSortOptions]}
+      />
+      {results.length ? (
+        <div className="list-wrapper">
+          <ul
+            className={`list ${
+              albumAppearance === AlbumAppearance.GridCell && "grid"
+            }`}
+          >
+            {results.map((album, i) => (
+              <li key={i}>
+                <Album {...album} appearance={albumAppearance} />
+              </li>
+            ))}
+          </ul>
+        </div>
+      ) : (
+        <NoResult />
+      )}
       <StyledViewSetter>
         <button
           className="view-setter"

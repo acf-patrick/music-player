@@ -55,13 +55,17 @@ const StyledGridCell = styled.div`
     display: none;
   }
 
+  .name,
+  .artist {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+
   .name {
     font-size: 0.75rem;
     font-weight: bold;
     color: ${({ theme }) => theme.colors.albumName};
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
   }
 
   .artist {

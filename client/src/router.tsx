@@ -42,4 +42,27 @@ const router = createBrowserRouter([
   },
 ]);
 
-export default router;
+const fields = [
+  {
+    name: "Song",
+    path: "/",
+  },
+  {
+    name: "Artist",
+    path: "artists",
+  },
+  {
+    name: "Genre",
+    path: "genres",
+  },
+  {
+    name: "Album",
+    path: "albums",
+  },
+  {
+    name: "Playlist",
+    path: "playlists",
+  },
+];
+
+export { router, fields };

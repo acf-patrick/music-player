@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useSongs } from "../../../utils/hook";
 import { StyledOverview as StyledContainer } from "../../../styles";
 import { SongSortOptions, Song } from "../../../utils/models";
-import { Song as SongComponent } from "../../../components";
+import { Song as SongComponent, NoResult } from "../../../components";
 import Header from "./Header";
 
 export default function Songs() {
@@ -52,15 +52,19 @@ export default function Songs() {
         sortOptions={[...SongSortOptions]}
         sortOptionOnUpdate={sortOptionOnUpdate}
       />
-      <div className="list-wrapper">
-        <ul className="list">
-          {results.map((song, i) => (
-            <li key={i}>
-              <SongComponent datas={song} />
-            </li>
-          ))}
-        </ul>
-      </div>
+      {results.length ? (
+        <div className="list-wrapper">
+          <ul className="list">
+            {results.map((song, i) => (
+              <li key={i}>
+                <SongComponent datas={song} />
+              </li>
+            ))}
+          </ul>
+        </div>
+      ) : (
+        <NoResult />
+      )}
     </StyledContainer>
   );
 }
