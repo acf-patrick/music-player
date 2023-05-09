@@ -17,7 +17,7 @@ function Content({ songs }: { songs: Song[] }) {
 
   useEffect(() => {
     setQueue!(songs.map((song) => song.id));
-  }, [songs]);
+  }, []);
 
   const playButtonOnClick = () => {
     if (playingSong) setPaused!(!paused);

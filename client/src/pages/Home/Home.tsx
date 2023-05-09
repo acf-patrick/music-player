@@ -1,6 +1,6 @@
 import styled from "styled-components";
 import Content from "./Content";
-import Overview from "./Overview";
+import { Outlet } from "react-router-dom";
 import { useSongs } from "../../utils/hook";
 
 const StyledContainer = styled.div`
@@ -11,12 +11,10 @@ const StyledContainer = styled.div`
 `;
 
 function Home() {
-  const songs = useSongs();
-
   return (
     <StyledContainer>
-      <Overview songs={songs} />
-      <Content songs={songs} />
+      <Outlet />
+      <Content songs={[]} />
     </StyledContainer>
   );
 }

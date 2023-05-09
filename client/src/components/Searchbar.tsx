@@ -1,25 +1,27 @@
-import { useRef } from "react";
+import { useState } from "react";
 import { HiMagnifyingGlass } from "react-icons/hi2";
 import { TiArrowSortedDown } from "react-icons/ti";
 import { StyledForm } from "../styles";
 
-interface ISearchbarProps {
-  optionsFolded: boolean;
+interface SearchbarProps {
   inputOnEdit: React.ChangeEventHandler<HTMLInputElement>;
-  selectOnClick: () => void;
   currentField: String;
   fields: String[];
   optionOnClick: (i: number) => void;
 }
 
 function Searchbar({
-  optionsFolded,
   inputOnEdit,
-  selectOnClick,
   currentField,
   fields,
   optionOnClick,
-}: ISearchbarProps) {
+}: SearchbarProps) {
+  const [optionsFolded, setOptionsFolded] = useState(true);
+
+  const selectOnClick = () => {
+    setOptionsFolded((optionsFolded) => !optionsFolded);
+  };
+
   return (
     <StyledForm
       arrowDown={optionsFolded}

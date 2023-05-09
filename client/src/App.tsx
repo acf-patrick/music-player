@@ -47,13 +47,7 @@ function App() {
           }}
         >
           <StyledAppContainer>
-            <Router>
-              <Routes>
-                <Route path="/" element={<Home />} />
-                <Route path="/album/:name" element={<Album />} />
-                <Route path="*" element={<Error />} />
-              </Routes>
-            </Router>
+            <Home />
           </StyledAppContainer>
         </DataMutatorsContext.Provider>
       </DatasContext.Provider>

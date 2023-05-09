@@ -1,13 +1,7 @@
-import { MdSort } from "react-icons/md";
-import { GrClose } from "react-icons/gr";
 import { StyledOverview } from "../../styles";
 import { BsFillGearFill } from "react-icons/bs";
-import { useState, useRef, useContext, useEffect } from "react";
-import { Song, Searchbar, Popup, Album } from "../../components";
-import {
-  AiOutlineSortAscending,
-  AiOutlineSortDescending,
-} from "react-icons/ai";
+import { useState, useRef, useEffect, createContext } from "react";
+import { Song, Searchbar, Album } from "../../components";
 import {
   AlbumAppearance,
   Song as Audio,
@@ -15,7 +9,9 @@ import {
   SongSortOptions,
   AlbumSortOptions,
 } from "../../utils/models";
-import { useAlbums, useArtists, useGenres } from "../../utils/hook";
+import { Outlet, useNavigate } from "react-router-dom";
+
+export const SearchValueContext = createContext("");
 
 // Convenience component for conditional rendering
 function Result({
@@ -62,30 +58,16 @@ function Result({
   return <></>;
 }
 
-function Overview({ songs }: { songs: Audio[] }) {
-  const artists = useArtists();
-  const genres = useGenres();
-  const albums = useAlbums();
-
-  const [results, setResults] = useState<Audio[] | string[] | IAlbum[]>([]);
+function Overview() {
+  const navigate = useNavigate();
 
   // Whether the select options are shown or not
   const [optionsFolded, setOptionsFolded] = useState(true);
 
+  const routes = ["/", "/artists", "/genres", "/playlists", "/albums"];
   const fields = ["Song", "Artist", "Genre", "Playlist", "Album"] as const;
   const [currentField, setCurrentField] =
     useState<(typeof fields)[number]>("Song");
-
-  // How album items will be displayed
-  const [albumAppearance, setAlbumAppearance] = useState(
-    AlbumAppearance.WithThumbnail
-  );
-
-  const viewSetterButton = useRef<HTMLButtonElement>(null);
-  const viewOptions = useRef<HTMLDivElement>(null);
-
-  // button displayed in album view setter
-  const [viewButton, setViewButton] = useState(<BsFillGearFill />);
 
   // Whether the options used to set album viewing are set or not
   const [viewOptionsFolded, setViewOptionsFolded] = useState(true);
@@ -98,126 +80,24 @@ function Overview({ songs }: { songs: Audio[] }) {
     (typeof AlbumSortOptions)[number] | (typeof SongSortOptions)[number] | null
   >(null);
 
-  const [sortPopupShown, setSortPopupShown] = useState(false);
-
-  const getDefaultResults = () => {
-    switch (currentField) {
-      case "Song":
-        return [...songs];
-        break;
-      case "Artist":
-        return [...artists];
-        break;
-      case "Genre":
-        return [...genres];
-        break;
-      case "Album":
-        return [...albums];
-        break;
-      case "Playlist":
-        return [];
-        break;
-      default:
-    }
-
-    return [];
-  };
-
-  // Show all occurencies
-  const resetResults = () => {
-    setResults(getDefaultResults());
-  };
-
-  useEffect(() => {
-    // Setting result view according to field chosen by the user
-    resetResults();
-  }, [songs, currentField]);
+  const [searchValue, setSearchValue] = useState("");
 
   useEffect(() => {
     setSortBy(null);
   }, [currentField]);
 
-  useEffect(() => {
-    setResults(results.reverse());
-  }, [sortDirection]);
-
-  useEffect(() => {
-    const button = viewSetterButton.current;
-    if (button)
-      button.style.transform = `rotate(${viewOptionsFolded ? 180 : 0}deg)`;
-    const div = viewOptions.current;
-    if (div) div.style.transform = `scaleY(${viewOptionsFolded ? 0 : 1})`;
-    setTimeout(() => {
-      setViewButton(viewOptionsFolded ? <BsFillGearFill /> : <GrClose />);
-    }, 300);
-  }, [viewOptionsFolded]);
-
-  useEffect(() => {
-    if (sortBy) {
-      const sort = (arr: any[], key: string) => {
-        arr.sort((a, b) => {
-          if (a[key] < b[key]) return -1;
-          if (a[key] > b[key]) return 1;
-          return 0;
-        });
-
-        return sortDirection === "ascending" ? arr : arr.reverse();
-      };
-      setResults(sort([...results], sortBy.toString()));
-    }
-  }, [sortDirection, sortBy]);
-
   /* Event Handlers */
 
   const optionOnClick = (index: number) => {
     setCurrentField(fields[index]);
-    setAlbumAppearance(AlbumAppearance.WithThumbnail);
     setViewOptionsFolded(true);
     setOptionsFolded(true);
-  };
-
-  const viewOptionOnClick = (appearance: AlbumAppearance) => {
-    setAlbumAppearance(appearance);
-    setViewOptionsFolded(true);
+    navigate(routes[index]);
   };
 
   const inputOnEdit = (e: React.ChangeEvent<HTMLInputElement>) => {
     e.preventDefault();
-    const input = e.target as HTMLInputElement;
-    const keyword = input.value.toLowerCase();
-    if (!keyword) {
-      resetResults();
-      return;
-    }
-
-    switch (currentField) {
-      case "Album":
-        setResults(
-          albums.filter(
-            (album) => album.title.toLowerCase().indexOf(keyword) >= 0
-          )
-        );
-        break;
-      case "Genre":
-        setResults(
-          genres.filter((genre) => genre.toLowerCase().indexOf(keyword) >= 0)
-        );
-        break;
-      case "Artist":
-        setResults(
-          artists.filter((artist) => artist.toLowerCase().indexOf(keyword) >= 0)
-        );
-        break;
-      case "Song":
-        setResults(
-          songs.filter((song) =>
-            song.title ? song.title.toLowerCase().indexOf(keyword) >= 0 : false
-          )
-        );
-        break;
-      default:
-        break;
-    }
+    setSearchValue(e.currentTarget.value);
   };
 
   const sortDirectionButtonOnClick = () => {
@@ -227,7 +107,7 @@ function Overview({ songs }: { songs: Audio[] }) {
   };
 
   return (
-    <StyledOverview albumAppearance={albumAppearance}>
+    <StyledOverview>
       <Searchbar
         currentField={currentField}
         fields={[...fields]}
@@ -238,109 +118,9 @@ function Overview({ songs }: { songs: Audio[] }) {
           setOptionsFolded(!optionsFolded);
         }}
       />
-      {results.length ? (
-        <>
-          <div className="sort-container">
-            {(currentField === "Song" || currentField === "Album") && (
-              <div
-                className="buttons"
-                onMouseLeave={() => {
-                  setSortPopupShown(false);
-                }}
-              >
-                {sortBy && (
-                  <button
-                    className="sort-direction"
-                    title={sortDirection}
-                    onClick={sortDirectionButtonOnClick}
-                  >
-                    {sortDirection === "ascending" ? (
-                      <AiOutlineSortAscending />
-                    ) : (
-                      <AiOutlineSortDescending />
-                    )}
-                  </button>
-                )}
-                <button
-                  className="sort-by"
-                  onClick={() => {
-                    setSortPopupShown(!sortPopupShown);
-                  }}
-                >
-                  <MdSort />
-                </button>
-                {sortPopupShown && (
-                  <Popup
-                    options={(currentField === "Song"
-                      ? SongSortOptions
-                      : AlbumSortOptions
-                    ).map((option, i) => {
-                      return {
-                        text: option,
-                        callback: () => {
-                          setSortBy(option);
-                          setSortPopupShown(false);
-                        },
-                      };
-                    })}
-                  />
-                )}
-              </div>
-            )}
-            <div className="count">
-              <span>{results.length}</span>
-              {`result${results.length > 1 ? "s" : ""}`}
-            </div>
-          </div>
-          <div className="results-wrapper">
-            <ul className="results">
-              {results.map((result, i) => (
-                <li key={i}>
-                  <Result
-                    result={result}
-                    field={currentField}
-                    albumAppearance={albumAppearance}
-                  />
-                </li>
-              ))}
-            </ul>
-          </div>
-        </>
-      ) : (
-        <h1 className="no-result">
-          <span>No result found 😞</span>
-        </h1>
-      )}
-      {currentField === "Album" && (
-        <>
-          <button
-            className="view-setter"
-            ref={viewSetterButton}
-            onClick={() => {
-              setViewOptionsFolded(!viewOptionsFolded);
-            }}
-          >
-            {viewButton}
-          </button>
-          <div className="view-options" ref={viewOptions}>
-            <div
-              onClick={() => {
-                viewOptionOnClick(AlbumAppearance.WithThumbnail);
-              }}
-            >
-              List with thumbnail
-            </div>
-            <div
-              onClick={() => {
-                viewOptionOnClick(AlbumAppearance.GridCell);
-              }}
-            >
-              Grid view
-            </div>
-          </div>
-          {!viewOptionsFolded && <div className="arrow"></div>}
-        </>
-      )}
+        <SearchValueContext.Provider value={searchValue}>
+          <Outlet />
+        </SearchValueContext.Provider>
     </StyledOverview>
   );
 }

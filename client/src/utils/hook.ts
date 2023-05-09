@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Song, Image, Album } from "./models";
 import { createDataUri } from ".";
+import { getImageUri } from "./providers";
 
 export function useImage(coverId: string) {
   const [cover, setCover] = useState("");

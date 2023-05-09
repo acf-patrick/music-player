@@ -1,13 +1,13 @@
 import styled from "styled-components";
 import { AlbumAppearance } from "../utils/models";
 
-const StyledOverview = styled.div<{ albumAppearance: AlbumAppearance }>`
+const StyledOverview = styled.div`
   display: flex;
   overflow-y: auto;
   flex-direction: column;
   padding: ${({ theme }) => theme.spacings.padding} 2rem 0;
 
-  .results-wrapper {
+  .list-wrapper {
     overflow-y: auto;
 
     ::-webkit-scrollbar {
@@ -55,12 +55,12 @@ const StyledOverview = styled.div<{ albumAppearance: AlbumAppearance }>`
     }
   }
 
-  ul.results {
-    display: ${({ albumAppearance }) =>
+  ul.list {
+    /* display: ${({ albumAppearance }) =>
       albumAppearance === AlbumAppearance.GridCell ? "grid" : "block"};
 
     font-size: ${({ albumAppearance }) =>
-      albumAppearance === AlbumAppearance.GridCell ? "0.75rem" : "1rem"};
+      albumAppearance === AlbumAppearance.GridCell ? "0.75rem" : "1rem"}; */
 
     list-style: none;
     padding: 0 2px;
@@ -70,7 +70,7 @@ const StyledOverview = styled.div<{ albumAppearance: AlbumAppearance }>`
     grid-gap: 0.5rem;
   }
 
-  ul.results>li {
+  ul.list>li {
     padding: 0.5rem;
     cursor: pointer;
     outline: none;
@@ -95,70 +95,6 @@ const StyledOverview = styled.div<{ albumAppearance: AlbumAppearance }>`
     flex-grow: 1;
     display: grid;
     place-items: center;
-  }
-
-  .view-setter {
-    position: absolute;
-    right: calc(50% + 32px);
-    bottom: 32px;
-    width: 46px;
-    height: 46px;
-    border: none;
-    outline: none;
-    border-radius: 100%;
-    display: grid;
-    place-items: center;
-    cursor: pointer;
-    background: transparent;
-    transform: rotate(180deg);
-    transition: background 300ms, transform 500ms ease-out;
-    backdrop-filter: blur(15px);
-
-    &:hover {
-      background: ${({ theme }) => theme.colors.hovered.background};
-    }
-
-    svg {
-      font-size: 1.5rem;
-    }
-  }
-
-  .view-options {
-    position: absolute;
-    right: calc(50% + 32px);
-    bottom: 98px;
-    border-radius: 5px;
-    overflow: hidden;
-    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.4);
-    background: black;
-    transform-origin: bottom center;
-    transform: scaleY(0);
-    transition: transform 200ms ease-out;
-
-    div {
-      font-size: 0.85rem;
-      color: white;
-      cursor: pointer;
-      padding: 0.5rem 1rem;
-      background: transparent;
-      transition: background 300ms;
-
-      &:hover {
-        color: black;
-        background: ${({ theme }) => theme.colors.hovered.background};
-      }
-    }
-  }
-
-  .arrow {
-    z-index: 3;
-    width: 0;
-    position: absolute;
-    bottom: 82px;
-    right: calc(50% + 40px);
-    border-top: solid 16px black;
-    border-left: solid 16px transparent;
-    border-right: solid 16px transparent;
   }
 `;
 
