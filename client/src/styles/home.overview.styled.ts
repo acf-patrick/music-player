@@ -1,5 +1,4 @@
 import styled from "styled-components";
-import { AlbumAppearance } from "../utils/models";
 
 const StyledOverview = styled.div`
   display: flex;
@@ -55,22 +54,21 @@ const StyledOverview = styled.div`
     }
   }
 
-  ul.list {
-    /* display: ${({ albumAppearance }) =>
-      albumAppearance === AlbumAppearance.GridCell ? "grid" : "block"};
-
-    font-size: ${({ albumAppearance }) =>
-      albumAppearance === AlbumAppearance.GridCell ? "0.75rem" : "1rem"}; */
-
-    list-style: none;
-    padding: 0 2px;
-
+  ul.grid {
+    display: grid;
+    font-size: 0.75rem;
     grid-template-columns: repeat(auto-fit, minmax(128px, 160px));
     grid-auto-rows: 1fr;
     grid-gap: 0.5rem;
   }
 
-  ul.list>li {
+  ul.list {
+    font-size: 1rem;
+    list-style: none;
+    padding: 0 2px;
+  }
+
+  ul.list > li {
     padding: 0.5rem;
     cursor: pointer;
     outline: none;

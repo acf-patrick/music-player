@@ -5,7 +5,7 @@ import { useParams } from "react-router-dom";
 import AlbumList from "./AlbumList";
 import SongList from "./SongList";
 import styled, { keyframes } from "styled-components";
-import { createColorPalette, createDataUri } from "../../utils";
+import { createColorPalette } from "../../utils";
 
 const slideRight = keyframes`
   from {

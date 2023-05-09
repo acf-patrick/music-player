@@ -2,12 +2,14 @@ import styled from "styled-components";
 import { useRef, useEffect, useState, useContext } from "react";
 import { BsFillGearFill } from "react-icons/bs";
 import { GrClose } from "react-icons/gr";
+import Header from "./Header";
 import { Album } from "../../../components";
 import { AlbumAppearance } from "../../../utils/models";
 import { SearchValueContext } from "../Overview";
 import { useAlbums } from "../../../utils/hook";
+import { StyledOverview as StyledContainer } from "../../../styles";
 
-const StyledContainer = styled.div`
+const StyledViewSetter = styled.div`
   .view-setter {
     position: absolute;
     right: calc(50% + 32px);
@@ -111,39 +113,48 @@ export default function Albums() {
 
   return (
     <StyledContainer>
-      <ul className="results">
-        {albums.map((album, i) => (
-          <li key={i}>
-            <Album {...album} appearance={albumAppearance} />
-          </li>
-        ))}
-      </ul>
-      <button
-        className="view-setter"
-        ref={viewSetterButtonRef}
-        onClick={() => {
-          setViewOptionsFolded(!viewOptionsFolded);
-        }}
-      >
-        {viewButton}
-      </button>
-      <div className="view-options" ref={viewOptionsRef}>
-        <div
-          onClick={() => {
-            viewOptionOnClick(AlbumAppearance.WithThumbnail);
-          }}
+      <Header   />
+      <div className="list-wrapper">
+        <ul
+          className={`list ${
+            albumAppearance === AlbumAppearance.GridCell && "grid"
+          }`}
         >
-          List with thumbnail
-        </div>
-        <div
-          onClick={() => {
-            viewOptionOnClick(AlbumAppearance.GridCell);
-          }}
-        >
-          Grid view
-        </div>
+          {albums.map((album, i) => (
+            <li key={i}>
+              <Album {...album} appearance={albumAppearance} />
+            </li>
+          ))}
+        </ul>
       </div>
-      {!viewOptionsFolded && <div className="arrow"></div>}
+      <StyledViewSetter>
+        <button
+          className="view-setter"
+          ref={viewSetterButtonRef}
+          onClick={() => {
+            setViewOptionsFolded(!viewOptionsFolded);
+          }}
+        >
+          {viewButton}
+        </button>
+        <div className="view-options" ref={viewOptionsRef}>
+          <div
+            onClick={() => {
+              viewOptionOnClick(AlbumAppearance.WithThumbnail);
+            }}
+          >
+            List with thumbnail
+          </div>
+          <div
+            onClick={() => {
+              viewOptionOnClick(AlbumAppearance.GridCell);
+            }}
+          >
+            Grid view
+          </div>
+        </div>
+        {!viewOptionsFolded && <div className="arrow"></div>}
+      </StyledViewSetter>
     </StyledContainer>
   );
 }
