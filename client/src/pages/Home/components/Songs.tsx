@@ -29,18 +29,20 @@ export default function Songs() {
 
   const sortOptionOnUpdate = (
     sortDirection: "ascending" | "descending",
-    sortBy: string
+    sortBy?: string
   ) => {
-    const key = sortBy as keyof Song;
-    setResults((results) => {
-      const sorted = [...results].sort((a, b) => {
-        if (a[key]! < b[key]!) return -1;
-        if (a[key]! > b[key]!) return 1;
-        return 0;
-      });
+    if (sortBy) {
+      const key = sortBy as keyof Song;
+      setResults((results) => {
+        const sorted = [...results].sort((a, b) => {
+          if (a[key]! < b[key]!) return -1;
+          if (a[key]! > b[key]!) return 1;
+          return 0;
+        });
 
-      return sortDirection === "ascending" ? sorted : sorted.reverse();
-    });
+        return sortDirection === "ascending" ? sorted : sorted.reverse();
+      });
+    }
   };
 
   return (

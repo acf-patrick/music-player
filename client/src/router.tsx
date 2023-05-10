@@ -49,19 +49,19 @@ const fields = [
   },
   {
     name: "Artist",
-    path: "artists",
+    path: "/artists",
   },
   {
     name: "Genre",
-    path: "genres",
+    path: "/genres",
   },
   {
     name: "Album",
-    path: "albums",
+    path: "/albums",
   },
   {
     name: "Playlist",
-    path: "playlists",
+    path: "/playlists",
   },
 ];
 

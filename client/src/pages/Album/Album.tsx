@@ -34,7 +34,7 @@ const StyledAlbumCover = styled.div<{
   bg: string;
   show: boolean;
 }>`
-  background: linear-gradient(to top, ${({ colors }) => colors.join(", ")});
+  background: linear-gradient(to top, ${({ colors }) => colors.length ?  colors.join(", ") : "black, #8f8f8f"});
   display: grid;
   place-items: center;
 
@@ -142,7 +142,7 @@ export default function Album() {
                 }
 
                 setColors(
-                  colors.map(
+                  [palette[len - 1], palette[0]].map(
                     (color) => `rgb(${color.r}, ${color.g}, ${color.b})`
                   )
                 );

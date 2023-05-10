@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import { Album } from "../../utils/models";
 import { getAlbums, getImageUri } from "../../utils/providers";
@@ -34,30 +35,48 @@ const AlbumCard = styled.div<{ cover?: string }>`
   max-width: 115px;
   cursor: pointer;
 
-  div {
+  .inner-circle {
+    display: ${({ cover }) => (cover ? "none" : "block")};
+    width: 95%;
+    aspect-ratio: 1;
+    position: absolute;
+    background: blue;
+  }
+
+  .cover {
     position: relative;
     width: 100px;
     aspect-ratio: 1;
     border: 1px solid black;
     border-radius: 100%;
-    background: ${({ cover }) => `url(${cover})`};
+    background: ${({ cover }) => (cover ? `url(${cover})` : "black")};
     background-size: cover;
 
-    &::after {
-      display: block;
+    &::after,
+    &::before {
       content: "";
       position: absolute;
       left: 50%;
       top: 50%;
       transform: translate(-50%, -50%);
-      width: 13px;
-      aspect-ratio: 1;
       border-radius: 100%;
+      aspect-ratio: 1;
+    }
+
+    &::before {
+      display: ${({ cover }) => (cover ? "none" : "block")};
+      width: 98%;
+      border: 1px solid grey;
+    }
+
+    &::after {
+      display: block;
+      width: 13px;
       background: ${({ theme }) => theme.colors.background};
     }
   }
 
-  p {
+  .name {
     color: ${({ theme }) => theme.colors.album.page.name};
     text-align: center;
     font-size: 0.825rem;
@@ -65,6 +84,8 @@ const AlbumCard = styled.div<{ cover?: string }>`
 `;
 
 export default function AlbumList({ artists }: { artists?: string[] }) {
+  const navigate = useNavigate();
+
   const [albums, setAlbums] = useState<Album[]>([]);
   useEffect(() => {
     const fetchAlbums = async (artists: string[] | undefined) => {
@@ -95,15 +116,23 @@ export default function AlbumList({ artists }: { artists?: string[] }) {
     });
   }, [artists]);
 
+  const albumOnClick = (name: string) => {
+    navigate(`/album/${btoa(name)}`);
+  };
+
   return (
     <StyledContainer>
       <h1>{artists?.join(" & ")}</h1>
       <div className="list">
         <div>
           {albums.map((album, i) => (
-            <AlbumCard cover={album.cover} key={i}>
-              <div></div>
-              <p>{album.title}</p>
+            <AlbumCard
+              cover={album.cover}
+              onClick={() => albumOnClick(album.title)}
+              key={i}
+            >
+              <div className="cover"></div>
+              <p className="name">{album.title}</p>
             </AlbumCard>
           ))}
         </div>

@@ -98,7 +98,7 @@ export default function Albums() {
 
   // How album items will be displayed
   const [albumAppearance, setAlbumAppearance] = useState(
-    AlbumAppearance.WithThumbnail
+    AlbumAppearance.GridCell
   );
 
   useEffect(() => {
@@ -133,29 +133,31 @@ export default function Albums() {
 
   const sortOptionOnUpdate = (
     sortDirection: "ascending" | "descending",
-    sortBy: string
+    sortBy?: string
   ) => {
-    setResults((results) => {
-      const sorted = [...results].sort((a, b) => {
-        if (sortBy === "artist") {
-          if (a.artists && b.artists) {
-            if (a.artists.join(", ") < b.artists.join(", ")) return -1;
-            if (a.artists.join(", ") > b.artists.join(", ")) return 1;
+    if (sortBy) {
+      setResults((results) => {
+        const sorted = [...results].sort((a, b) => {
+          if (sortBy === "artist") {
+            if (a.artists && b.artists) {
+              if (a.artists.join(", ") < b.artists.join(", ")) return -1;
+              if (a.artists.join(", ") > b.artists.join(", ")) return 1;
+            }
+          } else if (sortBy === "name") {
+            if (a.title < b.title) return -1;
+            if (a.title > b.title) return 1;
+          } else {
+            if (a.duration && b.duration) {
+              if (a.duration < b.duration) return -1;
+              if (a.duration > b.duration) return 1;
+            }
           }
-        } else if (sortBy === "name") {
-          if (a.title < b.title) return -1;
-          if (a.title > b.title) return 1;
-        } else {
-          if (a.duration && b.duration) {
-            if (a.duration < b.duration) return -1;
-            if (a.duration > b.duration) return 1;
-          }
-        }
-        return 0;
-      });
+          return 0;
+        });
 
-      return sortDirection === "ascending" ? sorted : sorted.reverse();
-    });
+        return sortDirection === "ascending" ? sorted : sorted.reverse();
+      });
+    }
   };
 
   return (

@@ -13,7 +13,7 @@ interface HeaderProps {
   sortOptions?: string[];
   sortOptionOnUpdate?: (
     sortDirection: "ascending" | "descending",
-    sortBy: string
+    sortBy?: string
   ) => void;
   searchInputOnEdit: (value: string) => void;
   count: number;
@@ -35,7 +35,8 @@ export default function Header({
   >("ascending");
 
   useEffect(() => {
-    if (sortOptionOnUpdate && sortBy) sortOptionOnUpdate(sortDirection, sortBy);
+    if (sortOptionOnUpdate)
+      sortOptionOnUpdate(sortDirection, sortBy ? sortBy : undefined);
   }, [sortBy, sortDirection]);
 
   return (
@@ -60,23 +61,21 @@ export default function Header({
               className="buttons"
               onMouseLeave={() => setSortPopupShown(false)}
             >
-              {sortBy && (
-                <button
-                  className="sort-direction"
-                  title={sortDirection}
-                  onClick={() =>
-                    setSortDirection((sortDirection) =>
-                      sortDirection === "ascending" ? "descending" : "ascending"
-                    )
-                  }
-                >
-                  {sortDirection === "ascending" ? (
-                    <AiOutlineSortAscending />
-                  ) : (
-                    <AiOutlineSortDescending />
-                  )}
-                </button>
-              )}
+              <button
+                className="sort-direction"
+                title={sortDirection}
+                onClick={() =>
+                  setSortDirection((sortDirection) =>
+                    sortDirection === "ascending" ? "descending" : "ascending"
+                  )
+                }
+              >
+                {sortDirection === "ascending" ? (
+                  <AiOutlineSortAscending />
+                ) : (
+                  <AiOutlineSortDescending />
+                )}
+              </button>
               {sortOptions && (
                 <button
                   className="sort-by"
@@ -95,7 +94,6 @@ export default function Header({
                           return {
                             text: option,
                             callback: () => {
-                              console.log(option);
                               setSortBy(option);
                               setSortPopupShown(false);
                             },

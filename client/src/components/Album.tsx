@@ -4,6 +4,7 @@ import { AlbumAppearance, Album as IAlbum } from "../utils/models";
 import { IoAlbums } from "react-icons/io5";
 import styled from "styled-components";
 import { durationToString, createDataUri } from "../utils";
+import { useImage } from "../utils/hook";
 
 const StyledWithThumbnail = styled.div`
   display: flex;
@@ -86,25 +87,7 @@ function Album({
   duration,
 }: IAlbum) {
   const navigate = useNavigate();
-
-  const [cover, setCover] = useState("");
-  useEffect(() => {
-    if (coverId)
-      fetch(`/api/image/${coverId}`)
-        .then((res) => res.json())
-        .then(
-          (data: {
-            id: string;
-            mime_type: string;
-            data: { type: string; data: number[] };
-          }) => {
-            setCover(createDataUri(data.mime_type, data.data.data));
-          }
-        )
-        .catch((error) => {
-          console.error(error);
-        });
-  }, [coverId]);
+  const cover = useImage(coverId ? coverId : "");
 
   const handleOnClick = () => {
     navigate(`/album/${btoa(title)}`);
