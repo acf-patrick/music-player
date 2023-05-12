@@ -16,6 +16,7 @@ const themes = {
       activated: "#655DBB",
     },
     album: {
+      cover: "grey",
       artist: {
         gridCell: "black",
         listItem: "grey",

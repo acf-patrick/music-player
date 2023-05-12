@@ -51,6 +51,37 @@ const StyledWithThumbnail = styled.div`
 const StyledGridCell = styled.div`
   height: 100%;
   padding: 0.25rem;
+  isolation: isolate;
+
+  .cover {
+    position: relative;
+    display: flex;
+    min-width: 134px;
+    aspect-ratio: 1;
+    background: black;
+
+    &::after,
+    &::before {
+      display: block;
+      content: "";
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      aspect-ratio: 1;
+      border-radius: 100%;
+    }
+
+    &::after {
+      width: 15%;
+      border: 10px solid ${({ theme }) => theme.colors.album.cover};
+    }
+
+    &::before {
+      width: 45%;
+      border: 5px solid ${({ theme }) => theme.colors.album.cover};
+    }
+  }
 
   .duration {
     display: none;
@@ -74,8 +105,10 @@ const StyledGridCell = styled.div`
   }
 
   img {
-    width: 100%;
+    flex-grow: 1;
+    object-fit: cover;
     aspect-ratio: 1;
+    z-index: 1;
   }
 `;
 
@@ -110,7 +143,13 @@ function Album({
   return (
     <Container onClick={handleOnClick}>
       <div className="cover">
-        {cover ? <img src={`${cover}`} alt="" /> : <IoAlbums />}
+        {cover ? (
+          <img src={`${cover}`} alt="" />
+        ) : appearance === AlbumAppearance.GridCell ? (
+          <></>
+        ) : (
+          <IoAlbums />
+        )}
       </div>
       <div>
         <div className="name">{title}</div>

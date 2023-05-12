@@ -2,6 +2,7 @@ import styled from "styled-components";
 
 const StyledOverview = styled.div`
   display: flex;
+  position: relative;
   overflow-y: auto;
   flex-direction: column;
   padding: ${({ theme }) => theme.spacings.padding} 2rem 0;

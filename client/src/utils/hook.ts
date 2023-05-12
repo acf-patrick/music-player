@@ -1,7 +1,14 @@
 import { useState, useEffect } from "react";
 import { Song, Image, Album } from "./models";
 import { createDataUri } from ".";
-import { getImageUri } from "./providers";
+interface Response {
+  songs: Song[];
+  totalItems: number;
+  paging: {
+    index: number;
+    total: number;
+  };
+}
 
 export function useImage(coverId: string) {
   const [cover, setCover] = useState("");
@@ -20,12 +27,35 @@ export function useImage(coverId: string) {
   return cover;
 }
 
-interface Response {
-  songs: Song[];
-  paging: {
-    index: number;
-    total: number;
-  };
+export function useSong(page: number) {
+  const [songs, setSongs] = useState<Song[]>([]);
+  const [pending, setPending] = useState(true);
+  const [totalItems, setTotalItems] = useState(0);
+  const [totalPages, setTotalPages] = useState(Number.MAX_VALUE);
+
+  useEffect(() => {
+    if (page < totalPages) {
+      setPending(true);
+      console.log(page);
+      fetch(`/api/song?page=${page}`)
+        .then((res) => {
+          if (res.ok) return res.json();
+          else {
+            throw `${res.status} : ${res.statusText}`;
+          }
+        })
+        .then((data: Response) => {
+          console.log("here")
+          setPending(false);
+          setSongs(data.songs);
+          setTotalItems(data.totalItems);
+          setTotalPages(data.paging.total);
+        })
+        .catch((err) => console.error(err));
+    }
+  }, [page, totalPages]);
+
+  return { pending, totalItems, totalPages, songs };
 }
 
 export function useSongs() {
@@ -40,11 +70,11 @@ export function useSongs() {
         const datas: Response = await res.json();
         songs = datas.songs;
 
-        for (let i = 1; i < datas.paging.total; ++i) {
-          const res = await fetch(`/api/song?page=${i}`);
-          const datas: Response = await res.json();
-          songs = songs.concat(datas.songs);
-        }
+        // for (let i = 1; i < datas.paging.total; ++i) {
+        //   const res = await fetch(`/api/song?page=${i}`);
+        //   const datas: Response = await res.json();
+        //   songs = songs.concat(datas.songs);
+        // }
       } catch (error) {
         console.error(error);
       }
@@ -52,8 +82,8 @@ export function useSongs() {
       return songs;
     };
 
-    fetchSongs().then((songs) => {
-      setSongs(songs);
+    fetchSongs().then((datas) => {
+      setSongs((songs) => (songs.length ? songs : datas));
     });
   }, []);
 
@@ -86,18 +116,6 @@ export function useGenres() {
   return genres;
 }
 
-export function useAlbumsByArtist(artist: string) {
-  const [albums, setAlbums] = useState<Album[]>([]);
-  useEffect(() => {
-    fetch(`/api/album?artist=${artist}`)
-      .then((res) => res.json())
-      .then((data) => setAlbums(data))
-      .catch((err) => console.error(err));
-  }, [artist]);
-
-  return albums;
-}
-
 export function useAlbum(name: string) {
   const [album, setAlbum] = useState<Album | null>(null);
   useEffect(() => {
@@ -117,7 +135,9 @@ export function useAlbums() {
   useEffect(() => {
     fetch("/api/albums")
       .then((res) => res.json())
-      .then((data) => setAlbums(data))
+      .then((data: Album[]) =>
+        setAlbums(data.filter((album) => (album.title ? true : false)))
+      )
       .catch((error) => console.error(error));
   }, []);
 

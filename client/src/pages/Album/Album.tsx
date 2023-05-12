@@ -35,6 +35,7 @@ const StyledAlbumCover = styled.div<{
   show: boolean;
 }>`
   background: linear-gradient(to top, ${({ colors }) => colors.length ?  colors.join(", ") : "black, #8f8f8f"});
+
   display: grid;
   place-items: center;
 
@@ -98,7 +99,6 @@ const StyledAlbumCover = styled.div<{
 `;
 
 export default function Album() {
-  // VGVybWluYWwgUmVkdXg=
   const { name } = useParams();
   const [colors, setColors] = useState<string[]>([]);
   const [uri, setUri] = useState("");

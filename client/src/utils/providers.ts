@@ -26,9 +26,10 @@ export async function getAlbums(artists: string[]) {
     const data: Album[] = await res.json();
     for (let album of data) {
       if (
+        album.title &&
         !albums.find(
           (record) =>
-            record.title === album.title && record.artists == album.artists
+            record.title === album.title && record.artists === album.artists
         )
       )
         albums.push(album);

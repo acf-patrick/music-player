@@ -3,13 +3,14 @@ import * as dotenv from "dotenv";
 import * as sqlite from "sqlite3";
 import { Album } from "./models";
 import { createCondition } from "./func";
+import Cache from "./cache";
 
 dotenv.config();
 
 const port = process.env.PORT || 3000;
 const database = process.env.DATABASE || "database.db";
 const pageLength =
-  (process.env.PAGE_LENGTH ? parseInt(process.env.PAGE_LENGTH!) : null) || 50;
+  (process.env.PAGE_LENGTH ? parseInt(process.env.PAGE_LENGTH) : null) || 50;
 
 const db = new sqlite.Database(database, sqlite.OPEN_READWRITE, (err) => {
   if (err) console.error(`Failed to connect to database : ${err}`);
@@ -167,34 +168,49 @@ app.get("/image/:id", (req, res) => {
 
 // /song?title=&artist=&page
 app.get("/song", (req, res) => {
+  let pageIndex = 0;
+  if (req.query.page) {
+    try {
+      pageIndex = parseInt(req.query.page as string);
+    } catch {}
+  }
+
+  const sendPage = (songs: unknown[], pageIndex: number) => {
+    const totalPage = Math.ceil(songs.length / pageLength);
+
+    if (pageIndex < totalPage) {
+      res.json({
+        songs: songs.slice(pageIndex, pageIndex + pageLength),
+        totalItems: songs.length,
+        paging: {
+          index: pageIndex,
+          total: totalPage,
+        },
+      });
+    } else res.status(400).send("Page index out of range.");
+  };
+
   const handler = (err: Error | null, rows: unknown[]) => {
     if (err || rows.length === 0) res.sendStatus(404);
     else {
-      const totalPage = Math.ceil(rows.length / pageLength);
-      let pageIndex = 0;
-      if (req.query.page) {
-        try {
-          pageIndex = parseInt(req.query.page as string);
-        } catch {}
-      }
-
-      if (pageIndex < totalPage)
-        res.json({
-          songs: rows.slice(pageIndex, pageIndex + pageLength),
-          paging: {
-            index: pageIndex,
-            total: totalPage,
-          },
-        });
-      else res.status(400).send("Page index out of range.");
+      Cache.lastResults = rows;
+      sendPage(rows, pageIndex);
     }
   };
 
-  const keys = Object.keys(req.query);
   const conditions = createCondition(req.query);
-  if (conditions.length && keys.length !== 1 && keys[0] !== "page")
-    db.all(`SELECT * FROM song WHERE(${conditions})`, [], handler);
-  else db.all("SELECT * FROM song", [], handler);
+  if (Cache.lastQuery === conditions && Cache.lastResults.length) {
+    // Using cached results
+    sendPage(Cache.lastResults, pageIndex);
+  } else {
+    Cache.lastResults = [];
+
+    if (conditions.length)
+      db.all(`SELECT * FROM song WHERE(${conditions})`, [], handler);
+    else db.all("SELECT * FROM song", [], handler);
+
+    Cache.lastQuery = conditions;
+  }
 });
 
 app.get("/song/:id", (req, res) => {

@@ -1,12 +1,9 @@
 export function createCondition<Query extends object>(query: Query) {
-  const len = Object.keys(query).length;
-  let i = 0;
-  let condition = "";
+  const conditions: string[] = [];
   for (let key in query) {
-    condition += `${key} LIKE "%${query[key]}%"`;
-    if (i < len - 1) condition += " AND ";
-    i++;
+    if (key !== "page") {
+      conditions.push(`${key} LIKE "%${query[key]}%"`);
+    }
   }
-
-  return condition;
+  return conditions.join(" AND ");
 }

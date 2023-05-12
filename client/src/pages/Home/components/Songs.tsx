@@ -1,17 +1,49 @@
 import { useState, useEffect } from "react";
-import { useSongs } from "../../../utils/hook";
+import styled, { keyframes } from "styled-components";
+import { AiOutlineLoading } from "react-icons/ai";
+import { useSongs, useSong } from "../../../utils/hook";
 import { StyledOverview as StyledContainer } from "../../../styles";
 import { SongSortOptions, Song } from "../../../utils/models";
 import { Song as SongComponent, NoResult } from "../../../components";
 import Header from "./Header";
 
+const spin = keyframes`
+  from {
+    transform: rotate(0);
+  } to {
+    transform: rotate(360deg);
+  }
+`;
+
+const Loader = styled.div`
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 1.5rem;
+  
+  svg {
+    animation: ${spin} 750ms ease-in-out infinite;
+  }
+`;
+
 export default function Songs() {
-  const songs = useSongs();
+  // const songs = useSongs();
   const [results, setResults] = useState<Song[]>([]);
+  const [currentPage, setCurrentPage] = useState(0);
+  const { pending, totalItems, totalPages, songs } = useSong(currentPage);
+
+  // useEffect(() => {
+  //   setResults(songs);
+  // }, [songs]);
 
   useEffect(() => {
-    setResults(songs);
-  }, [songs]);
+    setResults((results) =>
+      (currentPage === 0 && results.length === 0) || currentPage > 0
+        ? [...results, ...songs]
+        : results
+    );
+  }, [currentPage, songs]);
 
   const searchInputOnEdit = (value: string) => {
     const keyword = value.toLowerCase();
@@ -45,6 +77,18 @@ export default function Songs() {
     }
   };
 
+  const listOnScroll = (e: React.UIEvent<HTMLDivElement>) => {
+    const threshold = 1;
+    const div = e.currentTarget;
+    if (
+      Math.abs(div.scrollHeight - div.clientHeight - div.scrollTop) < threshold
+    ) {
+      setCurrentPage((currentPage) =>
+        currentPage < totalPages ? currentPage + 1 : currentPage
+      );
+    }
+  };
+
   return (
     <StyledContainer>
       <Header
@@ -55,7 +99,7 @@ export default function Songs() {
         sortOptionOnUpdate={sortOptionOnUpdate}
       />
       {results.length ? (
-        <div className="list-wrapper">
+        <div className="list-wrapper" onScroll={listOnScroll}>
           <ul className="list">
             {results.map((song, i) => (
               <li key={i}>
@@ -67,6 +111,9 @@ export default function Songs() {
       ) : (
         <NoResult />
       )}
+      {pending && <Loader>
+        <AiOutlineLoading />
+      </Loader>}
     </StyledContainer>
   );
 }
