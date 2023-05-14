@@ -212,7 +212,7 @@ function Queue({ songs }: { songs: string[] }) {
         </ul>
       ) : (
         <div className="empty-queue">
-          <h1>Played musics appear here. 🎧</h1>
+          <h1>Queue is empty 🎧</h1>
         </div>
       )}
     </StyledContainer>

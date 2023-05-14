@@ -15,7 +15,7 @@ import { StyledOverview as StyledContainer } from "../../../styles";
 const StyledViewSetter = styled.div`
   .view-setter {
     position: absolute;
-    right: calc(50% + 32px);
+    right: 32px;
     bottom: 32px;
     width: 46px;
     height: 46px;
@@ -41,7 +41,7 @@ const StyledViewSetter = styled.div`
 
   .view-options {
     position: absolute;
-    right: calc(50% + 32px);
+    right: 32px;
     bottom: 98px;
     border-radius: 5px;
     overflow: hidden;
@@ -71,7 +71,7 @@ const StyledViewSetter = styled.div`
     width: 0;
     position: absolute;
     bottom: 82px;
-    right: calc(50% + 40px);
+    right: 40px;
     border-top: solid 16px black;
     border-left: solid 16px transparent;
     border-right: solid 16px transparent;

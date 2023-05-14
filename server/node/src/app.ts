@@ -148,26 +148,48 @@ app.get("/genres", (req, res) => {
 });
 
 app.get("/image/:id", (req, res) => {
+  if (!Cache.get("image")) {
+    Cache.set("image", {
+      lastQuery: "",
+      lastResults: [],
+    });
+  }
+  const cache = Cache.get("image")!;
+
   if (req.params.id) {
-    db.get(
-      "SELECT * FROM image WHERE id = ?",
-      req.params.id,
-      (
-        err,
-        row: {
-          id: string;
-          mime_type: string;
-          data: any;
+    if (cache.lastQuery === req.params.id) {
+      res.json(cache.lastResults);
+    } else {
+      db.get(
+        "SELECT * FROM image WHERE id = ?",
+        req.params.id,
+        (
+          err,
+          row: {
+            id: string;
+            mime_type: string;
+            data: any;
+          }
+        ) => {
+          cache.lastQuery = req.params.id;
+          cache.lastResults = row;
+          res.json(row);
         }
-      ) => {
-        res.json(row);
-      }
-    );
+      );
+    }
   } else res.sendStatus(404);
 });
 
 // /song?title=&artist=&page
 app.get("/song", (req, res) => {
+  if (!Cache.get("song"))
+    Cache.set("song", {
+      lastQuery: "",
+      lastResults: [],
+    });
+
+  const cache = Cache.get("song")!;
+
   let pageIndex = 0;
   if (req.query.page) {
     try {
@@ -193,23 +215,24 @@ app.get("/song", (req, res) => {
   const handler = (err: Error | null, rows: unknown[]) => {
     if (err || rows.length === 0) res.sendStatus(404);
     else {
-      Cache.lastResults = rows;
+      cache.lastResults = rows;
       sendPage(rows, pageIndex);
     }
   };
 
   const conditions = createCondition(req.query);
-  if (Cache.lastQuery === conditions && Cache.lastResults.length) {
+
+  if (cache.lastQuery === conditions && cache.lastResults.length) {
     // Using cached results
-    sendPage(Cache.lastResults, pageIndex);
+    sendPage(cache.lastResults, pageIndex);
   } else {
-    Cache.lastResults = [];
+    cache.lastResults = [];
 
     if (conditions.length)
       db.all(`SELECT * FROM song WHERE(${conditions})`, [], handler);
     else db.all("SELECT * FROM song", [], handler);
 
-    Cache.lastQuery = conditions;
+    cache.lastQuery = conditions;
   }
 });
 

@@ -61,6 +61,7 @@ const StyledOverview = styled.div`
     grid-template-columns: repeat(auto-fit, minmax(128px, 160px));
     grid-auto-rows: 1fr;
     grid-gap: 0.5rem;
+    justify-content: space-evenly;
   }
 
   ul.list {

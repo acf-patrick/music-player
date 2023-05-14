@@ -117,7 +117,11 @@ export default function AlbumList({ artists }: { artists?: string[] }) {
   }, [artists]);
 
   const albumOnClick = (name: string) => {
-    navigate(`/album/${btoa(name)}`);
+    navigate(`/album`, {
+      state: {
+        name: name,
+      },
+    });
   };
 
   return (

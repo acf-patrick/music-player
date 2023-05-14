@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { getImageData, getImageUri } from "../../utils/providers";
 import { useAlbum } from "../../utils/hook";
-import { useParams } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import AlbumList from "./AlbumList";
 import SongList from "./SongList";
 import styled, { keyframes } from "styled-components";
@@ -34,7 +34,10 @@ const StyledAlbumCover = styled.div<{
   bg: string;
   show: boolean;
 }>`
-  background: linear-gradient(to top, ${({ colors }) => colors.length ?  colors.join(", ") : "black, #8f8f8f"});
+  background: linear-gradient(
+    to top,
+    ${({ colors }) => (colors.length ? colors.join(", ") : "black, #8f8f8f")}
+  );
 
   display: grid;
   place-items: center;
@@ -99,10 +102,10 @@ const StyledAlbumCover = styled.div<{
 `;
 
 export default function Album() {
-  const { name } = useParams();
+  const location = useLocation();
   const [colors, setColors] = useState<string[]>([]);
   const [uri, setUri] = useState("");
-  const album = useAlbum(atob(name!));
+  const album = useAlbum(location.state.name);
 
   useEffect(() => {
     if (album) {

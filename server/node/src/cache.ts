@@ -1,9 +1,9 @@
-const Cache: {
-  lastQuery: string;
-  lastResults: unknown[];
-} = {
-  lastQuery: "",
-  lastResults: [],
-};
+const Cache = new Map<
+  string,
+  {
+    lastQuery: string;
+    lastResults: any;
+  }
+>();
 
 export default Cache;

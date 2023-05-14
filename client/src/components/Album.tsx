@@ -123,7 +123,7 @@ function Album({
   const cover = useImage(coverId ? coverId : "");
 
   const handleOnClick = () => {
-    navigate(`/album/${btoa(title)}`);
+    navigate(`/album`, { state: { name: title } });
   };
 
   const containers = [StyledGridCell, StyledWithThumbnail] as const;
