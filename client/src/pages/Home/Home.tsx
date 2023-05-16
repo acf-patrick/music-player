@@ -1,7 +1,7 @@
 import styled from "styled-components";
 import Content from "./Content";
 import { Outlet } from "react-router-dom";
-import { useSongs } from "../../utils/hook";
+import { useQueue } from "../../utils/hook";
 
 const StyledContainer = styled.div`
   width: 100%;
@@ -14,7 +14,7 @@ function Home() {
   return (
     <StyledContainer>
       <Outlet />
-      <Content songs={[]} />
+      <Content />
     </StyledContainer>
   );
 }

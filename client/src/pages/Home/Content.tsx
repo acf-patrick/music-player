@@ -5,19 +5,17 @@ import { CiSearch } from "react-icons/ci";
 import { FaPause, FaPlay } from "react-icons/fa";
 import { StyledHomeContent } from "../../styles";
 import { Queue, Player } from "../../components";
-import { useImage } from "../../utils/hook";
+import { useImage, useQueue } from "../../utils/hook";
 
-function Content({ songs }: { songs: Song[] }) {
-  const { playingSong, paused, queue } = useContext(DatasContext);
-  const { setPlayingSongIndex, setPaused, setQueue } =
+function Content() {
+  const { playingSong, paused } = useContext(DatasContext);
+  const { setPlayingSongIndex, setPaused } =
     useContext(DataMutatorsContext);
+
+  const queue = useQueue();
 
   const coverId = playingSong?.cover ? playingSong?.cover : "";
   const cover = useImage(coverId);
-
-  useEffect(() => {
-    setQueue!(songs.map((song) => song.id));
-  }, []);
 
   const playButtonOnClick = () => {
     if (playingSong) setPaused!(!paused);
@@ -35,7 +33,7 @@ function Content({ songs }: { songs: Song[] }) {
         <div className="texts">
           <h1>Library</h1>
           <p>
-            {songs.length} song{songs.length > 1 ? "s" : ""}
+            {queue.length} song{queue.length > 1 ? "s" : ""}
           </p>
         </div>
         <div className="play-button">

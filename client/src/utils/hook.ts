@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Song, Image, Album } from "./models";
 import { createDataUri } from ".";
+import { getSong } from "./providers";
 interface Response {
   songs: Song[];
   totalItems: number;
@@ -45,7 +46,7 @@ export function useSong(page: number) {
           }
         })
         .then((data: Response) => {
-          console.log("here")
+          console.log("here");
           setPending(false);
           setSongs(data.songs);
           setTotalItems(data.totalItems);
@@ -56,38 +57,6 @@ export function useSong(page: number) {
   }, [page, totalPages]);
 
   return { pending, totalItems, totalPages, songs };
-}
-
-export function useSongs() {
-  const [songs, setSongs] = useState<Song[]>([]);
-
-  useEffect(() => {
-    const fetchSongs = async () => {
-      let songs: Song[] = [];
-
-      try {
-        const res = await fetch("/api/song");
-        const datas: Response = await res.json();
-        songs = datas.songs;
-
-        // for (let i = 1; i < datas.paging.total; ++i) {
-        //   const res = await fetch(`/api/song?page=${i}`);
-        //   const datas: Response = await res.json();
-        //   songs = songs.concat(datas.songs);
-        // }
-      } catch (error) {
-        console.error(error);
-      }
-
-      return songs;
-    };
-
-    fetchSongs().then((datas) => {
-      setSongs((songs) => (songs.length ? songs : datas));
-    });
-  }, []);
-
-  return songs;
 }
 
 export function useArtists() {
@@ -142,4 +111,24 @@ export function useAlbums() {
   }, []);
 
   return albums;
+}
+
+export function useQueue() {
+  const [queue, setQueue] = useState<string[]>([]);
+  useEffect(() => {
+    const fetchQueue = async () => {
+      try {
+        const res = await fetch("/api/queue");
+        const data: string[] = await res.json();
+        return data;
+      } catch (e) {
+        console.error(e);
+      }
+      return [];
+    };
+
+    fetchQueue().then((ids) => setQueue(ids));
+  }, []);
+
+  return queue;
 }

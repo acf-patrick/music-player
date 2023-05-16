@@ -61,21 +61,23 @@ export default function Header({
               className="buttons"
               onMouseLeave={() => setSortPopupShown(false)}
             >
-              <button
-                className="sort-direction"
-                title={sortDirection}
-                onClick={() =>
-                  setSortDirection((sortDirection) =>
-                    sortDirection === "ascending" ? "descending" : "ascending"
-                  )
-                }
-              >
-                {sortDirection === "ascending" ? (
-                  <AiOutlineSortAscending />
-                ) : (
-                  <AiOutlineSortDescending />
-                )}
-              </button>
+              {(sortOptions ? sortBy : true) && (
+                <button
+                  className="sort-direction"
+                  title={sortDirection}
+                  onClick={() =>
+                    setSortDirection((sortDirection) =>
+                      sortDirection === "ascending" ? "descending" : "ascending"
+                    )
+                  }
+                >
+                  {sortDirection === "ascending" ? (
+                    <AiOutlineSortAscending />
+                  ) : (
+                    <AiOutlineSortDescending />
+                  )}
+                </button>
+              )}
               {sortOptions && (
                 <button
                   className="sort-by"

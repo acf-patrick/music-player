@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import styled, { keyframes } from "styled-components";
 import { AiOutlineLoading } from "react-icons/ai";
-import { useSongs, useSong } from "../../../utils/hook";
+import { useSong } from "../../../utils/hook";
 import { StyledOverview as StyledContainer } from "../../../styles";
 import { SongSortOptions, Song } from "../../../utils/models";
 import { Song as SongComponent, NoResult } from "../../../components";
@@ -28,7 +28,6 @@ const Loader = styled.div`
 `;
 
 export default function Songs() {
-  // const songs = useSongs();
   const [results, setResults] = useState<Song[]>([]);
   const [currentPage, setCurrentPage] = useState(0);
   const { pending, totalItems, totalPages, songs } = useSong(currentPage);
