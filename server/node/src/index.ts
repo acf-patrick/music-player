@@ -3,6 +3,7 @@ import {
   artistRouter,
   genreRouter,
   imageRouter,
+  playbackRouter,
   queueRouter,
   songRouter,
 } from "./controllers";
@@ -34,6 +35,10 @@ const routes = [
   {
     path: "/song",
     router: songRouter,
+  },
+  {
+    path: "/playback",
+    router: playbackRouter,
   },
 ];
 

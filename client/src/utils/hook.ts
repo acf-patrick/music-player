@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Song, Image, Album } from "./models";
 import { createDataUri } from ".";
-import { getSong } from "./providers";
+
 interface Response {
   songs: Song[];
   totalItems: number;
@@ -102,7 +102,7 @@ export function useAlbum(name: string) {
 export function useAlbums() {
   const [albums, setAlbums] = useState<Album[]>([]);
   useEffect(() => {
-    fetch("/api/albums")
+    fetch("/api/album/a")
       .then((res) => res.json())
       .then((data: Album[]) =>
         setAlbums(data.filter((album) => (album.title ? true : false)))
@@ -126,7 +126,7 @@ export function useQueue() {
       }
       return [];
     };
-
+    
     fetchQueue().then((ids) => setQueue(ids));
   }, []);
 

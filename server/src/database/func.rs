@@ -293,10 +293,10 @@ mod tests {
                     let mut i = 0;
                     for id in iter {
                         if let Ok(id) = id {
-                            i = i + 1;
                             manage_db_error(
                                 conn.execute("INSERT INTO queue VALUES(?, ?)", params![i, id]),
                             );
+                            i = i + 1;
                         }
                     }
                 }
