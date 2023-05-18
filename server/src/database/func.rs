@@ -275,6 +275,25 @@ pub fn scan_folder(src_path: &str, conn: &Connection) {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use std::env;
+
+    #[test]
+    #[ignore]
+    fn fill_database() {
+        let DATABASE = "node/database.db";
+        if let Ok(conn) = create_database(DATABASE) {
+            scan_folder(
+                if env::consts::OS == "linux" {
+                    "/home/acf-patrick/projects/music-player/client/public"
+                } else {
+                    "D:/FIT_Apprenti_Vague_006/music-player/client/public/test"
+                },
+                &conn,
+            );
+        } else {
+            panic!("Failed to connect to application database.");
+        }
+    }
 
     #[test]
     fn fill_queue() {

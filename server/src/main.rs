@@ -1,19 +1,49 @@
 mod database;
-use database::func::{create_database, scan_folder};
-use std::env;
 
-fn main() {
-    let DATABASE = "node/database.db";
-    if let Ok(conn) = create_database(DATABASE) {
-        scan_folder(
-            if env::consts::OS == "linux" {
-                "/home/acf-patrick/projects/music-player/client/public"
-            } else {
-                "D:/FIT_Apprenti_Vague_006/music-player/client/public/test"
-            },
-            &conn,
-        );
-    } else {
-        eprintln!("Failed to connect to application database.");
-    }
+use actix_web::{get, web, App, HttpServer, Responder};
+use rusqlite::Connection;
+use serde::Serialize;
+
+#[derive(Serialize, Clone)]
+struct PlayingSong {
+    index: i16,
+    paused: bool,
+}
+
+struct AppState {
+    playing_song: PlayingSong,
+    db: Connection,
+}
+
+#[get("/")]
+async fn index() -> String {
+    String::from("Hello world")
+}
+
+#[get("/state")]
+async fn get_state(data: web::Data<AppState>) -> impl Responder {
+    web::Json(data.playing_song.clone())
+}
+
+#[actix_web::main]
+async fn main() -> std::io::Result<()> {
+    let port = 8080;
+    println!("🚀 Server running on port {port}");
+
+    HttpServer::new(|| {
+        let db = Connection::open("mozika.db").unwrap();
+        App::new()
+            .app_data(web::Data::new(AppState {
+                playing_song: PlayingSong {
+                    index: -1,
+                    paused: true,
+                },
+                db,
+            }))
+            .service(index)
+            .service(get_state)
+    })
+    .bind(("127.0.0.1", port))?
+    .run()
+    .await
 }
