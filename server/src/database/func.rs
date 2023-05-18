@@ -280,8 +280,7 @@ mod tests {
     #[test]
     #[ignore]
     fn fill_database() {
-        let DATABASE = "node/database.db";
-        if let Ok(conn) = create_database(DATABASE) {
+        if let Ok(conn) = create_database("./mozika.db") {
             scan_folder(
                 if env::consts::OS == "linux" {
                     "/home/acf-patrick/projects/music-player/client/public"

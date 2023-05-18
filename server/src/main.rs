@@ -1,8 +1,12 @@
 mod database;
+mod server;
 
 use actix_web::{get, web, App, HttpServer, Responder};
 use rusqlite::Connection;
 use serde::Serialize;
+
+use server::controllers::artist::get_artists;
+use server::controllers::genre::get_genres;
 
 #[derive(Serialize, Clone)]
 struct PlayingSong {
@@ -10,19 +14,14 @@ struct PlayingSong {
     paused: bool,
 }
 
-struct AppState {
+pub struct AppState {
     playing_song: PlayingSong,
     db: Connection,
 }
 
 #[get("/")]
 async fn index() -> String {
-    String::from("Hello world")
-}
-
-#[get("/state")]
-async fn get_state(data: web::Data<AppState>) -> impl Responder {
-    web::Json(data.playing_song.clone())
+    String::from("ayeee")
 }
 
 #[actix_web::main]
@@ -41,7 +40,8 @@ async fn main() -> std::io::Result<()> {
                 db,
             }))
             .service(index)
-            .service(get_state)
+            .service(web::scope("/genres").service(get_genres))
+            .service(web::scope("/artists").service(get_artists))
     })
     .bind(("127.0.0.1", port))?
     .run()
