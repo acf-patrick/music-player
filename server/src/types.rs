@@ -33,7 +33,7 @@ pub struct Playlist {
 pub struct Album {
     pub title: String,
     pub artists: Vec<String>,
-    pub year: u8,
+    pub year: u16,
     pub duration: u32,
     pub cover: Option<String>,   // ID to one of image table record
     pub track_count: u8, // number of tracks

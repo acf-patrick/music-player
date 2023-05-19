@@ -9,7 +9,9 @@ use rusqlite::Connection;
 use serde::Serialize;
 
 use crate::server::controllers::{
-    album::get_album_by_name_or_artist, artist::get_artists, genre::get_genres,
+    album::{get_album_by_name_or_artist, get_all_albums},
+    artist::get_artists,
+    genre::get_genres,
 };
 
 #[derive(Serialize, Clone)]
@@ -47,7 +49,11 @@ async fn main() -> std::io::Result<()> {
             .service(index)
             .service(web::scope("/genres").service(get_genres))
             .service(web::scope("/artists").service(get_artists))
-            .service(web::scope("/album").service(get_album_by_name_or_artist))
+            .service(
+                web::scope("/album")
+                    .service(get_album_by_name_or_artist)
+                    .service(get_all_albums),
+            )
     })
     .bind(("127.0.0.1", port))?
     .run()

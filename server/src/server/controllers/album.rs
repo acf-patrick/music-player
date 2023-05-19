@@ -1,4 +1,5 @@
 use actix_web::{get, web, HttpResponse, Responder};
+use rusqlite::{Connection, Error};
 use serde::{Deserialize, Serialize};
 
 use crate::types::Album;
@@ -15,7 +16,7 @@ struct AlbumRow {
     album: String,
     artist: String,
     duration: u32,
-    year: u8,
+    year: u16,
     cover: Option<String>,
 }
 
@@ -25,26 +26,40 @@ pub async fn get_album_by_name_or_artist(
     data: web::Data<AppState>,
 ) -> impl Responder {
     let mut condition = String::new();
-    
+
     if let Some(name) = &query.name {
-      condition += &format!("name LIKE %{}%", name);
+        condition.push_str(&format!("album LIKE '%{}%'", name));
+        if let Some(_) = &query.artist {
+            condition.push_str(" AND ");
+        }
     }
 
     if let Some(artist) = &query.artist {
-      condition += &format!("artist LIKE %{}%", artist);
+        condition.push_str(&format!("artist LIKE '%{}%'", artist));
     }
 
     if condition.is_empty() {
-        return HttpResponse::NotFound().body("Provide 'name' or 'artist' information as query.");
+        return HttpResponse::BadRequest().body("Provide 'name' or 'artist' information as query.");
     }
-    
-    // Album list
+
+    send_response(data, condition)
+}
+
+#[get("/a")]
+pub async fn get_all_albums(data: web::Data<AppState>) -> impl Responder {
+    send_response(data, String::new())
+}
+
+fn get_album_list(conn: &Connection, condition: String) -> Result<Vec<Album>, Error> {
     let mut albums: Vec<Album> = vec![];
 
-    let conn = get_db_conn!(data);
-    match conn.prepare(&format!(
-        "SELECT album, artist, duration, year, cover FROM song WHERE({condition})"
-    )) {
+    let query: String = if condition.is_empty() {
+        String::from("SELECT album, artist, duration, year, cover FROM song")
+    } else {
+        format!("SELECT album, artist, duration, year, cover FROM song WHERE({condition})")
+    };
+
+    match conn.prepare(&query) {
         Ok(mut stmt) => {
             if let Ok(iter) = stmt.query_map([], |row| {
                 Ok(AlbumRow {
@@ -89,15 +104,28 @@ pub async fn get_album_by_name_or_artist(
                     }
                 }
             }
+            Ok(albums)
         }
         Err(error) => {
-            HttpResponse::BadRequest().body(format!("{error}"));
+            eprintln!("{error}");
+            Err(error)
         }
     }
+}
 
-    if albums.is_empty() {
-        return HttpResponse::NotFound().body("No album found.");
+fn send_response(data: web::Data<AppState>, condition: String) -> HttpResponse {
+    let conn = get_db_conn!(data);
+    match get_album_list(&conn, condition) {
+        Ok(albums) => {
+            if albums.is_empty() {
+                HttpResponse::NotFound().body("No album found.")
+            } else {
+                HttpResponse::Ok().json(albums)
+            }
+        }
+        Err(error) => {
+            eprintln!("{error}");
+            HttpResponse::InternalServerError().body(format!("{error}"))
+        }
     }
-
-    HttpResponse::Ok().json(albums)
 }
