@@ -1,3 +1,5 @@
+use serde::Serialize;
+
 #[derive(Debug)]
 pub struct Image {
     pub id: String, // generated using SHA256
@@ -27,11 +29,12 @@ pub struct Playlist {
     pub song: String, // ID to one of song table record
 }
 
-#[derive(Debug)]
+#[derive(Debug, Serialize)]
 pub struct Album {
-    pub id: u32,
     pub title: String,
-    pub artist: Option<String>,
+    pub artists: Vec<String>,
+    pub year: u8,
+    pub duration: u32,
     pub cover: Option<String>,   // ID to one of image table record
-    pub track_count: Option<u8>, // number of tracks
+    pub track_count: u8, // number of tracks
 }

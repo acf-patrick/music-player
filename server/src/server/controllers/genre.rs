@@ -21,9 +21,9 @@ pub async fn get_genres(data: web::Data<AppState>) -> impl Responder {
             }
         }
         Err(error) => {
-            HttpResponse::BadRequest().body(format!("{error}"));
+            return HttpResponse::BadRequest().body(format!("{error}"));
         }
     }
 
-    web::Json(genres)
+    HttpResponse::Ok().json(genres)
 }

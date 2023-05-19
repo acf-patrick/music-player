@@ -1,5 +1,6 @@
 mod database;
 mod server;
+mod types;
 
 use std::sync::Mutex;
 
@@ -7,8 +8,9 @@ use actix_web::{get, post, web, App, HttpResponse, HttpServer, Responder};
 use rusqlite::Connection;
 use serde::Serialize;
 
-use server::controllers::artist::get_artists;
-use server::controllers::genre::get_genres;
+use crate::server::controllers::{
+    album::get_album_by_name_or_artist, artist::get_artists, genre::get_genres,
+};
 
 #[derive(Serialize, Clone)]
 struct PlayingSong {
@@ -45,6 +47,7 @@ async fn main() -> std::io::Result<()> {
             .service(index)
             .service(web::scope("/genres").service(get_genres))
             .service(web::scope("/artists").service(get_artists))
+            .service(web::scope("/album").service(get_album_by_name_or_artist))
     })
     .bind(("127.0.0.1", port))?
     .run()

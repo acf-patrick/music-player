@@ -3,7 +3,7 @@ use actix_web::{get, web, HttpResponse, Responder};
 
 #[get("")]
 pub async fn get_artists(data: web::Data<AppState>) -> impl Responder {
-    let mut genres: Vec<String> = vec![];
+    let mut artists: Vec<String> = vec![];
     let conn = get_db_conn!(data);
 
     match conn.prepare("SELECT DISTINCT artist FROM song") {
@@ -12,17 +12,17 @@ pub async fn get_artists(data: web::Data<AppState>) -> impl Responder {
                 let genre: String = row.get(0)?;
                 Ok(genre)
             }) {
-                for genre in iter {
-                    if let Ok(genre) = genre {
-                        genres.push(genre);
+                for artist in iter {
+                    if let Ok(artist) = artist {
+                      artists.push(artist);
                     }
                 }
             }
         }
         Err(error) => {
-            HttpResponse::BadRequest().body(format!("{error}"));
+            return HttpResponse::BadRequest().body(format!("{error}"));
         }
     }
 
-    web::Json(genres)
+    HttpResponse::Ok().json(artists)
 }
