@@ -1,7 +1,9 @@
 mod database;
 mod server;
 
-use actix_web::{get, web, App, HttpServer, Responder};
+use std::sync::Mutex;
+
+use actix_web::{get, post, web, App, HttpResponse, HttpServer, Responder};
 use rusqlite::Connection;
 use serde::Serialize;
 
@@ -16,7 +18,7 @@ struct PlayingSong {
 
 pub struct AppState {
     playing_song: PlayingSong,
-    db: Connection,
+    db: Mutex<Connection>,
 }
 
 #[get("/")]
@@ -29,16 +31,17 @@ async fn main() -> std::io::Result<()> {
     let port = 8080;
     println!("🚀 Server running on port {port}");
 
-    HttpServer::new(|| {
-        let db = Connection::open("mozika.db").unwrap();
+    let app_state = web::Data::new(AppState {
+        playing_song: PlayingSong {
+            index: -1,
+            paused: true,
+        },
+        db: Mutex::new(Connection::open("mozika.db").unwrap()),
+    });
+
+    HttpServer::new(move || {
         App::new()
-            .app_data(web::Data::new(AppState {
-                playing_song: PlayingSong {
-                    index: -1,
-                    paused: true,
-                },
-                db,
-            }))
+            .app_data(app_state.clone())
             .service(index)
             .service(web::scope("/genres").service(get_genres))
             .service(web::scope("/artists").service(get_artists))
