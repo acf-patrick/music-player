@@ -4,14 +4,15 @@ mod types;
 
 use std::sync::Mutex;
 
-use actix_web::{get, post, web, App, HttpResponse, HttpServer, Responder};
+use actix_web::{get, web, App, HttpServer};
 use rusqlite::Connection;
-use serde::Serialize;
 
-use crate::server::controllers::{
+use server::controllers::{
     album::{get_album_by_name_or_artist, get_all_albums},
     artist::get_artists,
-    genre::get_genres, image::get_image,
+    genre::get_genres,
+    image::get_image,
+    queue::{add_to_queue, get_queue, remove_from_queue},
 };
 use types::{cache, PlayingSong};
 
@@ -55,8 +56,14 @@ async fn main() -> std::io::Result<()> {
                     .service(get_all_albums),
             )
             .service(web::scope("/image").service(get_image))
+            .service(
+                web::scope("/queue")
+                    .service(get_queue)
+                    .service(add_to_queue)
+                    .service(remove_from_queue),
+            )
     })
-    .bind(("127.0.0.1", port))?
+    .bind(("192.168.43.173", port))?
     .run()
     .await
 }

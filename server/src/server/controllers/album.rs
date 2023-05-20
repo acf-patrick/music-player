@@ -6,7 +6,7 @@ use crate::types::Album;
 use crate::{get_db_conn, AppState};
 
 #[derive(Deserialize)]
-pub struct AlbumQuery {
+struct AlbumQuery {
     name: Option<String>,
     artist: Option<String>,
 }

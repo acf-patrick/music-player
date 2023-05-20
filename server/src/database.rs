@@ -307,7 +307,7 @@ mod tests {
 
     #[test]
     fn fill_queue() {
-        if let Ok(conn) = Connection::open("node/database.db") {
+        if let Ok(conn) = Connection::open("./mozika.db") {
             if let Err(error) = conn.execute("DELETE FROM queue;", ()) {
                 panic!("{error}");
             }
