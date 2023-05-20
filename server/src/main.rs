@@ -1,3 +1,4 @@
+mod consts;
 mod database;
 mod server;
 mod types;
@@ -8,17 +9,19 @@ use actix_web::{get, web, App, HttpServer};
 use rusqlite::Connection;
 
 use server::controllers::{
-    album::{get_album_by_name_or_artist, get_all_albums},
+    album::{get_album, get_all_albums},
     artist::get_artists,
     genre::get_genres,
     image::get_image,
     queue::{add_to_queue, get_queue, remove_from_queue},
+    song::{get_one_song, get_song},
 };
 use types::{cache, PlayingSong};
 
 pub struct AppState {
     playing_song: PlayingSong,
     image_cache: Mutex<cache::Image>,
+    song_cache: Mutex<cache::Song>,
     db: Mutex<Connection>,
 }
 
@@ -29,8 +32,7 @@ async fn index() -> String {
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
-    let port = 8080;
-    println!("🚀 Server running on port {port}");
+    println!("🚀 Server running on port {}", consts::PORT);
 
     let app_state = web::Data::new(AppState {
         playing_song: PlayingSong {
@@ -40,6 +42,10 @@ async fn main() -> std::io::Result<()> {
         image_cache: Mutex::new(cache::Image {
             id: None,
             data: None,
+        }),
+        song_cache: Mutex::new(cache::Song {
+            query: None,
+            result: vec![],
         }),
         db: Mutex::new(Connection::open("mozika.db").unwrap()),
     });
@@ -52,7 +58,7 @@ async fn main() -> std::io::Result<()> {
             .service(web::scope("/artists").service(get_artists))
             .service(
                 web::scope("/album")
-                    .service(get_album_by_name_or_artist)
+                    .service(get_album)
                     .service(get_all_albums),
             )
             .service(web::scope("/image").service(get_image))
@@ -62,8 +68,9 @@ async fn main() -> std::io::Result<()> {
                     .service(add_to_queue)
                     .service(remove_from_queue),
             )
+            .service(web::scope("/song").service(get_song).service(get_one_song))
     })
-    .bind(("192.168.43.173", port))?
+    .bind(("127.0.0.1", consts::PORT))?
     .run()
     .await
 }

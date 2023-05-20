@@ -20,8 +20,9 @@ struct AlbumRow {
     cover: Option<String>,
 }
 
+/// Get album by name or artist
 #[get("")]
-pub async fn get_album_by_name_or_artist(
+pub async fn get_album(
     query: web::Query<AlbumQuery>,
     data: web::Data<AppState>,
 ) -> impl Responder {

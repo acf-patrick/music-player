@@ -49,7 +49,7 @@ pub fn create_database(db_name: &str) -> Result<Connection, Error> {
         "year" INTEGER,
         "title" TEXT,
         "artist" TEXT,
-		    "genre" TEXT,
+		"genre" TEXT,
         "track_number" INTEGER,
         "cover" TEXT,
         "album" TEXT,
@@ -291,7 +291,7 @@ mod tests {
     #[test]
     #[ignore]
     fn fill_database() {
-        if let Ok(conn) = create_database("./mozika.db") {
+        if let Ok(conn) = create_database(crate::consts::DATABASE) {
             scan_folder(
                 if env::consts::OS == "linux" {
                     "/home/acf-patrick/projects/music-player/client/public"
@@ -307,7 +307,7 @@ mod tests {
 
     #[test]
     fn fill_queue() {
-        if let Ok(conn) = Connection::open("./mozika.db") {
+        if let Ok(conn) = Connection::open(crate::consts::DATABASE) {
             if let Err(error) = conn.execute("DELETE FROM queue;", ()) {
                 panic!("{error}");
             }

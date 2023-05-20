@@ -5,6 +5,11 @@ pub mod cache {
         pub id: Option<String>,
         pub data: Option<super::Image>,
     }
+
+    pub struct Song {
+        pub query: Option<String>,
+        pub result: Vec<super::Song>,
+    }
 }
 
 #[derive(Serialize, Clone)]
@@ -30,7 +35,7 @@ pub struct Album {
     pub track_count: u8,       // number of tracks
 }
 
-#[derive(Debug)]
+#[derive(Debug, Serialize, Clone)]
 pub struct Song {
     pub id: String,   // generated using SHA256
     pub path: String, // path to the audio file
