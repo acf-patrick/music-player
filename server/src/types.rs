@@ -1,10 +1,33 @@
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 
-#[derive(Debug)]
+pub mod cache {
+    pub struct Image {
+        pub id: Option<String>,
+        pub data: Option<super::Image>,
+    }
+}
+
+#[derive(Serialize, Clone)]
+pub struct PlayingSong {
+    pub index: i16,
+    pub paused: bool,
+}
+
+#[derive(Deserialize, Serialize)]
 pub struct Image {
     pub id: String, // generated using SHA256
     pub mime_type: String,
     pub data: Vec<u8>,
+}
+
+#[derive(Serialize)]
+pub struct Album {
+    pub title: String,
+    pub artists: Vec<String>,
+    pub year: u16,
+    pub duration: u32,
+    pub cover: Option<String>, // ID to one of image table record
+    pub track_count: u8,       // number of tracks
 }
 
 #[derive(Debug)]
@@ -27,14 +50,4 @@ pub struct Playlist {
     pub id: u8,
     pub name: String,
     pub song: String, // ID to one of song table record
-}
-
-#[derive(Debug, Serialize)]
-pub struct Album {
-    pub title: String,
-    pub artists: Vec<String>,
-    pub year: u16,
-    pub duration: u32,
-    pub cover: Option<String>,   // ID to one of image table record
-    pub track_count: u8, // number of tracks
 }

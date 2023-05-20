@@ -11,17 +11,13 @@ use serde::Serialize;
 use crate::server::controllers::{
     album::{get_album_by_name_or_artist, get_all_albums},
     artist::get_artists,
-    genre::get_genres,
+    genre::get_genres, image::get_image,
 };
-
-#[derive(Serialize, Clone)]
-struct PlayingSong {
-    index: i16,
-    paused: bool,
-}
+use types::{cache, PlayingSong};
 
 pub struct AppState {
     playing_song: PlayingSong,
+    image_cache: Mutex<cache::Image>,
     db: Mutex<Connection>,
 }
 
@@ -40,6 +36,10 @@ async fn main() -> std::io::Result<()> {
             index: -1,
             paused: true,
         },
+        image_cache: Mutex::new(cache::Image {
+            id: None,
+            data: None,
+        }),
         db: Mutex::new(Connection::open("mozika.db").unwrap()),
     });
 
@@ -54,6 +54,7 @@ async fn main() -> std::io::Result<()> {
                     .service(get_album_by_name_or_artist)
                     .service(get_all_albums),
             )
+            .service(web::scope("/image").service(get_image))
     })
     .bind(("127.0.0.1", port))?
     .run()
