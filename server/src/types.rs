@@ -35,7 +35,7 @@ pub struct Album {
     pub track_count: u8,       // number of tracks
 }
 
-#[derive(Debug, Serialize, Clone)]
+#[derive(Debug, Deserialize, Serialize, Clone)]
 pub struct Song {
     pub id: String,   // generated using SHA256
     pub path: String, // path to the audio file
@@ -55,4 +55,22 @@ pub struct Playlist {
     pub id: u8,
     pub name: String,
     pub song: String, // ID to one of song table record
+}
+
+impl Song {
+    pub fn new(id: String, path: String) -> Self {
+        Song {
+            id,
+            path,
+            liked: false,
+            year: None,
+            title: None,
+            artist: None,
+            genre: None,
+            track_number: None,
+            cover: None,
+            album: None,
+            duration: None,
+        }
+    }
 }

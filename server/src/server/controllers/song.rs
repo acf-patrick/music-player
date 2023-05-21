@@ -3,6 +3,7 @@ use crate::{get_db_conn, AppState};
 use actix_web::{get, web, HttpResponse, Responder};
 use rusqlite::Connection;
 use serde::{Deserialize, Serialize};
+use serde_rusqlite::{from_row, from_rows};
 
 #[derive(Deserialize)]
 struct SongQuery {
@@ -85,22 +86,9 @@ pub async fn get_song(data: web::Data<AppState>, query: web::Query<SongQuery>) -
 
     let res = match conn.prepare(&query) {
         Ok(mut stmt) => {
-            if let Ok(iter) = stmt.query_map([], |row| {
-                Ok(Song {
-                    id: row.get(0)?,
-                    path: row.get(1)?,
-                    liked: row.get(2)?,
-                    year: Some(row.get(3)?),
-                    title: Some(row.get(4)?),
-                    artist: Some(row.get(5)?),
-                    album: Some(row.get(6)?),
-                    track_number: Some(row.get(7)?),
-                    genre: Some(row.get(8)?),
-                    cover: Some(row.get(9)?),
-                    duration: Some(row.get(10)?),
-                })
-            }) {
+            if let Ok(iter) = stmt.query([]) {
                 let mut songs: Vec<Song> = vec![];
+                let iter = from_rows::<Song>(iter);
                 for row in iter {
                     if let Ok(song) = row {
                         songs.push(song);
@@ -132,26 +120,17 @@ pub async fn get_one_song(song_id: web::Path<String>, data: web::Data<AppState>)
     let conn = get_db_conn!(data);
     let res = match conn.prepare("SELECT * FROM song WHERE id = ?") {
         Ok(mut stmt) => {
-            if let Ok(mut iter) = stmt.query_map(&[&song_id.to_string()], |row| {
-                Ok(Song {
-                    id: row.get(0)?,
-                    path: row.get(1)?,
-                    liked: row.get(2)?,
-                    year: Some(row.get(3)?),
-                    title: Some(row.get(4)?),
-                    artist: Some(row.get(5)?),
-                    album: Some(row.get(6)?),
-                    track_number: Some(row.get(7)?),
-                    genre: Some(row.get(8)?),
-                    cover: Some(row.get(9)?),
-                    duration: Some(row.get(10)?),
-                })
-            }) {
-                if let Some(row) = iter.next() {
-                    HttpResponse::Ok().json(row.unwrap())
-                } else {
-                    HttpResponse::NotFound().finish()
+            let mut song: Option<Song> = None;
+            if let Ok(mut iter) = stmt.query(&[&song_id.to_string()]) {
+                if let Ok(Some(row)) = iter.next() {
+                    if let Ok(row) = from_row::<Song>(row) {
+                        song = Some(row);
+                    }
                 }
+            }
+
+            if let Some(song) = song {
+                HttpResponse::Ok().json(song)
             } else {
                 HttpResponse::NotFound().finish()
             }
