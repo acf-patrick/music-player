@@ -2,8 +2,7 @@ use actix_web::{get, web, HttpResponse, Responder};
 use rusqlite::{Connection, Error};
 use serde::{Deserialize, Serialize};
 
-use crate::types::Album;
-use crate::{get_db_conn, AppState};
+use crate::{get_db_conn, server::database::model::Album, types::AppState};
 
 #[derive(Deserialize)]
 struct AlbumQuery {
@@ -22,10 +21,7 @@ struct AlbumRow {
 
 /// Get album by name or artist
 #[get("")]
-pub async fn get_album(
-    query: web::Query<AlbumQuery>,
-    data: web::Data<AppState>,
-) -> impl Responder {
+pub async fn get_album(query: web::Query<AlbumQuery>, data: web::Data<AppState>) -> impl Responder {
     let mut condition = String::new();
 
     if let Some(name) = &query.name {

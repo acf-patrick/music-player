@@ -1,4 +1,4 @@
-use crate::{get_db_conn, types::Image, AppState};
+use crate::{get_db_conn, server::database::model::Image, types::AppState};
 use actix_web::{get, web, HttpResponse, Responder};
 use serde_rusqlite::from_row;
 

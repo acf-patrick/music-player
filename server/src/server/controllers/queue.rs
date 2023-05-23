@@ -1,4 +1,4 @@
-use crate::{get_db_conn, AppState};
+use crate::{get_db_conn, types::AppState};
 use actix_web::{delete, get, post, web, HttpResponse, Responder};
 use rusqlite::Connection;
 use serde::Deserialize;

@@ -1,8 +1,10 @@
-use super::types;
+use crate::types;
 use indicatif::ProgressBar;
 use lofty::{Accessor, AudioFile, Picture, PictureType, Probe, TaggedFileExt};
 use rusqlite::{params, Connection, Error, Error::SqlInputError};
 use std::fs;
+
+use super::model::Song;
 
 /// Get database connection from Mutex wrapper
 #[macro_export]
@@ -121,7 +123,7 @@ pub fn generate_audio_id(src_path: &str) -> String {
     String::new()
 }
 
-fn save_song(song: &types::Song, conn: &Connection) {
+fn save_song(song: &Song, conn: &Connection) {
     manage_db_error(conn.execute(
         r#"INSERT INTO song VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"#,
         (
@@ -156,7 +158,7 @@ pub fn store_audio_metadatas(audio_path: &str, conn: &Connection) -> bool {
         path = audio_path.to_owned();
     }
 
-    let mut song = types::Song {
+    let mut song = Song {
         id: audio_id.clone(),
         path: path.clone(),
         liked: false,
@@ -247,7 +249,7 @@ pub fn store_audio_metadatas(audio_path: &str, conn: &Connection) -> bool {
             let i = audio_path.rfind("/").unwrap();
             title = audio_path[(i + 1)..].to_string();
         }
-        let song = types::Song {
+        let song = Song {
             id: audio_id,
             path,
             liked: false,

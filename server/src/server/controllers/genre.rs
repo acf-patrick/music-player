@@ -1,5 +1,4 @@
-use crate::get_db_conn;
-use crate::AppState;
+use crate::{get_db_conn, types::AppState};
 use actix_web::{get, web, HttpResponse, Responder};
 
 #[get("")]
