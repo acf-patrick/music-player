@@ -9,13 +9,13 @@ export async function getSong(songId: string): Promise<Song> {
 export async function getImageData(id: string) {
   const res = await fetch(`/api/image/${id}`);
   const datas: Image = await res.json();
-  return datas.data.data;
+  return datas.data;
 }
 
 export async function getImageUri(id: string) {
   const res = await fetch(`/api/image/${id}`);
-  const datas = await res.json();
-  return createDataUri(datas.mime_type, datas.data.data);
+  const datas: Image = await res.json();
+  return createDataUri(datas.mime_type, datas.data);
 }
 
 export async function getAlbums(artists: string[]) {

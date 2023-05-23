@@ -47,7 +47,7 @@ async fn main() -> std::io::Result<()> {
             query: None,
             result: vec![],
         }),
-        db: Mutex::new(Connection::open("mozika.db").unwrap()),
+        db: Mutex::new(Connection::open(consts::DATABASE).unwrap()),
     });
 
     HttpServer::new(move || {

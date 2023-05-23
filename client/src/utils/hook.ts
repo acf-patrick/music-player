@@ -18,7 +18,7 @@ export function useImage(coverId: string) {
       fetch(`/api/image/${coverId}`)
         .then((res) => res.json())
         .then((data: Image) => {
-          const datas = data.data.data;
+          const datas = data.data;
           setCover(createDataUri(data.mime_type, datas));
         })
         .catch((error) => {

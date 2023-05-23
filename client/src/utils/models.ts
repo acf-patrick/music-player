@@ -53,7 +53,7 @@ export interface Album {
 export interface Image {
   id: string;
   mime_type: string;
-  data: { type: string; data: number[] };
+  data: number[];
 }
 
 export const AlbumSortOptions = ["name", "artist", "duration"] as const;

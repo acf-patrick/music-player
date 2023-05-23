@@ -1,5 +1,6 @@
 use crate::{get_db_conn, types::Image, AppState};
 use actix_web::{get, web, HttpResponse, Responder};
+use serde_rusqlite::from_row;
 
 #[get("/{id}")]
 pub async fn get_image(image_id: web::Path<String>, data: web::Data<AppState>) -> impl Responder {
@@ -19,33 +20,21 @@ pub async fn get_image(image_id: web::Path<String>, data: web::Data<AppState>) -
     }
 
     let conn = get_db_conn!(data);
-    let res = match conn.prepare("SELECT * FROM image WHERE id=?") {
+    let res = match conn.prepare("SELECT * FROM image WHERE id = ?") {
         Ok(mut stmt) => {
-            if let Ok(iter) = stmt.query_map(&[&image_id.to_string()], |row| {
-                Ok(Image {
-                    id: row.get(0)?,
-                    mime_type: row.get(1)?,
-                    data: row.get(2)?,
-                })
-            }) {
-                let mut image: Option<Image> = None;
-                for row in iter {
-                    image = match row {
-                        Ok(image) => Some(image),
-                        Err(e) => {
-                            eprintln!("{e}");
-                            None
-                        }
-                    };
+            let mut image: Option<Image> = None;
+            if let Ok(mut iter) = stmt.query(&[&image_id.to_string()]) {
+                if let Ok(Some(row)) = iter.next() {
+                    if let Ok(row) = from_row::<Image>(row) {
+                        image = Some(row);
+                    }
                 }
+            }
 
-                if let Some(image) = image {
-                    cache.id = Some(image_id.to_string());
-                    cache.data = Some(image);
-                    HttpResponse::Ok().json(&cache.data)
-                } else {
-                    HttpResponse::NotFound().body("Image not found")
-                }
+            if let Some(image) = image {
+                cache.id = Some(image_id.to_string());
+                cache.data = Some(image);
+                HttpResponse::Ok().json(&cache.data)
             } else {
                 HttpResponse::NotFound().body("Image not found")
             }
