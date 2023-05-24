@@ -1,10 +1,11 @@
 use server::start_server;
 
-mod consts;
-mod server;
 mod types;
+mod server;
+mod consts;
+mod lyric_scraper;
 
-#[actix_web::main]
+#[tokio::main]
 async fn main() -> std::io::Result<()> {
     start_server().await
 }
