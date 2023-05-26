@@ -2,7 +2,6 @@ use crate::{get_db_conn, types::AppState, server::database::model::Song};
 use actix_web::{get, web, HttpResponse, Responder};
 use serde::{Deserialize, Serialize};
 use serde_rusqlite::{from_row, from_rows};
-use rusqlite::Connection;
 
 #[derive(Deserialize)]
 struct SongQuery {

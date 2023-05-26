@@ -11,6 +11,7 @@ pub struct Image {
 pub struct Album {
     pub title: String,
     pub artists: Vec<String>,
+    pub genres: Vec<String>,
     pub year: u16,
     pub duration: u32,
     pub cover: Option<String>, // ID to one of image table record

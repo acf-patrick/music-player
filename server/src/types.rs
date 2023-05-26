@@ -15,12 +15,19 @@ pub mod cache {
         pub query: Option<String>,
         pub result: Vec<model::Song>,
     }
+
+    pub struct Lyrics {
+        pub artist: Option<String>,
+        pub song: Option<String>,
+        pub lyrics: String,
+    }
 }
 
 pub struct AppState {
     pub playing_song: PlayingSong,
     pub image_cache: Mutex<cache::Image>,
     pub song_cache: Mutex<cache::Song>,
+    pub lyrics_cache: Mutex<cache::Lyrics>,
     pub db: Mutex<Connection>,
 }
 

@@ -27,6 +27,7 @@ serde_rusqlite = "0.33.1"
 scraper = "0.16.0"
 reqwest = { version = "0.11", features = ["json"] }
 tokio = { version = "1", features = ["full"] }
+unidecode = "0.3.0"
 
 [dependencies.rusqlite]
 version = "0.29.0"

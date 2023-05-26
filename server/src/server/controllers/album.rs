@@ -1,6 +1,7 @@
 use actix_web::{get, web, HttpResponse, Responder};
 use rusqlite::{Connection, Error};
 use serde::{Deserialize, Serialize};
+use serde_rusqlite::from_rows;
 
 use crate::{get_db_conn, server::database::model::Album, types::AppState};
 
@@ -10,7 +11,7 @@ struct AlbumQuery {
     artist: Option<String>,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Deserialize)]
 struct AlbumRow {
     album: String,
     artist: String,
@@ -58,22 +59,19 @@ fn get_album_list(conn: &Connection, condition: String) -> Result<Vec<Album>, Er
 
     match conn.prepare(&query) {
         Ok(mut stmt) => {
-            if let Ok(iter) = stmt.query_map([], |row| {
-                Ok(AlbumRow {
-                    album: row.get(0)?,
-                    artist: row.get(1)?,
-                    duration: row.get(2)?,
-                    year: row.get(3)?,
-                    cover: row.get(4)?,
-                })
-            }) {
+            if let Ok(iter) = stmt.query([]) {
+                let iter = from_rows::<AlbumRow>(iter);
                 for row in iter {
                     if let Ok(row) = row {
                         if let Some(i) = albums.iter().position(|album| album.title == row.album) {
                             let stored = &mut albums[i];
+                            
                             if let None = stored.artists.iter().find(|a| a == &&row.artist) {
                                 stored.artists.push(row.artist);
                             }
+
+                            // if let None = stored.artists.iter().find(|a| a == &&row.g)
+
                             stored.duration += row.duration;
                             stored.track_count += 1;
 
@@ -90,6 +88,7 @@ fn get_album_list(conn: &Connection, condition: String) -> Result<Vec<Album>, Er
                             let mut album = Album {
                                 title: row.album,
                                 artists: vec![],
+                                genres: vec![],
                                 year: row.year,
                                 duration: row.duration,
                                 cover: row.cover,

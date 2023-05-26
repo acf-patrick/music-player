@@ -1,15 +1,19 @@
 use reqwest::StatusCode;
 use scraper::{Html, Selector};
+use unidecode::unidecode;
 
 fn convert_to_lowercase(s: &str) -> String {
   let mut result = String::new();
+  let s = unidecode(s);
 
   for c in s.chars() {
       if c.is_ascii_alphabetic() {
           let lowercase_c = c.to_ascii_lowercase();
           if lowercase_c >= 'a' && lowercase_c <= 'z' {
               result.push(lowercase_c);
-          }
+          }else if c >= '0' && c <= '9' {
+            result.push(c);
+        } 
       }
   }
 

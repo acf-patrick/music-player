@@ -6,6 +6,11 @@ use std::sync::Mutex;
 use actix_web::{get, web, App, HttpServer};
 use rusqlite::Connection;
 
+use crate::consts;
+use crate::{
+    server::controllers::lyrics::get_lyrics,
+    types::{cache, AppState, PlayingSong},
+};
 use controllers::{
     album::{get_album, get_all_albums},
     artist::get_artists,
@@ -14,8 +19,6 @@ use controllers::{
     queue::{add_to_queue, get_queue, remove_from_queue},
     song::{get_one_song, get_song},
 };
-use crate::types::{cache, AppState, PlayingSong};
-use crate::consts;
 
 #[get("/")]
 async fn index() -> String {
@@ -37,6 +40,11 @@ pub async fn start_server() -> std::io::Result<()> {
         song_cache: Mutex::new(cache::Song {
             query: None,
             result: vec![],
+        }),
+        lyrics_cache: Mutex::new(cache::Lyrics {
+            artist: None,
+            song: None,
+            lyrics: String::new(),
         }),
         db: Mutex::new(Connection::open(consts::DATABASE).unwrap()),
     });
@@ -60,6 +68,7 @@ pub async fn start_server() -> std::io::Result<()> {
                     .service(remove_from_queue),
             )
             .service(web::scope("/song").service(get_song).service(get_one_song))
+            .service(web::scope("/lyrics").service(get_lyrics))
     })
     .bind(("127.0.0.1", consts::PORT))?
     .run()
