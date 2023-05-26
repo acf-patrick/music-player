@@ -17,6 +17,7 @@ struct AlbumRow {
     artist: String,
     duration: u32,
     year: u16,
+    genre: String,
     cover: Option<String>,
 }
 
@@ -52,9 +53,9 @@ fn get_album_list(conn: &Connection, condition: String) -> Result<Vec<Album>, Er
     let mut albums: Vec<Album> = vec![];
 
     let query: String = if condition.is_empty() {
-        String::from("SELECT album, artist, duration, year, cover FROM song")
+        String::from("SELECT album, artist, duration, year, cover, genre FROM song")
     } else {
-        format!("SELECT album, artist, duration, year, cover FROM song WHERE({condition})")
+        format!("SELECT album, artist, duration, year, cover, genre FROM song WHERE({condition})")
     };
 
     match conn.prepare(&query) {
@@ -65,12 +66,13 @@ fn get_album_list(conn: &Connection, condition: String) -> Result<Vec<Album>, Er
                     if let Ok(row) = row {
                         if let Some(i) = albums.iter().position(|album| album.title == row.album) {
                             let stored = &mut albums[i];
-                            
                             if let None = stored.artists.iter().find(|a| a == &&row.artist) {
                                 stored.artists.push(row.artist);
                             }
 
-                            // if let None = stored.artists.iter().find(|a| a == &&row.g)
+                            if let None = stored.genres.iter().find(|a| a == &&row.genre) {
+                              stored.genres.push(row.genre);
+                            }
 
                             stored.duration += row.duration;
                             stored.track_count += 1;
