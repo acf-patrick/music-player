@@ -43,7 +43,7 @@ const StyledContainer = styled.div`
       display: none;
     }
 
-    li {
+    .song {
       padding-left: 4rem !important;
       padding-right: 3rem !important;
     }
@@ -160,7 +160,7 @@ export default function SongList({ album }: { album: Album }) {
         </StyledAlbumName>
       </div>
       <div className="songs">
-        <Queue songs={songs} />
+        <Queue songs={songs} itemClass="song" />
       </div>
     </StyledContainer>
   );

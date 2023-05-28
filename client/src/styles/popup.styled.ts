@@ -91,6 +91,9 @@ const StyledPopup = styled.div<{
     input {
       padding: 5px;
       width: 100%;
+      background: transparent;
+      outline: none;
+      border: none;
 
       &::placeholder {
         padding: unset;

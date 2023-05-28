@@ -5,3 +5,4 @@ pub mod image;
 pub mod queue;
 pub mod song;
 pub mod lyrics;
+pub mod playback;

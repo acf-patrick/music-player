@@ -173,7 +173,7 @@ const StyledContainer = styled.div`
   }
 `;
 
-function Queue({ songs }: { songs: string[] }) {
+function Queue({ songs, itemClass }: { songs: string[]; itemClass?: string }) {
   const { playingSong, playingSongIndex, paused } = useContext(DatasContext);
   const { setPlayingSongIndex, setPaused } = useContext(DataMutatorsContext);
 
@@ -217,7 +217,11 @@ function Queue({ songs }: { songs: string[] }) {
               onDoubleClick={() => {
                 playButtonOnClick(i);
               }}
-              className={i === playingSongIndex && !paused ? "playing" : ""}
+              className={
+                i === playingSongIndex && !paused
+                  ? "playing"
+                  : "" + ` ${itemClass ? itemClass : ""}`
+              }
             >
               <Song index={i} queue={queue} song={{ ...song }} />
             </li>
