@@ -126,7 +126,7 @@ export function useQueue() {
       }
       return [];
     };
-    
+
     fetchQueue().then((ids) => setQueue(ids));
   }, []);
 

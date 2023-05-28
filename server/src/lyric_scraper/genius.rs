@@ -29,7 +29,7 @@ pub async fn get_lyrics(artist: &str, song: &str) -> Option<String> {
         convert_to_lowercase(song)
     );
 
-    match reqwest::get(url).await {
+    match reqwest::get(url.clone()).await {
         Ok(res) => {
             if res.status() == StatusCode::OK {
                 if let Ok(html) = res.text().await {
@@ -49,6 +49,7 @@ pub async fn get_lyrics(artist: &str, song: &str) -> Option<String> {
                     None
                 }
             } else {
+                eprintln!("{url} : {}", res.status());
                 None
             }
         }

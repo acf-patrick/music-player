@@ -174,7 +174,7 @@ export default function Album() {
         </StyledAlbumCover>
         <AlbumList artists={album?.artists} />
       </div>
-      <SongList />
+      {album && <SongList album={album} />}
     </StyledContainer>
   );
 }

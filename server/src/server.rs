@@ -12,7 +12,7 @@ use crate::{
     types::{cache, AppState, PlayingSong},
 };
 use controllers::{
-    album::{get_album, get_all_albums},
+    album::{get_album, get_album_songs, get_all_albums},
     artist::get_artists,
     genre::get_genres,
     image::get_image,
@@ -58,7 +58,8 @@ pub async fn start_server() -> std::io::Result<()> {
             .service(
                 web::scope("/album")
                     .service(get_album)
-                    .service(get_all_albums),
+                    .service(get_all_albums)
+                    .service(get_album_songs),
             )
             .service(web::scope("/image").service(get_image))
             .service(

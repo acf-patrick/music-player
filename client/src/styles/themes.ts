@@ -16,6 +16,15 @@ const themes = {
       activated: "#655DBB",
     },
     album: {
+      background: {
+        primary: "#DAD3D5",
+        secondary: "rgba(211, 200, 211, 0.75)"
+      },
+      colors: {
+        primary: "black",
+        secondary: "rgba(0, 0, 0, 0.5)",
+        tertiary: "#2A88F6",
+      },
       cover: "grey",
       artist: {
         gridCell: "black",

@@ -38,3 +38,17 @@ export async function getAlbums(artists: string[]) {
 
   return albums;
 }
+
+export async function getAlbumSongs(album: string) {
+  const res = await fetch(`/api/album/song`, {
+    method: "POST",
+    body: JSON.stringify({
+      name: album,
+    }),
+    headers: {
+      "Content-type": "application/json",
+    },
+  });
+  const songs: string[] = await res.json();
+  return songs;
+}

@@ -179,9 +179,22 @@ function Queue({ songs }: { songs: string[] }) {
 
   const [queue, setQueue] = useState<Audio[]>([]);
   useEffect(() => {
+    setQueue([]);
     songs.forEach((id) => {
       getSong(id)
-        .then((data) => setQueue((queue) => [...queue, data]))
+        .then((data) =>
+          setQueue((queue) =>
+            [...queue, data].sort((a, b) => {
+              if (
+                a.track_number !== undefined &&
+                b.track_number !== undefined
+              ) {
+                return a.track_number - b.track_number;
+              }
+              return 0;
+            })
+          )
+        )
         .catch((err) => console.error(err));
     });
   }, [songs]);

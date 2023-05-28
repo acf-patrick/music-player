@@ -3,21 +3,21 @@ use scraper::{Html, Selector};
 use unidecode::unidecode;
 
 fn convert_to_lowercase(s: &str) -> String {
-  let mut result = String::new();
-  let s = unidecode(s);
+    let mut result = String::new();
+    let s = unidecode(s);
 
-  for c in s.chars() {
-      if c.is_ascii_alphabetic() {
-          let lowercase_c = c.to_ascii_lowercase();
-          if lowercase_c >= 'a' && lowercase_c <= 'z' {
-              result.push(lowercase_c);
-          }else if c >= '0' && c <= '9' {
-            result.push(c);
-        } 
-      }
-  }
+    for c in s.chars() {
+        if c.is_ascii_alphabetic() {
+            let lowercase_c = c.to_ascii_lowercase();
+            if lowercase_c >= 'a' && lowercase_c <= 'z' {
+                result.push(lowercase_c);
+            } else if c >= '0' && c <= '9' {
+                result.push(c);
+            }
+        }
+    }
 
-  result
+    result
 }
 
 pub async fn get_lyrics(artist: &str, song: &str) -> Option<String> {
@@ -27,7 +27,7 @@ pub async fn get_lyrics(artist: &str, song: &str) -> Option<String> {
         convert_to_lowercase(song)
     );
 
-    match reqwest::get(url).await {
+    match reqwest::get(url.clone()).await {
         Ok(res) => {
             if res.status() == StatusCode::OK {
                 if let Ok(html) = res.text().await {
@@ -48,6 +48,7 @@ pub async fn get_lyrics(artist: &str, song: &str) -> Option<String> {
                     None
                 }
             } else {
+                eprintln!("{url} : {}", res.status());
                 None
             }
         }

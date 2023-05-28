@@ -59,28 +59,6 @@ const StyledHomeContent = styled.div<{ headerBg?: string }>`
     margin-bottom: 1rem;
   }
 
-  .header button {
-    width: 60px;
-    height: 60px;
-    border-radius: 100%;
-    overflow: hidden;
-    display: grid;
-    place-items: center;
-    font-size: 1.25rem;
-    cursor: pointer;
-    border: none;
-    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.5);
-    animation: ${showPlayButton} 500ms 1s both;
-
-    &:active {
-      box-shadow: 0 0 5px rgba(0, 0, 0, 1) inset;
-    }
-
-    svg {
-      transform: translateX(1px);
-    }
-  }
-
   input {
     background: transparent;
     outline: none;

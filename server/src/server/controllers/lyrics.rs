@@ -20,11 +20,13 @@ pub async fn get_lyrics(query: web::Json<Query>, data: web::Data<AppState>) -> i
         let song = query.song.clone().unwrap();
 
         if cache.artist != None && cache.song != None {
-          if artist == cache.artist.clone().unwrap() && song == cache.song.clone().unwrap() {
-            lyrics = Some(cache.lyrics.clone());
-          }
+            if artist == cache.artist.clone().unwrap() && song == cache.song.clone().unwrap() {
+                lyrics = Some(cache.lyrics.clone());
+            } else {
+                lyrics = lyric_scraper::get_lyrics(&artist, &song).await;
+            }
         } else {
-          lyrics = lyric_scraper::get_lyrics(&artist, &song).await;
+            lyrics = lyric_scraper::get_lyrics(&artist, &song).await;
         }
 
         if let Some(lyrics) = lyrics {

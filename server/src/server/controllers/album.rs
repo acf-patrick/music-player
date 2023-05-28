@@ -1,4 +1,4 @@
-use actix_web::{get, web, HttpResponse, Responder};
+use actix_web::{get, post, web, HttpResponse, Responder};
 use rusqlite::{Connection, Error};
 use serde::{Deserialize, Serialize};
 use serde_rusqlite::from_rows;
@@ -27,14 +27,14 @@ pub async fn get_album(query: web::Query<AlbumQuery>, data: web::Data<AppState>)
     let mut condition = String::new();
 
     if let Some(name) = &query.name {
-        condition.push_str(&format!("album LIKE '%{}%'", name));
+        condition.push_str(&format!("album LIKE \"%{}%\"", name));
         if let Some(_) = &query.artist {
             condition.push_str(" AND ");
         }
     }
 
     if let Some(artist) = &query.artist {
-        condition.push_str(&format!("artist LIKE '%{}%'", artist));
+        condition.push_str(&format!("artist LIKE \"%{}%\"", artist));
     }
 
     if condition.is_empty() {
@@ -42,6 +42,35 @@ pub async fn get_album(query: web::Query<AlbumQuery>, data: web::Data<AppState>)
     }
 
     send_response(data, condition)
+}
+
+#[post("/song")]
+pub async fn get_album_songs(
+    query: web::Json<AlbumQuery>,
+    data: web::Data<AppState>,
+) -> impl Responder {
+    if query.name == None {
+        return HttpResponse::BadRequest().body("Provide album name.");
+    }
+
+    let conn = get_db_conn!(data);
+    let query = format!("SELECT id FROM song WHERE album = \"{}\"", query.name.clone().unwrap());
+
+    let res = match conn.prepare(&query) {
+        Ok(mut stmt) => match stmt.query([]) {
+            Ok(iter) => {
+                let iter = from_rows::<String>(iter);
+                let songs: Vec<String> = iter.map(|x| x.unwrap()).collect();
+                HttpResponse::Ok().json(songs)
+            }
+            Err(error) => HttpResponse::NotFound().finish(),
+        },
+        Err(error) => {
+            eprintln!("{error}");
+            HttpResponse::NotFound().finish()
+        }
+    };
+    res
 }
 
 #[get("/a")]
@@ -71,7 +100,7 @@ fn get_album_list(conn: &Connection, condition: String) -> Result<Vec<Album>, Er
                             }
 
                             if let None = stored.genres.iter().find(|a| a == &&row.genre) {
-                              stored.genres.push(row.genre);
+                                stored.genres.push(row.genre);
                             }
 
                             stored.duration += row.duration;

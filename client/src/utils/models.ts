@@ -44,6 +44,7 @@ export const SongSortOptions = [
 export interface Album {
   title: string;
   artists?: string[];
+  genres?: string[];
   duration?: number;
   cover?: string;
   year?: number; // Year of the latest released song

@@ -1,16 +1,13 @@
-import { useContext, useEffect } from "react";
+import { useContext } from "react";
 import { DataMutatorsContext, DatasContext } from "../../utils";
-import { Song } from "../../utils/models";
 import { CiSearch } from "react-icons/ci";
-import { FaPause, FaPlay } from "react-icons/fa";
 import { StyledHomeContent } from "../../styles";
-import { Queue, Player } from "../../components";
+import { Queue, Player, PlayButton } from "../../components";
 import { useImage, useQueue } from "../../utils/hook";
 
 function Content() {
   const { playingSong, paused } = useContext(DatasContext);
-  const { setPlayingSongIndex, setPaused } =
-    useContext(DataMutatorsContext);
+  const { setPlayingSongIndex, setPaused } = useContext(DataMutatorsContext);
 
   const queue = useQueue();
 
@@ -37,9 +34,10 @@ function Content() {
           </p>
         </div>
         <div className="play-button">
-          <button onClick={playButtonOnClick}>
-            {paused ? <FaPlay /> : <FaPause />}
-          </button>
+          <PlayButton
+            paused={paused ? true : false}
+            onClick={playButtonOnClick}
+          />
         </div>
       </div>
       <div className="inner">
