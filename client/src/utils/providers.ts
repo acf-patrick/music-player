@@ -1,20 +1,23 @@
 import { Song, Image, Album } from "./models";
 import { createDataUri } from ".";
+import api from "../api";
+
+const API = import.meta.env.API_ENDPOINT || "http://localhost:8000";
 
 export async function getSong(songId: string): Promise<Song> {
-  const res = await fetch(`/api/song/${songId}`);
-  return await res.json();
+  const res = await api.get(`/song/${songId}`);
+  return res.data;
 }
 
 export async function getImageData(id: string) {
-  const res = await fetch(`/api/image/${id}`);
-  const datas: Image = await res.json();
+  const res = await api.get(`/image/${id}`);
+  const datas: Image = res.data;
   return datas.data;
 }
 
 export async function getImageUri(id: string) {
-  const res = await fetch(`/api/image/${id}`);
-  const datas: Image = await res.json();
+  const res = await api.get(`/image/${id}`);
+  const datas: Image = res.data;
   return createDataUri(datas.mime_type, datas.data);
 }
 
@@ -22,8 +25,8 @@ export async function getAlbums(artists: string[]) {
   const albums: Album[] = [];
 
   for (let artist of artists) {
-    const res = await fetch(`/api/album?artist=${artist}`);
-    const data: Album[] = await res.json();
+    const res = await api.get(`/album?artist=${artist}`);
+    const data: Album[] = res.data;
     for (let album of data) {
       if (
         album.title &&
@@ -40,15 +43,9 @@ export async function getAlbums(artists: string[]) {
 }
 
 export async function getAlbumSongs(album: string) {
-  const res = await fetch(`/api/album/song`, {
-    method: "POST",
-    body: JSON.stringify({
-      name: album,
-    }),
-    headers: {
-      "Content-type": "application/json",
-    },
+  const res = await api.post(`/album/song`, {
+    name: album,
   });
-  const songs: string[] = await res.json();
+  const songs: string[] = res.data;
   return songs;
 }

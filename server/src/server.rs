@@ -3,6 +3,7 @@ pub mod database;
 
 use std::sync::Mutex;
 
+use actix_cors::Cors;
 use actix_web::{get, web, App, HttpServer};
 use rusqlite::Connection;
 
@@ -50,7 +51,12 @@ pub async fn start_server() -> std::io::Result<()> {
     });
 
     HttpServer::new(move || {
+        let cors = Cors::default()
+            .allow_any_origin()
+            .allow_any_method()
+            .allow_any_header();
         App::new()
+            .wrap(cors)
             .app_data(app_state.clone())
             .service(index)
             .service(web::scope("/genres").service(get_genres))
@@ -71,7 +77,7 @@ pub async fn start_server() -> std::io::Result<()> {
             .service(web::scope("/song").service(get_song).service(get_one_song))
             .service(web::scope("/lyrics").service(get_lyrics))
     })
-    .bind(("127.0.0.1", consts::PORT))?
+    .bind(("0.0.0.0", consts::PORT))?
     .run()
     .await
 }

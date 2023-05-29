@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState, FC } from "react";
+import { useContext, useEffect, useState, FC, useMemo } from "react";
 import styled from "styled-components";
 import { Song as Audio, PopupOption } from "../utils/models";
 import { DatasContext, DataMutatorsContext, durationToString } from "../utils";
@@ -178,25 +178,27 @@ function Queue({ songs, itemClass }: { songs: string[]; itemClass?: string }) {
   const { setPlayingSongIndex, setPaused } = useContext(DataMutatorsContext);
 
   const [queue, setQueue] = useState<Audio[]>([]);
+
   useEffect(() => {
-    setQueue([]);
-    songs.forEach((id) => {
-      getSong(id)
-        .then((data) =>
-          setQueue((queue) =>
-            [...queue, data].sort((a, b) => {
-              if (
-                a.track_number !== undefined &&
-                b.track_number !== undefined
-              ) {
-                return a.track_number - b.track_number;
-              }
-              return 0;
-            })
+    if (songs.length) {
+      songs.forEach((id) => {
+        getSong(id)
+          .then((data) =>
+            setQueue((queue) =>
+              [...queue, data].sort((a, b) => {
+                if (
+                  a.track_number !== undefined &&
+                  b.track_number !== undefined
+                ) {
+                  return a.track_number - b.track_number;
+                }
+                return 0;
+              })
+            )
           )
-        )
-        .catch((err) => console.error(err));
-    });
+          .catch((err) => console.error(err));
+      });
+    }
   }, [songs]);
 
   const playButtonOnClick = (index: number) => {
