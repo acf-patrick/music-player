@@ -177,28 +177,28 @@ function Queue({ songs, itemClass }: { songs: string[]; itemClass?: string }) {
   const { playingSong, playingSongIndex, paused } = useContext(DatasContext);
   const { setPlayingSongIndex, setPaused } = useContext(DataMutatorsContext);
 
-  const [queue, setQueue] = useState<Audio[]>([]);
+  const [songDatas, setSongDatas] = useState<Map<string, Audio>>(new Map());
+  const queue = useMemo(() => {
+    let queue: Audio[] = [];
+    songs.forEach((id) => {
+      if (songDatas.has(id)) queue.push(songDatas.get(id)!);
+    });
+    return queue;
+  }, [songs, songDatas]);
 
   useEffect(() => {
-    if (songs.length) {
-      songs.forEach((id) => {
-        getSong(id)
-          .then((data) =>
-            setQueue((queue) =>
-              [...queue, data].sort((a, b) => {
-                if (
-                  a.track_number !== undefined &&
-                  b.track_number !== undefined
-                ) {
-                  return a.track_number - b.track_number;
-                }
-                return 0;
-              })
-            )
-          )
-          .catch((err) => console.error(err));
-      });
-    }
+    songs.forEach((id) => {
+      getSong(id)
+        .then((data) => {
+          setSongDatas((datas) => {
+            if (datas.has(id)) return datas;
+            let clone = new Map(datas);
+            clone.set(id, data);
+            return clone;
+          });
+        })
+        .catch((err) => console.error(err));
+    });
   }, [songs]);
 
   const playButtonOnClick = (index: number) => {
