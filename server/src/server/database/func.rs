@@ -142,7 +142,7 @@ fn save_song(song: &Song, conn: &Connection) {
     ));
 }
 
-pub fn store_audio_metadatas(audio_path: &str, conn: &Connection) -> bool {
+pub async fn store_audio_metadatas(audio_path: &str, conn: &Connection) -> bool {
     let audio_id = generate_audio_id(audio_path);
     if audio_id.is_empty() {
         eprintln!("Unable to read {audio_path}");
@@ -270,14 +270,15 @@ pub fn store_audio_metadatas(audio_path: &str, conn: &Connection) -> bool {
 }
 
 /// Search audio files inside folder and store metadatas into database
-pub fn scan_folder(src_path: &str, conn: &Connection) {
+pub async fn scan_folder(src_path: &str, conn: &Connection) {
     println!("{} Searching audio files", '\u{1F50E}');
     let files = scan_audio_files(src_path);
     let prog = ProgressBar::new(u64::try_from(files.len()).unwrap());
 
     println!("{} Fetching audio metadatas", '\u{1F4C3}');
     for file in files {
-        if !store_audio_metadatas(&file, &conn) {
+        let res = store_audio_metadatas(&file, &conn).await;
+        if !res {
             eprintln!("Failed to extract {file} metadatas");
         }
         prog.inc(1);
@@ -290,9 +291,9 @@ mod tests {
     use super::*;
     use std::env;
 
-    #[test]
     #[ignore]
-    fn fill_database() {
+    #[tokio::test]
+    async fn fill_database() {
         if let Ok(conn) = create_database(crate::consts::DATABASE) {
             scan_folder(
                 if env::consts::OS == "linux" {
@@ -301,7 +302,8 @@ mod tests {
                     "D:/FIT_Apprenti_Vague_006/music-player/client/public/test"
                 },
                 &conn,
-            );
+            )
+            .await;
         } else {
             panic!("Failed to connect to application database.");
         }

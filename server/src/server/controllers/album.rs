@@ -54,10 +54,6 @@ pub async fn get_album_songs(
     }
 
     let conn = get_db_conn!(data);
-    // let query = format!(
-    //     "SELECT id FROM song ORDER BY track_number WHERE (album = \"{}\")",
-    //     query.name.clone().unwrap()
-    // );
 
     let query = format!(
       "WITH subquery AS ( SELECT id, track_number FROM song WHERE album = \"{}\" ) SELECT id FROM subquery ORDER BY track_number",
