@@ -1,4 +1,5 @@
-use crate::{lyric_scraper, types::AppState};
+use std::sync::{Arc, Mutex};
+use crate::{lyric_scraper, types::AppState, get_app_state};
 use actix_web::{post, web, HttpResponse, Responder};
 use serde::Deserialize;
 
@@ -9,12 +10,13 @@ struct Query {
 }
 
 #[post("")]
-pub async fn get_lyrics(query: web::Json<Query>, data: web::Data<AppState>) -> impl Responder {
+pub async fn get_lyrics(query: web::Json<Query>, data: web::Data<Arc<Mutex<AppState>>>) -> impl Responder {
     if query.artist == None || query.song == None {
         HttpResponse::BadRequest().finish()
     } else {
-        let mut cache = data.lyrics_cache.lock().unwrap();
-        let mut lyrics: Option<String> = None;
+        let mut state = get_app_state!(data);
+        let cache = &mut state.lyrics_cache;
+        let lyrics: Option<String>;
 
         let artist = query.artist.clone().unwrap();
         let song = query.song.clone().unwrap();

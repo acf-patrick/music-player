@@ -1,10 +1,12 @@
-use crate::{get_db_conn, types::AppState};
+use crate::{get_app_state, types::AppState};
 use actix_web::{get, web, HttpResponse, Responder};
+use std::sync::{Arc, Mutex};
 
 #[get("")]
-pub async fn get_genres(data: web::Data<AppState>) -> impl Responder {
+pub async fn get_genres(data: web::Data<Arc<Mutex<AppState>>>) -> impl Responder {
+    let state = get_app_state!(data);
     let mut genres: Vec<String> = vec![];
-    let conn = get_db_conn!(data);
+    let conn = &state.db;
 
     match conn.prepare("SELECT DISTINCT genre FROM song") {
         Ok(mut stmt) => {

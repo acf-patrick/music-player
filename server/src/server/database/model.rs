@@ -33,9 +33,10 @@ pub struct Song {
     pub duration: Option<u64>, // Song duration in seconds
 }
 
-#[derive(Debug)]
-pub struct Playlist {
+#[derive(Debug, Deserialize)]
+pub struct PlaylistRecord {
     pub id: u8,
     pub name: String,
     pub song: String, // ID to one of song table record
+    pub song_index: u8, // Index of song in a row
 }

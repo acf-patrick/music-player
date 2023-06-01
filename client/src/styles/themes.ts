@@ -72,6 +72,9 @@ const themes = {
     margin: "0.5rem",
   },
   borderRadius: "10px",
+  fonts: {
+    popup: "0.625rem"
+  },
   sizes: {
     minWidth: "1280px",
     minHeight: "720px",

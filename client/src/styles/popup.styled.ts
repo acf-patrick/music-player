@@ -65,6 +65,10 @@ const StyledPopup = styled.div<{
   display: flex;
   flex-direction: column;
 
+  * {
+    font-size: ${({ theme }) => theme.fonts.popup};
+  }
+
   .list {
     overflow-y: auto;
 

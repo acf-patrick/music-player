@@ -1,11 +1,12 @@
-use crate::{get_db_conn, types::AppState};
+use crate::{get_app_state, types::AppState};
 use actix_web::{delete, get, post, web, HttpResponse, Responder};
-use rusqlite::Connection;
 use serde::Deserialize;
+use std::sync::{Arc, Mutex};
 
 #[get("")]
-pub async fn get_queue(data: web::Data<AppState>) -> impl Responder {
-    let conn = get_db_conn!(data);
+pub async fn get_queue(data: web::Data<Arc<Mutex<AppState>>>) -> impl Responder {
+    let data = get_app_state!(data);
+    let conn = &data.db;
 
     let res = match conn.prepare("SELECT song FROM queue") {
         Ok(mut stmt) => {
@@ -40,10 +41,11 @@ struct QueueQuery {
 /// Append song to current queue
 #[post("")]
 pub async fn add_to_queue(
-    data: web::Data<AppState>,
+    data: web::Data<Arc<Mutex<AppState>>>,
     body: web::Json<QueueQuery>,
 ) -> impl Responder {
-    let conn = get_db_conn!(data);
+    let data = get_app_state!(data);
+    let conn = &data.db;
 
     let res = match conn.execute("INSERT INTO queue(song) VALUES(?)", &[&body.id]) {
         Ok(_) => HttpResponse::Ok().body("Added to queue"),
@@ -58,10 +60,11 @@ pub async fn add_to_queue(
 /// Remove song from queue
 #[delete("/{song_id}")]
 pub async fn remove_from_queue(
-    data: web::Data<AppState>,
+    data: web::Data<Arc<Mutex<AppState>>>,
     song_id: web::Path<String>,
 ) -> impl Responder {
-    let conn = get_db_conn!(data);
+    let state = get_app_state!(data);
+    let conn = &state.db;
 
     let res = match conn.execute("DELETE FROM queue WHERE song =?", &[&song_id.to_owned()]) {
         Ok(_) => HttpResponse::Ok().body("Song removed from queue"),

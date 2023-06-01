@@ -192,9 +192,7 @@ function Queue({ songs, itemClass }: { songs: string[]; itemClass?: string }) {
         .then((data) => {
           setSongDatas((datas) => {
             if (datas.has(id)) return datas;
-            let clone = new Map(datas);
-            clone.set(id, data);
-            return clone;
+            return new Map(datas).set(id, data);
           });
         })
         .catch((err) => console.error(err));
