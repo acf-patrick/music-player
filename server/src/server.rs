@@ -10,10 +10,8 @@ use crate::consts;
 use crate::server::controllers::playback::{
     get_playback, pause, play, set_to_next_song, set_to_previous_song,
 };
-use crate::{
-    server::controllers::lyrics::get_lyrics,
-    types::AppState
-};
+use crate::server::controllers::status::get_app_status;
+use crate::{server::controllers::lyrics::get_lyrics, types::AppState};
 use controllers::{
     album::{get_album, get_album_songs, get_all_albums},
     artist::get_artists,
@@ -67,6 +65,7 @@ pub async fn start_server() -> std::io::Result<()> {
                     .service(pause)
                     .service(play),
             )
+            .service(web::scope("/status").service(get_app_status))
     })
     .bind(("127.0.0.1", consts::PORT))?
     .run()

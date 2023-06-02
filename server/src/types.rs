@@ -90,7 +90,7 @@ pub struct PlayingSong {
     pub paused: bool,
 }
 
-#[derive(Deserialize, Clone, PartialEq)]
+#[derive(Deserialize, Serialize, Clone, PartialEq)]
 pub enum SongSource {
     #[serde(rename = "album")]
     Album(String),
