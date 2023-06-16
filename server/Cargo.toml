@@ -20,15 +20,17 @@ sha256 = "1.1.3"
 serde = { version = "1.0", features = ["derive"] }
 tauri = { version = "1.2.4", features = ["dialog-open", "protocol-asset"] }
 tauri-api = "0.7.6"
-lofty = "0.13.0"
+lofty = "0.14.0"
 indicatif = "0.17.3"
 actix-web = "4"
 actix-cors = "0.6.4"
+actix-files = "0.6.2"
 serde_rusqlite = "0.33.1"
 scraper = "0.16.0"
 reqwest = { version = "0.11", features = ["json"] }
 tokio = { version = "1", features = ["full"] }
 unidecode = "0.3.0"
+uuid = { version = "1.3.3", features = ["v4", "serde"] }
 
 [dependencies.rusqlite]
 version = "0.29.0"

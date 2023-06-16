@@ -2,11 +2,20 @@ import { Song, Image, Album } from "./models";
 import { createDataUri } from ".";
 import api from "../api";
 
-const API = import.meta.env.API_ENDPOINT || "http://localhost:8000";
-
-export async function getSong(songId: string): Promise<Song> {
+// Get audio metadatas
+export async function getSongMetadatas(songId: string): Promise<Song> {
   const res = await api.get(`/song/${songId}`);
   return res.data;
+}
+
+// Get audio file
+export async function getAudio(songId: string) {
+  const res = await api.get(`/audio/${songId}`, { responseType: "blob" });
+  const blob: Blob = res.data;
+  return {
+    format: blob.type.split("/")[1],
+    url: URL.createObjectURL(blob),
+  };
 }
 
 export async function getImageData(id: string) {

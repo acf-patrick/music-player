@@ -7,3 +7,4 @@ pub mod song;
 pub mod lyrics;
 pub mod playback;
 pub mod status;
+pub mod audio;

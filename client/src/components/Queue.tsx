@@ -5,7 +5,7 @@ import { DatasContext, DataMutatorsContext, durationToString } from "../utils";
 import { BsFillPlayFill, BsPauseFill } from "react-icons/bs";
 import { GoKebabVertical } from "react-icons/go";
 import { Popup } from ".";
-import { getSong } from "../utils/providers";
+import { getSongMetadatas } from "../utils/providers";
 
 const StyledSong = styled.div`
   display: flex;
@@ -188,7 +188,7 @@ function Queue({ songs, itemClass }: { songs: string[]; itemClass?: string }) {
 
   useEffect(() => {
     songs.forEach((id) => {
-      getSong(id)
+      getSongMetadatas(id)
         .then((data) => {
           setSongDatas((datas) => {
             if (datas.has(id)) return datas;

@@ -16,7 +16,8 @@ export function useImage(coverId: string) {
   const [cover, setCover] = useState("");
   useEffect(() => {
     if (coverId)
-      api.get(`/image/${coverId}`)
+      api
+        .get(`/image/${coverId}`)
         .then((res) => res.data)
         .then((data: Image) => {
           const datas = data.data;
@@ -38,8 +39,8 @@ export function useSong(page: number) {
   useEffect(() => {
     if (page < totalPages) {
       setPending(true);
-      console.log(page);
-      api.get(`/song?page=${page}`)
+      api
+        .get(`/song?page=${page}`)
         .then((res) => {
           if (res.status === 200) return res.data;
           else {
@@ -47,7 +48,6 @@ export function useSong(page: number) {
           }
         })
         .then((data: Response) => {
-          console.log("here");
           setPending(false);
           setSongs(data.songs);
           setTotalItems(data.totalItems);
@@ -64,7 +64,8 @@ export function useArtists() {
   const [artists, setArtists] = useState<string[]>([]);
 
   useEffect(() => {
-    api.get(`/artists`)
+    api
+      .get(`/artists`)
       .then((res) => res.data)
       .then((data) => setArtists(data))
       .catch((error) => console.error(error));
@@ -89,7 +90,8 @@ export function useGenres() {
 export function useAlbum(name: string) {
   const [album, setAlbum] = useState<Album | null>(null);
   useEffect(() => {
-    api.get(`/album?name=${name}`)
+    api
+      .get(`/album?name=${name}`)
       .then((res) => res.data)
       .then((data) => {
         setAlbum(data[0]);
@@ -103,7 +105,8 @@ export function useAlbum(name: string) {
 export function useAlbums() {
   const [albums, setAlbums] = useState<Album[]>([]);
   useEffect(() => {
-    api.get(`/album/a`)
+    api
+      .get(`/album/a`)
       .then((res) => res.data)
       .then((data: Album[]) =>
         setAlbums(data.filter((album) => (album.title ? true : false)))
@@ -131,5 +134,5 @@ export function useQueue() {
     fetchQueue().then((ids) => setQueue(ids));
   }, []);
 
-  return queue;
+  return { queue, setQueue };
 }

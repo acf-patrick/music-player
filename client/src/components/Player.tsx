@@ -15,14 +15,11 @@ import {
 } from "react-icons/tb";
 import { useRef, useEffect, useState, useMemo, useContext } from "react";
 import styled, { keyframes } from "styled-components";
-import {
-  DataMutatorsContext,
-  DatasContext,
-  durationToString,
-} from "../utils";
+import { DataMutatorsContext, DatasContext, durationToString } from "../utils";
 import { StyledCover } from "../styles";
 import { Howl, Howler } from "howler";
 import { useImage } from "../utils/hook";
+import { getAudio } from "../utils/providers";
 
 const slideUp = keyframes`
   from {
@@ -100,7 +97,7 @@ const StyledContainer = styled.div`
     @media (max-width: 1428px) {
       max-width: 148px;
     }
-    
+
     max-width: 180px;
     white-space: nowrap;
 
@@ -195,8 +192,8 @@ function Player() {
     useContext(DatasContext);
   const { setPaused, setPlayingSongIndex } = useContext(DataMutatorsContext);
 
-  const slideRef = useRef<HTMLInputElement | null>(null);
-  const toolTipRef = useRef<HTMLDivElement | null>(null);
+  const slideRef = useRef<HTMLInputElement>(null);
+  const toolTipRef = useRef<HTMLDivElement>(null);
 
   const coverId = playingSong?.cover ? playingSong?.cover : "";
   const cover = useImage(coverId);
@@ -244,15 +241,22 @@ function Player() {
     setProgression(0);
 
     if (playingSong) {
-      Howler.unload();
-      const song = new Howl({
-        src: playingSong.path,
-        autoplay: true,
-        onload: (id) => {},
-        onloaderror: (id, error) => {},
-      });
-      setSong(song);
-      setPaused!(false);
+      getAudio(playingSong.id)
+        .then(({ format, url }) => {
+          Howler.unload();
+          const song = new Howl({
+            src: url,
+            autoplay: true,
+            onload: () => {
+              playingSong.duration = song.duration();
+            },
+            onloaderror: (id, error) => {},
+            format: format,
+          });
+          setSong(song);
+          setPaused!(false);
+        })
+        .catch((e) => console.error(e));
     }
   }, [playingSong]);
 

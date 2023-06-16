@@ -3,6 +3,7 @@ use indicatif::ProgressBar;
 use lofty::{Accessor, AudioFile, Picture, PictureType, Probe, TaggedFileExt};
 use rusqlite::{params, Connection, Error, Error::SqlInputError};
 use std::fs;
+use uuid::Uuid;
 
 use super::model::Song;
 
@@ -133,20 +134,17 @@ fn save_song(song: &Song, conn: &Connection) {
 }
 
 pub fn store_audio_metadatas(audio_path: &str, conn: &Connection) -> bool {
-    let audio_id = generate_audio_id(audio_path);
-    if audio_id.is_empty() {
-        eprintln!("Unable to read {audio_path}");
-        return false;
-    }
+    let audio_id = Uuid::new_v4().to_string();
 
     let mut path = String::new();
-    if let Some(back_slash) = audio_path.find("public") {
-        for i in (back_slash + 6)..audio_path.len() {
-            path.push(char::from(audio_path.as_bytes()[i]));
-        }
-    } else {
-        path = audio_path.to_owned();
-    }
+    // if let Some(back_slash) = audio_path.find("public") {
+    //     for i in (back_slash + 6)..audio_path.len() {
+    //         path.push(char::from(audio_path.as_bytes()[i]));
+    //     }
+    // } else {
+    //     path = audio_path.to_owned();
+    // }
+    path = String::from(audio_path);
 
     let mut song = Song {
         id: audio_id.clone(),
@@ -162,12 +160,35 @@ pub fn store_audio_metadatas(audio_path: &str, conn: &Connection) -> bool {
         duration: None,
     };
 
-    let tagged = Probe::open(audio_path)
-        .expect(&format!("{audio_path} invaid path."))
-        .read()
-        .expect("Unable to open {audio_path}");
+    let tagged: Option<lofty::TaggedFile>;
 
-    if let Some(tags) = tagged.primary_tag() {
+    if let Ok(file) = Probe::open(audio_path) {
+        match file.read() {
+            Ok(tagged_file) => {
+                tagged = Some(tagged_file);
+            }
+            Err(error) => {
+                eprintln!("{error}");
+                tagged = None;
+            }
+        }
+    } else {
+        eprintln!("{audio_path} invalid path.");
+        return false;
+    }
+
+    let tags: Option<lofty::Tag>;
+    if let Some(tagged) = &tagged {
+        if let Some(primary_tag) = tagged.primary_tag() {
+            tags = Some(primary_tag.clone());
+        } else {
+            tags = None;
+        }
+    } else {
+        tags = None;
+    }
+
+    if let Some(tags) = tags {
         if let Some(year) = tags.year() {
             song.year = Some(year);
         }
@@ -199,7 +220,7 @@ pub fn store_audio_metadatas(audio_path: &str, conn: &Connection) -> bool {
             song.album = Some(album.to_string());
         }
 
-        let duration = tagged.properties().duration();
+        let duration = tagged.unwrap().properties().duration();
         song.duration = Some(duration.as_secs());
 
         let pics = tags.pictures();
@@ -232,13 +253,21 @@ pub fn store_audio_metadatas(audio_path: &str, conn: &Connection) -> bool {
 
         save_song(&song, conn);
     } else {
-        let mut title = String::new();
+        let title: String;
         if let Some(i) = audio_path.rfind("\\") {
             title = audio_path[(i + 1)..].to_string();
         } else {
             let i = audio_path.rfind("/").unwrap();
             title = audio_path[(i + 1)..].to_string();
         }
+
+        let duration: Option<u64>;
+        if let Some(tagged) = tagged {
+            duration = Some(tagged.properties().duration().as_secs());
+        } else {
+            duration = None;
+        }
+
         let song = Song {
             id: audio_id,
             path,
@@ -250,7 +279,7 @@ pub fn store_audio_metadatas(audio_path: &str, conn: &Connection) -> bool {
             genre: None,
             track_number: None,
             cover: None,
-            duration: None,
+            duration,
         };
         save_song(&song, &conn);
         println!("{audio_path} : no tags to read.");

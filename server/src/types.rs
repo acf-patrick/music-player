@@ -32,9 +32,17 @@ pub mod cache {
     }
 }
 
+#[derive(Serialize, Clone)]
+pub enum RepeatMode {
+    NoRepeat,
+    Once,
+    Indefinitely,
+}
+
 pub struct AppState {
     playing_song: PlayingSong,
     song_source: Option<SongSource>,
+    repeat_mode: RepeatMode,
     pub image_cache: cache::Image,
     pub song_cache: cache::Song,
     pub lyrics_cache: cache::Lyrics,
@@ -48,6 +56,7 @@ impl AppState {
                 index: -1,
                 paused: true,
             },
+            repeat_mode: RepeatMode::NoRepeat,
             image_cache: cache::Image {
                 id: None,
                 data: None,
@@ -64,6 +73,14 @@ impl AppState {
             song_source: None,
             db: Connection::open(consts::DATABASE).expect("Can not connect to database."),
         }
+    }
+
+    pub fn set_repeat_mode(&mut self, repeat_mode: RepeatMode) {
+        self.repeat_mode = repeat_mode;
+    }
+
+    pub fn get_repeat_mode(&self) -> RepeatMode {
+        self.repeat_mode.clone()
     }
 
     pub fn set_song_source(&mut self, source: Option<SongSource>) {

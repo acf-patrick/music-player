@@ -7,6 +7,7 @@ use actix_cors::Cors;
 use actix_web::{get, web, App, HttpServer};
 
 use crate::consts;
+use crate::server::controllers::audio::get_audio;
 use crate::server::controllers::playback::{
     get_playback, pause, play, set_to_next_song, set_to_previous_song,
 };
@@ -66,6 +67,7 @@ pub async fn start_server() -> std::io::Result<()> {
                     .service(play),
             )
             .service(web::scope("/status").service(get_app_status))
+            .service(web::scope("/audio").service(get_audio))
     })
     .bind(("127.0.0.1", consts::PORT))?
     .run()

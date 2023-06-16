@@ -6,10 +6,8 @@ import { Queue, Player, PlayButton } from "../../components";
 import { useImage, useQueue } from "../../utils/hook";
 
 function Content() {
-  const { playingSong, paused } = useContext(DatasContext);
+  const { queue, playingSong, paused } = useContext(DatasContext);
   const { setPlayingSongIndex, setPaused } = useContext(DataMutatorsContext);
-
-  const queue = useQueue();
 
   const coverId = playingSong?.cover ? playingSong?.cover : "";
   const cover = useImage(coverId);

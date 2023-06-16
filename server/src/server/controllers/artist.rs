@@ -11,8 +11,8 @@ pub async fn get_artists(data: web::Data<Arc<Mutex<AppState>>>) -> impl Responde
     match conn.prepare("SELECT DISTINCT artist FROM song") {
         Ok(mut stmt) => {
             if let Ok(iter) = stmt.query_map([], |row| {
-                let genre: String = row.get(0)?;
-                Ok(genre)
+                let artist: String = row.get(0)?;
+                Ok(artist)
             }) {
                 for artist in iter {
                     if let Ok(artist) = artist {
