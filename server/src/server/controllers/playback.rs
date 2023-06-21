@@ -7,6 +7,7 @@ use rusqlite::{params, Connection};
 use serde::Deserialize;
 use serde_rusqlite::from_rows;
 use std::sync::{Arc, Mutex};
+use uuid::Uuid;
 
 #[get("")]
 pub async fn get_playback(data: web::Data<Arc<Mutex<AppState>>>) -> impl Responder {
@@ -77,15 +78,45 @@ pub async fn play(data: web::Data<Arc<Mutex<AppState>>>) -> impl Responder {
     HttpResponse::Ok().finish()
 }
 
-#[derive(Deserialize)]
-struct ReqBody {
-    song_index: i16,
-    source: Option<SongSource>,
+#[derive(Deserialize, Debug)]
+#[serde(tag = "source")]
+enum SongDto {
+    #[serde(rename = "queue")]
+    FromQueue { index: usize },
+
+    #[serde(rename = "new")]
+    FromNewSource { index: usize, provider: SongSource },
+
+    #[serde(rename = "none")]
+    None { id: Uuid },
 }
 
-#[derive(Deserialize)]
-struct Row {
-    id: String,
+#[post("/play")]
+pub async fn play_song(
+    req_body: web::Json<SongDto>,
+    data: web::Data<Arc<Mutex<AppState>>>,
+) -> impl Responder {
+    let mut state = get_app_state!(data);
+
+    match req_body.0 {
+        SongDto::FromNewSource { index, provider } => {
+          match provider {
+            SongSource::Album(source) => {
+
+            }
+
+            SongSource::Playlist(source) => {
+              
+            }
+          }
+        }
+
+        SongDto::FromQueue { index } => {}
+
+        SongDto::None { id } => {}
+    }
+
+    ""
 }
 
 /// Play n-th song in a given source.

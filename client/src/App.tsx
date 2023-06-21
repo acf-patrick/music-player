@@ -1,14 +1,14 @@
-import { useEffect, useState } from "react";
+import { useEffect, useReducer, useState } from "react";
 import { RouterProvider } from "react-router-dom";
-import { DatasContext, DataMutatorsContext } from "./utils";
 
 import { StyledAppContainer } from "./styles";
 import { Song } from "./utils/models";
 import { ThemeProvider } from "styled-components";
 import { router } from "./router";
 import themes from "./styles/themes";
-import { useQueue } from "./utils/hook";
-import { getSongMetadatas } from "./utils/providers";
+import { getSongMetadatas, getQueue } from "./utils/providers";
+import { AppContext } from "./context";
+import reducer from "./reducer";
 
 // Set global volume to 50% by default
 Howler.volume(0);
@@ -18,6 +18,28 @@ function App() {
   const [paused, setPaused] = useState<boolean>(true);
   const [playingSong, setPlayingSong] = useState<Song | null>(null);
   const [playingSongIndex, setPlayingSongIndex] = useState(-1);
+
+  const [state, dispatch] = useReducer(reducer, {
+    paused: true,
+    playingSong: {
+      index: -1,
+      metadatas: null,
+    },
+    queue: [],
+  });
+
+  useEffect(() => {
+    getQueue().then((queue) => dispatch({ type: "set queue", queue }));
+  }, []);
+
+  useEffect(() => {
+    const index = state.playingSong.index;
+    if (index >= 0 && state.queue.length) {
+      getSongMetadatas(state.queue[index]).then((song) =>
+        dispatch({ type: "fetch success", payload: song })
+      );
+    }
+  }, [state.playingSong, state.queue]);
 
   return (
     <DatasContext.Provider
@@ -50,7 +72,9 @@ function App() {
       >
         <ThemeProvider theme={themes}>
           <StyledAppContainer>
-            <RouterProvider router={router} />
+            <AppContext.Provider value={{ state, dispatch }}>
+              <RouterProvider router={router} />
+            </AppContext.Provider>
           </StyledAppContainer>
         </ThemeProvider>
       </DataMutatorsContext.Provider>

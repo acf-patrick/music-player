@@ -1,15 +1,4 @@
-import { createContext } from "react";
-import { IDataList, IDataMutatorList } from "./models";
-
 export { default as createColorPalette } from "./colors";
-
-export const DatasContext = createContext<IDataList>({
-  queue: [],
-  playingSong: null,
-  playingSongIndex: -1,
-});
-
-export const DataMutatorsContext = createContext<IDataMutatorList>({});
 
 // Convert number of seconds to hh:mm:ss
 export function durationToString(duration: number, withLeadingZero = true) {

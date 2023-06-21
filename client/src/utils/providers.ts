@@ -2,6 +2,12 @@ import { Song, Image, Album } from "./models";
 import { createDataUri } from ".";
 import api from "../api";
 
+// Get list of song IDs in current queue
+export async function getQueue(): Promise<string[]> {
+  const res = await api.get("/queue");
+  return res.data;
+}
+
 // Get audio metadatas
 export async function getSongMetadatas(songId: string): Promise<Song> {
   const res = await api.get(`/song/${songId}`);

@@ -1,7 +1,8 @@
+use actix::{Actor, Addr};
 use rusqlite::Connection;
 use serde::{Deserialize, Serialize};
 
-use crate::consts;
+use crate::{consts, server::web_socket::lobby::Lobby};
 
 #[macro_export]
 macro_rules! get_app_state {
@@ -15,16 +16,19 @@ macro_rules! get_app_state {
 pub mod cache {
     use crate::server::database::model;
 
+    #[derive(Clone)]
     pub struct Image {
         pub id: Option<String>,
         pub data: Option<model::Image>,
     }
 
+    #[derive(Clone)]
     pub struct Song {
         pub query: Option<String>,
         pub result: Vec<model::Song>,
     }
 
+    #[derive(Clone)]
     pub struct Lyrics {
         pub artist: Option<String>,
         pub song: Option<String>,
@@ -43,6 +47,7 @@ pub struct AppState {
     playing_song: PlayingSong,
     song_source: Option<SongSource>,
     repeat_mode: RepeatMode,
+    pub ws_server: Option<Addr<Lobby>>,
     pub image_cache: cache::Image,
     pub song_cache: cache::Song,
     pub lyrics_cache: cache::Lyrics,
@@ -71,6 +76,7 @@ impl AppState {
                 lyrics: String::new(),
             },
             song_source: None,
+            ws_server: None,
             db: Connection::open(consts::DATABASE).expect("Can not connect to database."),
         }
     }
@@ -107,7 +113,8 @@ pub struct PlayingSong {
     pub paused: bool,
 }
 
-#[derive(Deserialize, Serialize, Clone, PartialEq)]
+#[derive(Deserialize, Serialize, Debug, Clone, PartialEq)]
+#[serde(tag = "type", content = "name")]
 pub enum SongSource {
     #[serde(rename = "album")]
     Album(String),

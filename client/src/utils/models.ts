@@ -1,22 +1,4 @@
-import { CSSProperties } from "styled-components";
-
-export type PopupOption = {
-  text: string;
-  callback?: () => void;
-  options?: IPopupProps;
-  styles?: CSSProperties; // Applied when Option is on hover
-};
-
-export interface IPopupProps {
-  options: PopupOption[];
-  searchbar?: string; // Placeholder text for a searchbar
-  separators?: number[]; // Option index where to place separator after
-}
-
-export enum AlbumAppearance {
-  WithThumbnail,
-  GridCell,
-}
+import { AlbumAppearance } from "./types";
 
 export interface Song {
   id: string;
@@ -32,15 +14,6 @@ export interface Song {
   duration: number;
 }
 
-export const SongSortOptions = [
-  "title",
-  "duration",
-  "album",
-  "artist",
-  "genre",
-  "year",
-] as const;
-
 export interface Album {
   title: string;
   artists?: string[];
@@ -55,20 +28,4 @@ export interface Image {
   id: string;
   mime_type: string;
   data: number[];
-}
-
-export const AlbumSortOptions = ["name", "artist", "duration"] as const;
-
-export interface IDataList {
-  queue: string[]; // List of played songs
-  playingSong: Song | null; // Currently playing song
-  playingSongIndex: number; // Index of currently playing song in current queue
-  paused?: boolean; // true if current selected song has been paused
-}
-
-export interface IDataMutatorList {
-  setQueue?: (songIds: string[]) => void;
-  setPlayingSongIndex?: (index: number) => void;
-  setPlayingSong?: (song: Song | null) => void;
-  setPaused?: (paused: boolean) => void;
 }

@@ -22,6 +22,8 @@ tauri = { version = "1.2.4", features = ["dialog-open", "protocol-asset"] }
 tauri-api = "0.7.6"
 lofty = "0.14.0"
 indicatif = "0.17.3"
+actix = "0.13"
+actix-web-actors = "4.1"
 actix-web = "4"
 actix-cors = "0.6.4"
 actix-files = "0.6.2"

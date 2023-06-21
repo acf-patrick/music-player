@@ -1,25 +1,27 @@
 pub mod controllers;
 pub mod database;
+pub mod web_socket;
 
 use std::sync::{Arc, Mutex};
 
+use actix::Actor;
 use actix_cors::Cors;
 use actix_web::{get, web, App, HttpServer};
 
-use crate::consts;
-use crate::server::controllers::audio::get_audio;
-use crate::server::controllers::playback::{
-    get_playback, pause, play, set_to_next_song, set_to_previous_song,
-};
-use crate::server::controllers::status::get_app_status;
-use crate::{server::controllers::lyrics::get_lyrics, types::AppState};
+use crate::server::web_socket::lobby::Lobby;
+use crate::types::AppState;
+use crate::{consts, server::web_socket::start_ws_connection};
 use controllers::{
     album::{get_album, get_album_songs, get_all_albums},
     artist::get_artists,
+    audio::get_audio,
     genre::get_genres,
     image::get_image,
+    lyrics::get_lyrics,
+    playback::{get_playback, pause, play, play_song, set_to_next_song, set_to_previous_song},
     queue::{add_to_queue, get_queue, remove_from_queue},
     song::{get_one_song, get_song},
+    status::get_app_status,
 };
 
 #[get("/")]
@@ -29,7 +31,7 @@ async fn index() -> String {
 
 pub async fn start_server() -> std::io::Result<()> {
     println!("🚀 Server running on port {}", consts::PORT);
-
+    
     let app_state = web::Data::new(Arc::new(Mutex::new(AppState::new())));
 
     HttpServer::new(move || {
@@ -37,10 +39,12 @@ pub async fn start_server() -> std::io::Result<()> {
             .allow_any_origin()
             .allow_any_method()
             .allow_any_header();
+
         App::new()
             .wrap(cors)
             .app_data(app_state.clone())
             .service(index)
+            .service(start_ws_connection)
             .service(web::scope("/genres").service(get_genres))
             .service(web::scope("/artists").service(get_artists))
             .service(
@@ -64,7 +68,8 @@ pub async fn start_server() -> std::io::Result<()> {
                     .service(set_to_next_song)
                     .service(set_to_previous_song)
                     .service(pause)
-                    .service(play),
+                    .service(play)
+                    .service(play_song),
             )
             .service(web::scope("/status").service(get_app_status))
             .service(web::scope("/audio").service(get_audio))

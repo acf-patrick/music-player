@@ -116,23 +116,3 @@ export function useAlbums() {
 
   return albums;
 }
-
-export function useQueue() {
-  const [queue, setQueue] = useState<string[]>([]);
-  useEffect(() => {
-    const fetchQueue = async () => {
-      try {
-        const res = await api.get(`/queue`);
-        const data: string[] = res.data;
-        return data;
-      } catch (e) {
-        console.error(e);
-      }
-      return [];
-    };
-
-    fetchQueue().then((ids) => setQueue(ids));
-  }, []);
-
-  return { queue, setQueue };
-}
