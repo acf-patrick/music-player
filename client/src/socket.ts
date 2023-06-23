@@ -2,6 +2,7 @@ type Event = {
   event: string;
   targets: string[];
   data: any;
+  broadcast: boolean; // true : omit self from targets
 };
 
 type Callback = (data?: any) => void;
@@ -14,6 +15,7 @@ class WebSocketConnection {
   private id = "";
   private reservedEvent = ["connection", "disconnection", "join", "leave"];
   private lastUrl = "";
+  private considerAsTarget = true;
 
   constructor(url: string) {
     this.targets = [];
@@ -86,6 +88,11 @@ class WebSocketConnection {
     };
   }
 
+  broadcast() {
+    this.considerAsTarget = false;
+    return this;
+  }
+
   to(target: string) {
     this.targets.push(target);
     return this;
@@ -105,10 +112,10 @@ class WebSocketConnection {
         event: event,
         data: data,
         targets: this.targets,
+        broadcast: !this.considerAsTarget
       };
       console.log(msg);
       this.socket.send(JSON.stringify(msg));
-      this.targets = [];
     } else {
       throw Error("Disconnected to web socket server.");
     }
@@ -121,6 +128,8 @@ class WebSocketConnection {
     }
 
     this.upgradedEmit(event, data);
+    this.targets = [];
+    this.considerAsTarget = true;
   }
 
   once(event: string, callback: Callback) {

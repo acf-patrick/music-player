@@ -13,7 +13,7 @@ use super::{
     messages::{ClientActorMessage, Connect, Disconnect, WebSocketMessage},
 };
 
-const CHECK_HEARTBEAT: bool = false;
+const CHECK_HEARTBEAT: bool = true;
 const HEARTBEAT_INTERVAL: Duration = Duration::from_secs(5);
 const CLIENT_TIMEOUT: Duration = Duration::from_secs(10);
 

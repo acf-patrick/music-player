@@ -4,11 +4,9 @@ pub mod web_socket;
 
 use std::sync::{Arc, Mutex};
 
-use actix::Actor;
 use actix_cors::Cors;
 use actix_web::{get, web, App, HttpServer};
 
-use crate::server::web_socket::lobby::Lobby;
 use crate::types::AppState;
 use crate::{consts, server::web_socket::start_ws_connection};
 use controllers::{
@@ -31,7 +29,7 @@ async fn index() -> String {
 
 pub async fn start_server() -> std::io::Result<()> {
     println!("🚀 Server running on port {}", consts::PORT);
-    
+
     let app_state = web::Data::new(Arc::new(Mutex::new(AppState::new())));
 
     HttpServer::new(move || {

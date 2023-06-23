@@ -63,6 +63,7 @@ impl Lobby {
             event: String::from(event),
             data,
             targets: vec![],
+            broadcast: false,
         };
         self.send_message(&json!(event).to_string(), id_to);
     }
@@ -227,7 +228,7 @@ impl Handler<ClientActorMessage> for Lobby {
                     for room in rooms {
                         if let Some(users) = self.rooms.get(&room) {
                             for target_id in users {
-                                if *target_id != msg.id {
+                                if !event.broadcast || (event.broadcast && *target_id != msg.id) {
                                     self.send_event(&event.event, event.data.clone(), target_id);
                                 }
                             }
@@ -243,7 +244,8 @@ impl Handler<ClientActorMessage> for Lobby {
                             let room = target;
                             if let Some(users) = self.rooms.get(&room) {
                                 for target_id in users {
-                                    if *target_id != msg.id {
+                                    if !event.broadcast || (event.broadcast && *target_id != msg.id)
+                                    {
                                         self.send_event(
                                             &event.event,
                                             event.data.clone(),

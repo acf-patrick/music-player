@@ -1,5 +1,5 @@
 pub mod lobby;
-mod messages;
+pub mod messages;
 mod ws;
 
 use crate::get_app_state;

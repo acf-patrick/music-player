@@ -40,23 +40,25 @@ export type AppState = {
   queue: string[];
 };
 
+export type SongDto =
+  | {
+      source: "queue";
+      index: number;
+    }
+  | {
+      source: "new";
+      index: number;
+      provider: { type: "album" | "playlist"; name: string };
+    }
+  | {
+      source: "none";
+      id: string;
+    };
+
 export type Action =
   | {
       type: "play";
-      song:
-        | {
-            source: "queue";
-            index: number;
-          }
-        | {
-            source: "new";
-            index: number;
-            provider: { type: "album" | "playlist"; name: string };
-          }
-        | {
-            source: "none";
-            id: string;
-          };
+      song: SongDto;
     }
   | {
       type: "fetch success";

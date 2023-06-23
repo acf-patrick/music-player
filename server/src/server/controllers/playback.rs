@@ -2,8 +2,8 @@ use crate::{
     get_app_state,
     types::{AppState, PlayingSong, SongSource},
 };
+
 use actix_web::{get, post, web, HttpResponse, Responder};
-use rusqlite::{params, Connection};
 use serde::Deserialize;
 use serde_rusqlite::from_rows;
 use std::sync::{Arc, Mutex};
@@ -18,6 +18,7 @@ pub async fn get_playback(data: web::Data<Arc<Mutex<AppState>>>) -> impl Respond
 
 #[derive(Deserialize)]
 struct QueueRow {
+    #[allow(dead_code)]
     id: u32,
     song: String,
 }
@@ -80,7 +81,7 @@ pub async fn play(data: web::Data<Arc<Mutex<AppState>>>) -> impl Responder {
 
 #[derive(Deserialize, Debug)]
 #[serde(tag = "source")]
-enum SongDto {
+pub enum SongDto {
     #[serde(rename = "queue")]
     FromQueue { index: usize },
 
@@ -96,25 +97,19 @@ pub async fn play_song(
     req_body: web::Json<SongDto>,
     data: web::Data<Arc<Mutex<AppState>>>,
 ) -> impl Responder {
-    let mut state = get_app_state!(data);
+    // let mut state = get_app_state!(data);
 
-    match req_body.0 {
-        SongDto::FromNewSource { index, provider } => {
-          match provider {
-            SongSource::Album(source) => {
+    // match req_body.0 {
+    //     SongDto::FromNewSource { index, provider } => match provider {
+    //         SongSource::Album(source) => {}
 
-            }
+    //         SongSource::Playlist(source) => {}
+    //     },
 
-            SongSource::Playlist(source) => {
-              
-            }
-          }
-        }
+    //     SongDto::FromQueue { index } => {}
 
-        SongDto::FromQueue { index } => {}
-
-        SongDto::None { id } => {}
-    }
+    //     SongDto::None { id } => {}
+    // }
 
     ""
 }

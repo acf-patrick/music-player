@@ -35,4 +35,5 @@ pub struct EventMessage<T> {
     pub event: String,
     pub data: T,
     pub targets: Vec<String>,
+    pub broadcast: bool, // true : omit self from targets
 }
