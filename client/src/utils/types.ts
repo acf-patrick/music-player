@@ -61,8 +61,12 @@ export type Action =
       song: SongDto;
     }
   | {
-      type: "fetch success";
+      type: "resume";
+    }
+  | {
+      type: "fetch playing song success";
       payload: Song;
     }
   | { type: "pause" }
-  | { type: "set queue"; queue: string[] };
+  | { type: "fetch queue success"; payload: string[] }
+  | { type: "set playing song index"; index: number };

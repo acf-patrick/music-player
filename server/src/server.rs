@@ -7,8 +7,7 @@ use std::sync::{Arc, Mutex};
 use actix_cors::Cors;
 use actix_web::{get, web, App, HttpServer};
 
-use crate::types::AppState;
-use crate::{consts, server::web_socket::start_ws_connection};
+use crate::{consts, types::AppState};
 use controllers::{
     album::{get_album, get_album_songs, get_all_albums},
     artist::get_artists,
@@ -20,6 +19,7 @@ use controllers::{
     queue::{add_to_queue, get_queue, remove_from_queue},
     song::{get_one_song, get_song},
     status::get_app_status,
+    ws::start_ws_connection,
 };
 
 #[get("/")]
@@ -42,7 +42,6 @@ pub async fn start_server() -> std::io::Result<()> {
             .wrap(cors)
             .app_data(app_state.clone())
             .service(index)
-            .service(start_ws_connection)
             .service(web::scope("/genres").service(get_genres))
             .service(web::scope("/artists").service(get_artists))
             .service(
@@ -71,8 +70,9 @@ pub async fn start_server() -> std::io::Result<()> {
             )
             .service(web::scope("/status").service(get_app_status))
             .service(web::scope("/audio").service(get_audio))
+            .service(start_ws_connection)
     })
-    .bind(("127.0.0.1", consts::PORT))?
+    .bind(("0.0.0.0", consts::PORT))?
     .run()
     .await
 }

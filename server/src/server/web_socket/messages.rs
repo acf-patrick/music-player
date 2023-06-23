@@ -34,6 +34,10 @@ pub struct ClientActorMessage {
 pub struct EventMessage<T> {
     pub event: String,
     pub data: T,
+
+    #[serde(default)]
     pub targets: Vec<String>,
+
+    #[serde(default)]
     pub broadcast: bool, // true : omit self from targets
 }

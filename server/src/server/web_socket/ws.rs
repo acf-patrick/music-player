@@ -36,7 +36,7 @@ impl WebSocketConn {
         if CHECK_HEARTBEAT {
             ctx.run_interval(HEARTBEAT_INTERVAL, |actor, ctx| {
                 if Instant::now().duration_since(actor.hb) > CLIENT_TIMEOUT {
-                    println!("Disconnecting failed heartbeat");
+                    println!("{} : Disconnecting failed heartbeat", actor.id);
                     actor.lobby_addr.do_send(Disconnect { id: actor.id });
                     ctx.stop();
                     return;

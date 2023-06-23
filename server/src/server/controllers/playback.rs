@@ -3,7 +3,7 @@ use crate::{
     types::{AppState, PlayingSong, SongSource},
 };
 
-use actix_web::{get, post, web, HttpResponse, Responder};
+use actix_web::{get, post, web, HttpRequest, HttpResponse, Responder};
 use serde::Deserialize;
 use serde_rusqlite::from_rows;
 use std::sync::{Arc, Mutex};
@@ -96,6 +96,7 @@ pub enum SongDto {
 pub async fn play_song(
     req_body: web::Json<SongDto>,
     data: web::Data<Arc<Mutex<AppState>>>,
+    req: HttpRequest,
 ) -> impl Responder {
     // let mut state = get_app_state!(data);
 

@@ -15,7 +15,8 @@ import {
 } from "react-icons/tb";
 import { useRef, useEffect, useState, useMemo, useContext } from "react";
 import styled, { keyframes } from "styled-components";
-import { DataMutatorsContext, DatasContext, durationToString } from "../utils";
+import { durationToString } from "../utils";
+import { AppContext } from "../context";
 import { StyledCover } from "../styles";
 import { Howl, Howler } from "howler";
 import { useImage } from "../utils/hook";
@@ -188,13 +189,12 @@ const StyledContainer = styled.div`
 let playerTimerHandle = 0;
 
 function Player() {
-  const { paused, queue, playingSong, playingSongIndex } =
-    useContext(DatasContext);
-  const { setPaused, setPlayingSongIndex } = useContext(DataMutatorsContext);
+  const { state, dispatch } = useContext(AppContext);
 
   const slideRef = useRef<HTMLInputElement>(null);
   const toolTipRef = useRef<HTMLDivElement>(null);
 
+  const playingSong = state.playingSong.metadatas;
   const coverId = playingSong?.cover ? playingSong?.cover : "";
   const cover = useImage(coverId);
 
@@ -253,7 +253,7 @@ function Player() {
             onloaderror: (id, error) => {},
             format: format,
           });
-          setSong(song);
+          setSong(song); /// TODO here
           setPaused!(false);
         })
         .catch((e) => console.error(e));
