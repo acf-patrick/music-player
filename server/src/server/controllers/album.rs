@@ -7,7 +7,7 @@ use std::sync::{Arc, Mutex};
 use crate::{get_app_state, server::database::model::Album, types::AppState};
 
 #[derive(Deserialize)]
-struct AlbumQuery {
+pub struct AlbumQuery {
     name: Option<String>,
     artist: Option<String>,
 }

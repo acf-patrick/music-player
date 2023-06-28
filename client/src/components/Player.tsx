@@ -194,7 +194,9 @@ function Player() {
   const slideRef = useRef<HTMLInputElement>(null);
   const toolTipRef = useRef<HTMLDivElement>(null);
 
+  // state.playingSong.metadatas
   const playingSong = state.playingSong.metadatas;
+
   const coverId = playingSong?.cover ? playingSong?.cover : "";
   const cover = useImage(coverId);
 
@@ -254,7 +256,7 @@ function Player() {
             format: format,
           });
           setSong(song); /// TODO here
-          setPaused!(false);
+          dispatch({ type: "resume" });
         })
         .catch((e) => console.error(e));
     }
@@ -262,17 +264,17 @@ function Player() {
 
   useEffect(() => {
     if (progression >= playingSong!.duration) {
-      if (playingSongIndex < queue.length - 1) {
-        setPlayingSongIndex!(playingSongIndex + 1);
-      } else {
-        setPaused!(true);
+      if (state.playingSong.index >= state.queue.length) {
+        dispatch({ type: "pause" });
         setProgression(0);
+      } else {
+        dispatch({ type: "next song" });
       }
     }
   }, [progression]);
 
   useEffect(() => {
-    if (paused) {
+    if (state.paused) {
       clearInterval(playerTimerHandle);
       playerTimerHandle = 0;
       song?.pause();
@@ -280,7 +282,7 @@ function Player() {
       updateProgression();
       song?.play();
     }
-  }, [paused]);
+  }, [state.paused]);
 
   const sliderOnClick = (e: React.FormEvent<HTMLInputElement>) => {
     const input = e.target as HTMLInputElement;
@@ -383,27 +385,27 @@ function Player() {
         <div className="buttons">
           <button
             onClick={() => {
-              setPlayingSongIndex!(playingSongIndex - 1);
+              dispatch({ type: "prev song" });
             }}
-            disabled={playingSongIndex === 0}
-            title={playingSongIndex > 0 ? "" : "No previous song"}
+            disabled={state.playingSong.index === 0}
+            title={state.playingSong.index > 0 ? "" : "No previous song"}
           >
             <TbPlayerTrackPrevFilled />
           </button>
           <button
             onClick={() => {
-              setPaused!(!paused);
+              dispatch({ type: "resume" });
             }}
           >
-            {paused ? <TbPlayerPlayFilled /> : <TbPlayerPauseFilled />}
+            {state.paused ? <TbPlayerPlayFilled /> : <TbPlayerPauseFilled />}
           </button>
           <button
             onClick={() => {
-              setPlayingSongIndex!(playingSongIndex + 1);
+              dispatch({ type: "next song" });
             }}
-            disabled={playingSongIndex === queue.length - 1}
+            disabled={state.playingSong.index === state.queue.length - 1}
             title={
-              playingSongIndex < queue.length - 1
+              state.playingSong.index < state.queue.length - 1
                 ? ""
                 : "Reached end of the queue"
             }

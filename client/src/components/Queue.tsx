@@ -1,11 +1,13 @@
 import { useContext, useEffect, useState, FC, useMemo } from "react";
 import styled from "styled-components";
-import { Song as Audio, PopupOption } from "../utils/models";
-import { DatasContext, DataMutatorsContext, durationToString } from "../utils";
+import { Song as Audio } from "../utils/models";
+import { PopupOption } from "../utils/types";
+import { durationToString } from "../utils";
 import { BsFillPlayFill, BsPauseFill } from "react-icons/bs";
 import { GoKebabVertical } from "react-icons/go";
 import { Popup } from ".";
 import { getSongMetadatas } from "../utils/providers";
+import { AppContext } from "../context";
 
 const StyledSong = styled.div`
   display: flex;
@@ -74,16 +76,16 @@ const Song: FC<{
     },
   ];
 
-  const { paused, playingSong, playingSongIndex } = useContext(DatasContext);
-  const { setPlayingSongIndex, setPaused } = useContext(DataMutatorsContext);
+  const { state, dispatch } = useContext(AppContext);
+
   const [contextMenu, setContextMenu] = useState(false);
 
   const playButtonOnClick = (index: number) => {
-    const song = queue[index];
-    setPlayingSongIndex!(index);
-    if (playingSong) {
-      setPaused!(song.id === playingSong.id ? !paused : false);
-    } else setPaused!(false);
+    if (index === state.playingSong.index) {
+      dispatch({ type: state.paused ? "resume" : "pause" });
+    } else {
+      dispatch({ type: "play", song: { source: "queue", index: index } });
+    }
   };
 
   const menuButtonOnClick = () => {
@@ -98,8 +100,8 @@ const Song: FC<{
             playButtonOnClick(index);
           }}
         >
-          {playingSongIndex === index ? (
-            paused ? (
+          {state.playingSong.index === index ? (
+            state.paused ? (
               <BsFillPlayFill />
             ) : (
               <BsPauseFill />
@@ -174,10 +176,11 @@ const StyledContainer = styled.div`
 `;
 
 function Queue({ songs, itemClass }: { songs: string[]; itemClass?: string }) {
-  const { playingSong, playingSongIndex, paused } = useContext(DatasContext);
-  const { setPlayingSongIndex, setPaused } = useContext(DataMutatorsContext);
+  const { state, dispatch } = useContext(AppContext);
 
+  // song ID -> song metadatas
   const [songDatas, setSongDatas] = useState<Map<string, Audio>>(new Map());
+
   const queue = useMemo(() => {
     let queue: Audio[] = [];
     songs.forEach((id) => {
@@ -200,11 +203,11 @@ function Queue({ songs, itemClass }: { songs: string[]; itemClass?: string }) {
   }, [songs]);
 
   const playButtonOnClick = (index: number) => {
-    const song = queue[index];
-    setPlayingSongIndex!(index);
-    if (playingSong) {
-      setPaused!(song.id === playingSong.id ? !paused : false);
-    } else setPaused!(false);
+    if (index === state.playingSong.index) {
+      dispatch({ type: state.paused ? "resume" : "pause" });
+    } else {
+      dispatch({ type: "play", song: { source: "queue", index: index } });
+    }
   };
 
   return (
@@ -218,7 +221,7 @@ function Queue({ songs, itemClass }: { songs: string[]; itemClass?: string }) {
                 playButtonOnClick(i);
               }}
               className={
-                i === playingSongIndex && !paused
+                i === state.playingSong.index && !state.paused
                   ? "playing"
                   : "" + ` ${itemClass ? itemClass : ""}`
               }

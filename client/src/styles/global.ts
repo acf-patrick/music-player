@@ -1,10 +1,9 @@
 import { createGlobalStyle } from "styled-components";
-import poppins from "../assets/fonts/Poppins-Regular.ttf";
 
 const GlobalStyles = createGlobalStyle`
   @font-face {
     font-family: poppins;
-    src: url(${poppins});
+    src: url("/fonts/Poppins-Regular.ttf");
   } 
 
   body {

@@ -121,7 +121,6 @@ export default function Album() {
             createColorPalette(data)
               .then((palette) => {
                 const len = palette.length;
-                console.log(palette);
                 const colors = [
                   { r: 0, g: 0, b: 0 },
                   { r: 0, g: 0, b: 0 },

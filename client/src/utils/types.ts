@@ -57,10 +57,12 @@ export type SongDto =
 
 export type Action =
   | {
+      // play a new song
       type: "play";
       song: SongDto;
     }
   | {
+      // resume currently playing song
       type: "resume";
     }
   | {
@@ -68,5 +70,6 @@ export type Action =
       payload: Song;
     }
   | { type: "pause" }
-  | { type: "fetch queue success"; payload: string[] }
-  | { type: "set playing song index"; index: number };
+  | { type: "next song" }
+  | { type: "prev song" }
+  | { type: "fetch queue success"; payload: string[] };

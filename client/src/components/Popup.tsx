@@ -1,5 +1,5 @@
 import { RxMagnifyingGlass } from "react-icons/rx";
-import { IPopupProps } from "../utils/models";
+import { IPopupProps } from "../utils/types";
 import { StyledPopup, StyledPopupOption } from "../styles";
 import { useRef, useMemo, useEffect, useState } from "react";
 import { IoIosArrowForward } from "react-icons/io";

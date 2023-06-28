@@ -1,6 +1,7 @@
 import { useMemo, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { AlbumAppearance, Album as IAlbum } from "../utils/models";
+import { Album as IAlbum } from "../utils/models";
+import { AlbumAppearance } from "../utils/types";
 import { IoAlbums } from "react-icons/io5";
 import styled from "styled-components";
 import { durationToString, createDataUri } from "../utils";

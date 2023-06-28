@@ -3,7 +3,8 @@ import styled, { keyframes } from "styled-components";
 import { AiOutlineLoading } from "react-icons/ai";
 import { useSong } from "../../../utils/hook";
 import { StyledOverview as StyledContainer } from "../../../styles";
-import { SongSortOptions, Song } from "../../../utils/models";
+import { Song } from "../../../utils/models";
+import { SongSortOptions } from "../../../utils/types";
 import { Song as SongComponent, NoResult } from "../../../components";
 import Header from "./Header";
 
@@ -21,7 +22,7 @@ const Loader = styled.div`
   left: 50%;
   transform: translateX(-50%);
   font-size: 1.5rem;
-  
+
   svg {
     animation: ${spin} 750ms ease-in-out infinite;
   }
@@ -110,9 +111,11 @@ export default function Songs() {
       ) : (
         <NoResult />
       )}
-      {pending && <Loader>
-        <AiOutlineLoading />
-      </Loader>}
+      {pending && (
+        <Loader>
+          <AiOutlineLoading />
+        </Loader>
+      )}
     </StyledContainer>
   );
 }

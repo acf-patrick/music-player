@@ -4,11 +4,8 @@ import { BsFillGearFill } from "react-icons/bs";
 import { GrClose } from "react-icons/gr";
 import Header from "./Header";
 import { Album, NoResult } from "../../../components";
-import {
-  Album as TAlbum,
-  AlbumAppearance,
-  AlbumSortOptions,
-} from "../../../utils/models";
+import { Album as TAlbum } from "../../../utils/models";
+import { AlbumAppearance, AlbumSortOptions } from "../../../utils/types";
 import { useAlbums } from "../../../utils/hook";
 import { StyledOverview as StyledContainer } from "../../../styles";
 

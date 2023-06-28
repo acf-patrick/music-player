@@ -1,25 +1,23 @@
 import { useContext } from "react";
-import { DataMutatorsContext, DatasContext } from "../../utils";
 import { CiSearch } from "react-icons/ci";
 import { StyledHomeContent } from "../../styles";
 import { Queue, Player, PlayButton } from "../../components";
-import { useImage, useQueue } from "../../utils/hook";
+import { useImage } from "../../utils/hook";
+import { AppContext } from "../../context";
 
 function Content() {
-  const { queue, playingSong, paused } = useContext(DatasContext);
-  const { setPlayingSongIndex, setPaused } = useContext(DataMutatorsContext);
+  const { state, dispatch } = useContext(AppContext);
+
+  // state.playingSong.metadatas
+  const playingSong = state.playingSong.metadatas;
 
   const coverId = playingSong?.cover ? playingSong?.cover : "";
   const cover = useImage(coverId);
 
   const playButtonOnClick = () => {
-    if (playingSong) setPaused!(!paused);
-    else if (queue) {
-      if (queue.length) {
-        setPlayingSongIndex!(0);
-        setPaused!(false);
-      }
-    }
+    if (state.paused)
+      dispatch({ type: "play", song: { source: "queue", index: 0 } });
+    else dispatch({ type: "pause" });
   };
 
   return (
@@ -28,12 +26,12 @@ function Content() {
         <div className="texts">
           <h1>Library</h1>
           <p>
-            {queue.length} song{queue.length > 1 ? "s" : ""}
+            {state.queue.length} song{state.queue.length > 1 ? "s" : ""}
           </p>
         </div>
         <div className="play-button">
           <PlayButton
-            paused={paused ? true : false}
+            paused={state.paused}
             onClick={playButtonOnClick}
           />
         </div>
@@ -50,7 +48,7 @@ function Content() {
             By <span>Title</span>
           </div>
         </div>
-        <Queue songs={queue} />
+        <Queue songs={state.queue} />
         {playingSong ? <Player /> : <></>}
       </div>
     </StyledHomeContent>

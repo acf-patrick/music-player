@@ -78,8 +78,9 @@ export function useGenres() {
   const [genres, setGenres] = useState<string[]>([]);
 
   useEffect(() => {
-    fetch("${API}/genres")
-      .then((res) => res.json())
+    api
+      .get("/genres")
+      .then((res) => res.data)
       .then((data) => setGenres(data))
       .catch((error) => console.error(error));
   }, []);
