@@ -15,9 +15,9 @@ use controllers::{
     genre::get_genres,
     image::get_image,
     lyrics::get_lyrics,
-    playback::{get_playback, pause, play, play_song, set_to_next_song, set_to_previous_song},
+    playback::{get_playback, pause, play, set_to_next_song, set_to_previous_song},
     queue::{add_to_queue, get_queue, remove_from_queue},
-    song::{get_one_song, get_song},
+    song::{get_one_song, get_song, get_song_count},
     status::get_app_status,
     ws::start_ws_connection,
 };
@@ -42,6 +42,7 @@ pub async fn start_server() -> std::io::Result<()> {
             .wrap(cors)
             .app_data(app_state.clone())
             .service(index)
+            .service(get_song_count)
             .service(web::scope("/genres").service(get_genres))
             .service(web::scope("/artists").service(get_artists))
             .service(
@@ -66,7 +67,6 @@ pub async fn start_server() -> std::io::Result<()> {
                     .service(set_to_previous_song)
                     .service(pause)
                     .service(play)
-                    .service(play_song),
             )
             .service(web::scope("/status").service(get_app_status))
             .service(web::scope("/audio").service(get_audio))

@@ -2,6 +2,8 @@ use actix::{Message, Recipient};
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
+use crate::types::PlayingSong;
+
 /// WebSocketConn responds to this to pipe it through to the actual client
 #[derive(Message)]
 #[rtype(result = "()")]
@@ -41,3 +43,7 @@ pub struct EventMessage<T> {
     #[serde(default)]
     pub broadcast: bool, // true : omit self from targets
 }
+
+#[derive(Message)]
+#[rtype(result = "()")]
+pub struct PlaybackAction(pub PlayingSong);

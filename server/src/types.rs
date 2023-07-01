@@ -60,6 +60,7 @@ impl AppState {
             playing_song: PlayingSong {
                 index: -1,
                 paused: true,
+                progress: 0.0
             },
             repeat_mode: RepeatMode::NoRepeat,
             image_cache: cache::Image {
@@ -111,6 +112,7 @@ impl AppState {
 pub struct PlayingSong {
     pub index: i16,
     pub paused: bool,
+    pub progress: f32,
 }
 
 #[derive(Deserialize, Serialize, Debug, Clone, PartialEq)]

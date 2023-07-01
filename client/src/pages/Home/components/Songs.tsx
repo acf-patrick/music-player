@@ -33,10 +33,6 @@ export default function Songs() {
   const [currentPage, setCurrentPage] = useState(0);
   const { pending, totalItems, totalPages, songs } = useSong(currentPage);
 
-  // useEffect(() => {
-  //   setResults(songs);
-  // }, [songs]);
-
   useEffect(() => {
     setResults((results) =>
       (currentPage === 0 && results.length === 0) || currentPage > 0

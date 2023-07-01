@@ -3,7 +3,9 @@ use std::{
     str::FromStr,
 };
 
-use super::messages::{ClientActorMessage, Connect, Disconnect, EventMessage, WebSocketMessage};
+use super::messages::{
+    ClientActorMessage, Connect, Disconnect, EventMessage, PlaybackAction, WebSocketMessage,
+};
 use actix::{Actor, Context, Handler, Recipient};
 use serde::{Deserialize, Serialize};
 use serde_json::json;
@@ -55,6 +57,12 @@ impl Lobby {
             socket_recipient.do_send(WebSocketMessage(message.to_owned()));
         } else {
             eprintln!("Attempting to send message but couldn't find user id.");
+        }
+    }
+
+    fn spread_event<T: Serialize + Clone>(&self, event: &str, data: T) {
+        for (id, _) in self.sessions.iter() {
+            self.send_event(event, data.clone(), id);
         }
     }
 
@@ -134,6 +142,14 @@ impl Handler<Connect> for Lobby {
             datas::UserId { id: msg.self_id },
             &msg.self_id,
         );
+    }
+}
+
+impl Handler<PlaybackAction> for Lobby {
+    type Result = ();
+
+    fn handle(&mut self, action: PlaybackAction, _: &mut Self::Context) -> Self::Result {
+        self.spread_event("playback event", action.0)
     }
 }
 

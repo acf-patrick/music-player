@@ -1,7 +1,6 @@
 import styled from "styled-components";
 import Content from "./Content";
 import { Outlet } from "react-router-dom";
-import { useQueue } from "../../utils/hook";
 
 const StyledContainer = styled.div`
   width: 100%;

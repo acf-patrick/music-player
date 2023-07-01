@@ -1,5 +1,6 @@
 use crate::{
     get_app_state,
+    server::web_socket::messages::PlaybackAction,
     types::{AppState, PlayingSong, SongSource},
 };
 
@@ -23,7 +24,7 @@ struct QueueRow {
     song: String,
 }
 
-#[get("/next")]
+#[post("/next")]
 pub async fn set_to_next_song(data: web::Data<Arc<Mutex<AppState>>>) -> impl Responder {
     let mut data = get_app_state!(data);
     let playing_song = data.get_playing_song();
@@ -38,7 +39,7 @@ pub async fn set_to_next_song(data: web::Data<Arc<Mutex<AppState>>>) -> impl Res
     }
 }
 
-#[get("/prev")]
+#[post("/prev")]
 pub async fn set_to_previous_song(data: web::Data<Arc<Mutex<AppState>>>) -> impl Responder {
     let mut data = get_app_state!(data);
     let playing_song = data.get_playing_song();
@@ -53,7 +54,7 @@ pub async fn set_to_previous_song(data: web::Data<Arc<Mutex<AppState>>>) -> impl
     }
 }
 
-#[get("/pause")]
+#[post("/pause")]
 pub async fn pause(data: web::Data<Arc<Mutex<AppState>>>) -> impl Responder {
     let mut state = get_app_state!(data);
     let playing_song = state.get_playing_song();
@@ -62,7 +63,7 @@ pub async fn pause(data: web::Data<Arc<Mutex<AppState>>>) -> impl Responder {
     HttpResponse::Ok().finish()
 }
 
-#[get("/play")]
+/* #[get("/play")]
 pub async fn play(data: web::Data<Arc<Mutex<AppState>>>) -> impl Responder {
     let mut state = get_app_state!(data);
     let playing_song = state.get_playing_song();
@@ -77,7 +78,7 @@ pub async fn play(data: web::Data<Arc<Mutex<AppState>>>) -> impl Responder {
     state.set_playing_song(index, false);
 
     HttpResponse::Ok().finish()
-}
+} */
 
 #[derive(Deserialize, Debug)]
 #[serde(tag = "source")]
@@ -93,12 +94,16 @@ pub enum SongDto {
 }
 
 #[post("/play")]
-pub async fn play_song(
+pub async fn play(
     req_body: web::Json<SongDto>,
     data: web::Data<Arc<Mutex<AppState>>>,
     req: HttpRequest,
 ) -> impl Responder {
-    // let mut state = get_app_state!(data);
+    let state = get_app_state!(data);
+    if let Some(ws) = &state.ws_server {
+        let playing_song = state.get_playing_song();
+        ws.do_send(PlaybackAction(playing_song.clone()));
+    }
 
     // match req_body.0 {
     //     SongDto::FromNewSource { index, provider } => match provider {

@@ -1,12 +1,22 @@
-import { useContext } from "react";
+import { useContext, useEffect, useState } from "react";
 import { CiSearch } from "react-icons/ci";
 import { StyledHomeContent } from "../../styles";
 import { Queue, Player, PlayButton } from "../../components";
 import { useImage } from "../../utils/hook";
 import { AppContext } from "../../context";
+import { getAudioCount } from "../../utils/providers";
 
 function Content() {
   const { state, dispatch } = useContext(AppContext);
+  const [totalSongs, setTotalSongs] = useState(0);
+
+  useEffect(() => {
+    getAudioCount()
+      .then((count) => setTotalSongs(count))
+      .catch((err) => {
+        console.error(err);
+      });
+  }, []);
 
   // state.playingSong.metadatas
   const playingSong = state.playingSong.metadatas;
@@ -26,14 +36,11 @@ function Content() {
         <div className="texts">
           <h1>Library</h1>
           <p>
-            {state.queue.length} song{state.queue.length > 1 ? "s" : ""}
+            {totalSongs} song{totalSongs > 1 ? "s" : ""}
           </p>
         </div>
         <div className="play-button">
-          <PlayButton
-            paused={state.paused}
-            onClick={playButtonOnClick}
-          />
+          <PlayButton paused={state.paused} onClick={playButtonOnClick} />
         </div>
       </div>
       <div className="inner">

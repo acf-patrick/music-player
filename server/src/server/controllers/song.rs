@@ -5,7 +5,7 @@ use serde_rusqlite::{from_row, from_rows};
 use std::sync::{Arc, Mutex};
 
 #[derive(Deserialize)]
-struct SongQuery {
+pub struct SongQuery {
     title: Option<String>,
     artist: Option<String>,
     page: Option<usize>,
@@ -42,6 +42,21 @@ fn send_page(songs: &Vec<Song>, page_index: usize) -> HttpResponse {
     } else {
         HttpResponse::BadRequest().body("Page index out of range")
     }
+}
+
+/// Get total number of registered song
+#[get("/song_count")]
+pub async fn get_song_count(data: web::Data<Arc<Mutex<AppState>>>) -> impl Responder {
+    let state = get_app_state!(data);
+    let count = state
+        .db
+        .query_row("SELECT COUNT(id) FROM song", [], |row| {
+            let count: usize = row.get(0)?;
+            Ok(count)
+        })
+        .unwrap();
+
+    HttpResponse::Ok().json(count)
 }
 
 /// Get song list

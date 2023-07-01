@@ -14,6 +14,13 @@ export async function getSongMetadatas(songId: string): Promise<Song> {
   return res.data;
 }
 
+// Get audio count
+export async function getAudioCount() {
+  const res = await api.get("/song_count");
+  const count: number = res.data;
+  return count;
+}
+
 // Get audio file
 export async function getAudio(songId: string) {
   const res = await api.get(`/audio/${songId}`, { responseType: "blob" });

@@ -30,6 +30,7 @@ export default function Header({
 
   const [sortPopupShown, setSortPopupShown] = useState(false);
   const [sortBy, setSortBy] = useState<string | null>(null);
+  const [query, setQuery] = useState("");
   const [sortDirection, setSortDirection] = useState<
     "ascending" | "descending"
   >("ascending");
@@ -46,7 +47,9 @@ export default function Header({
         fields={fields.map((field) => field.name)}
         inputOnEdit={(e) => {
           e.preventDefault();
-          searchInputOnEdit(e.target.value);
+          const query = e.target.value;
+          setQuery(query);
+          searchInputOnEdit(query);
         }}
         optionOnClick={(i) => {
           if (field !== fields[i].name) {
@@ -107,8 +110,14 @@ export default function Header({
               )}
             </div>
             <div className="count">
-              <span>{count}</span>
-              {`result${count > 1 ? "s" : ""}`}
+              {query.length ? (
+                <>
+                  <span>{count}</span>
+                  {`result${count > 1 ? "s" : ""}`}
+                </>
+              ) : (
+                <></>
+              )}
             </div>
           </div>
         </>
