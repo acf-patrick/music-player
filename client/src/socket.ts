@@ -22,7 +22,7 @@ class WebSocketConnection {
     this.callbacks = new Map();
     this.oneTimeCallbacks = new Map();
 
-    this.on("connection", (data: { id: string }) => {
+    this.once("connection", (data: { id: string }) => {
       this.id = data.id;
     });
 

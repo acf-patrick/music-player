@@ -4,7 +4,7 @@ import { AppState, Action } from "./utils/types";
 export default function reducer(state: AppState, action: Action): AppState {
   switch (action.type) {
     case "pause":
-      if (!state.paused) api.get("/playback/pause");
+      if (!state.paused) api.post("/playback/pause");
       break;
 
     case "play":
@@ -12,7 +12,14 @@ export default function reducer(state: AppState, action: Action): AppState {
       break;
 
     case "resume":
-      if (state.paused) api.get("/playback/resume");
+      if (state.paused)
+        return reducer(state, {
+          type: "play",
+          song: {
+            source: "queue",
+            index: state.playingSong.index,
+          },
+        });
       break;
 
     case "next song":
@@ -20,7 +27,7 @@ export default function reducer(state: AppState, action: Action): AppState {
         type: "play",
         song: {
           source: "queue",
-          index: state.playingSong.index - 1,
+          index: state.playingSong.index + 1,
         },
       });
 
@@ -46,6 +53,10 @@ export default function reducer(state: AppState, action: Action): AppState {
       return action.payload !== state.queue
         ? { ...state, queue: action.payload }
         : state;
+
+    case "seek":
+      
+      break;
 
     default:
   }

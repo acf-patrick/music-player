@@ -1,7 +1,6 @@
 use crate::{
     get_app_state,
-    server::web_socket::messages::PlaybackAction,
-    types::{AppState, PlayingSong, SongSource},
+    types::{AppState, PlaybackData, SongSource},
 };
 
 use actix_web::{get, post, web, HttpRequest, HttpResponse, Responder};
@@ -13,8 +12,7 @@ use uuid::Uuid;
 #[get("")]
 pub async fn get_playback(data: web::Data<Arc<Mutex<AppState>>>) -> impl Responder {
     let state = get_app_state!(data);
-    let playing_song = state.get_playing_song();
-    HttpResponse::Ok().json(playing_song)
+    HttpResponse::Ok().json(PlaybackData::from(&state))
 }
 
 #[derive(Deserialize)]
@@ -31,7 +29,7 @@ pub async fn set_to_next_song(data: web::Data<Arc<Mutex<AppState>>>) -> impl Res
     let index = playing_song.index;
 
     match set_playing_song(&mut data, index + 1, false) {
-        Ok(playing_song) => HttpResponse::Ok().json(playing_song),
+        Ok(_) => HttpResponse::Ok().finish(),
         Err(error) => {
             eprintln!("{error}");
             HttpResponse::BadRequest().json(error)
@@ -46,7 +44,7 @@ pub async fn set_to_previous_song(data: web::Data<Arc<Mutex<AppState>>>) -> impl
     let index = playing_song.index;
 
     match set_playing_song(&mut data, index - 1, false) {
-        Ok(playing_song) => HttpResponse::Ok().json(playing_song),
+        Ok(_) => HttpResponse::Ok().finish(),
         Err(error) => {
             eprintln!("{error}");
             HttpResponse::BadRequest().json(error)
@@ -101,8 +99,7 @@ pub async fn play(
 ) -> impl Responder {
     let state = get_app_state!(data);
     if let Some(ws) = &state.ws_server {
-        let playing_song = state.get_playing_song();
-        ws.do_send(PlaybackAction(playing_song.clone()));
+        // let playing_song = state.get_playing_song();
     }
 
     // match req_body.0 {
@@ -181,7 +178,9 @@ pub async fn play(
 //     HttpResponse::Ok().finish()
 // }
 
-fn set_playing_song(data: &mut AppState, index: i16, paused: bool) -> Result<PlayingSong, String> {
+/// Play song at the given index from current queue.
+/// Returns Err if queue is empty
+fn set_playing_song(data: &mut AppState, index: i16, paused: bool) -> Result<(), String> {
     let db = &data.db;
 
     // Ordered list of song ids in the queue
@@ -204,8 +203,7 @@ fn set_playing_song(data: &mut AppState, index: i16, paused: bool) -> Result<Pla
             Err(String::from("Song index out of range."))
         } else {
             data.set_playing_song(index, paused);
-            let playing_song = data.get_playing_song();
-            Ok(playing_song)
+            Ok(())
         }
     } else {
         Err(String::from("Queue is empty"))

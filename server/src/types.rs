@@ -1,4 +1,4 @@
-use actix::{Actor, Addr};
+use actix::Addr;
 use rusqlite::Connection;
 use serde::{Deserialize, Serialize};
 
@@ -54,13 +54,32 @@ pub struct AppState {
     pub db: Connection,
 }
 
+#[derive(Serialize, Clone)]
+pub struct PlaybackData {
+    playing_song: PlayingSong,
+    repeat_mode: RepeatMode,
+    source: Option<SongSource>,
+}
+
+impl PlaybackData {
+    pub fn from(app_state: &AppState) -> PlaybackData {
+        PlaybackData {
+            playing_song: app_state.get_playing_song(),
+            repeat_mode: app_state.get_repeat_mode(),
+            source: app_state.get_song_source(),
+        }
+    }
+}
+
+// TODO : notify via socket on playback updates
+
 impl AppState {
     pub fn new() -> AppState {
         AppState {
             playing_song: PlayingSong {
                 index: -1,
                 paused: true,
-                progress: 0.0
+                progress: 0.0,
             },
             repeat_mode: RepeatMode::NoRepeat,
             image_cache: cache::Image {
@@ -99,6 +118,10 @@ impl AppState {
     }
 
     pub fn set_playing_song(&mut self, index: i16, paused: bool) {
+        if self.playing_song.index != index {
+            self.playing_song.progress = 0.0;
+        }
+
         self.playing_song.index = index;
         self.playing_song.paused = paused;
     }
@@ -112,7 +135,7 @@ impl AppState {
 pub struct PlayingSong {
     pub index: i16,
     pub paused: bool,
-    pub progress: f32,
+    pub progress: f32, // 0.0 -> 1.0
 }
 
 #[derive(Deserialize, Serialize, Debug, Clone, PartialEq)]

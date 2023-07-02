@@ -2,7 +2,7 @@ use actix::{Message, Recipient};
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
-use crate::types::PlayingSong;
+use crate::types::PlaybackData;
 
 /// WebSocketConn responds to this to pipe it through to the actual client
 #[derive(Message)]
@@ -46,4 +46,4 @@ pub struct EventMessage<T> {
 
 #[derive(Message)]
 #[rtype(result = "()")]
-pub struct PlaybackAction(pub PlayingSong);
+pub struct PlaybackAction(pub PlaybackData);

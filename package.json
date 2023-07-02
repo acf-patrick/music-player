@@ -1,0 +1,10 @@
+{
+	"scripts": {
+		"client": "cd client && yarn dev",
+		"server": "cd server && cargo watch -x run",
+		"dev": "concurrently \"yarn client\" \"yarn server\""
+	},
+	"devDependencies": {
+		"concurrently": "^8.2.0"
+	}
+}

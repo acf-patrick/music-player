@@ -72,4 +72,10 @@ export type Action =
   | { type: "pause" }
   | { type: "next song" }
   | { type: "prev song" }
+  | {
+      // Seek to a certain position
+      type: "seek";
+      // number between 0 - 1
+      progression: number;
+    }
   | { type: "fetch queue success"; payload: string[] };

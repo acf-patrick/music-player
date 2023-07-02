@@ -17,7 +17,7 @@ type Socket = Recipient<WebSocketMessage>;
 mod datas {
     use super::*;
 
-    #[derive(Serialize)]
+    #[derive(Serialize, Clone)]
     pub struct UserId {
         pub id: Uuid,
     }
@@ -136,12 +136,8 @@ impl Handler<Connect> for Lobby {
         // Store the address
         self.sessions.insert(msg.self_id, msg.addr);
 
-        // Send to connection response to client
-        self.send_event(
-            "connection",
-            datas::UserId { id: msg.self_id },
-            &msg.self_id,
-        );
+        // Notify clients for newcomer
+        self.spread_event("connection", datas::UserId { id: msg.self_id });
     }
 }
 
