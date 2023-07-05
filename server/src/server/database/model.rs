@@ -37,6 +37,6 @@ pub struct Song {
 pub struct PlaylistRecord {
     pub id: u8,
     pub name: String,
-    pub song: String, // ID to one of song table record
+    pub song: String,   // ID to one of song table record
     pub song_index: u8, // Index of song in a row
 }

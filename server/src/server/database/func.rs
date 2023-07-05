@@ -16,9 +16,14 @@ fn manage_db_error(result: Result<usize, Error>) {
     }
 }
 
-/// Create database tables
-pub fn create_database(db_name: &str) -> Result<Connection, Error> {
-    let conn = Connection::open(db_name)?;
+/// Open database connection
+/// If None, use a "in memory" connection
+pub fn open_db_connection(db_name: Option<&str>) -> Result<Connection, Error> {
+    let conn = if db_name.is_none() {
+        Connection::open_in_memory()?
+    } else {
+        Connection::open(db_name.unwrap())?
+    };
 
     // Tables created according to type definition in "types"
 
@@ -27,26 +32,26 @@ pub fn create_database(db_name: &str) -> Result<Connection, Error> {
 
     manage_db_error(conn.execute(
         r#"CREATE TABLE "image"(
-			"id" TEXT NOT NULL PRIMARY KEY,
-			"mime_type" TEXT,
-			"data" BLOB);"#,
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "mime_type" TEXT,
+    "data" BLOB);"#,
         (),
     ));
 
     manage_db_error(conn.execute(
         r#"CREATE TABLE "song"(
-        "id" TEXT NOT NULL PRIMARY KEY,
-        "path" TEXT,
-        "liked" INTEGER,
-        "year" INTEGER,
-        "title" TEXT,
-        "artist" TEXT,
-		"genre" TEXT,
-        "track_number" INTEGER,
-        "cover" TEXT,
-        "album" TEXT,
-        "duration" INTEGER,
-        FOREIGN KEY("cover") REFERENCES image("id"));"#,
+      "id" TEXT NOT NULL PRIMARY KEY,
+      "path" TEXT,
+      "liked" INTEGER,
+      "year" INTEGER,
+      "title" TEXT,
+      "artist" TEXT,
+  "genre" TEXT,
+      "track_number" INTEGER,
+      "cover" TEXT,
+      "album" TEXT,
+      "duration" INTEGER,
+      FOREIGN KEY("cover") REFERENCES image("id"));"#,
         (),
     ));
 
@@ -62,15 +67,20 @@ pub fn create_database(db_name: &str) -> Result<Connection, Error> {
 
     manage_db_error(conn.execute(
         r#"CREATE TABLE "queue"(
-        "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-        "song" TEXT,
-        FOREIGN KEY ("song") REFERENCES song("id"));"#,
+      "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+      "song" TEXT,
+      FOREIGN KEY ("song") REFERENCES song("id"));"#,
         (),
     ));
 
     println!("{} Database created", '\u{1F680}');
 
     Ok(conn)
+}
+
+/// Create database tables
+pub fn create_database(db_name: &str) -> Result<Connection, Error> {
+    open_db_connection(Some(db_name))
 }
 
 /// Scan audio files inside given directory
@@ -136,15 +146,7 @@ fn save_song(song: &Song, conn: &Connection) {
 pub fn store_audio_metadatas(audio_path: &str, conn: &Connection) -> bool {
     let audio_id = Uuid::new_v4().to_string();
 
-    let mut path = String::new();
-    // if let Some(back_slash) = audio_path.find("public") {
-    //     for i in (back_slash + 6)..audio_path.len() {
-    //         path.push(char::from(audio_path.as_bytes()[i]));
-    //     }
-    // } else {
-    //     path = audio_path.to_owned();
-    // }
-    path = String::from(audio_path);
+    let mut path = String::from(audio_path);
 
     let mut song = Song {
         id: audio_id.clone(),

@@ -44,6 +44,14 @@ pub struct EventMessage<T> {
     pub broadcast: bool, // true : omit self from targets
 }
 
-#[derive(Message)]
+#[derive(Serialize, Clone)]
+pub enum Action {
+  
+}
+
+#[derive(Message, Serialize, Clone)]
 #[rtype(result = "()")]
-pub struct PlaybackAction(pub PlaybackData);
+pub struct PlaybackAction {
+  pub action: Action,
+  pub data: PlaybackData
+}

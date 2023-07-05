@@ -145,7 +145,7 @@ impl Handler<PlaybackAction> for Lobby {
     type Result = ();
 
     fn handle(&mut self, action: PlaybackAction, _: &mut Self::Context) -> Self::Result {
-        self.spread_event("playback event", action.0)
+        self.spread_event("playback event", action)
     }
 }
 

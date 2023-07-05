@@ -34,7 +34,7 @@ pub async fn get_queue(data: web::Data<Arc<Mutex<AppState>>>) -> impl Responder 
 }
 
 #[derive(Deserialize)]
-struct QueueQuery {
+pub struct QueueQuery {
     id: String,
 }
 
